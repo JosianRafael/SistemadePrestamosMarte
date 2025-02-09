@@ -889,51 +889,88 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
             })
             .catch(error => console.error('Error al enviar la solicitud:', error));
         }
-        
-        
-        function printRoutes(rutas) {
-            const rutasList = document.getElementById('rutasList');
-            rutasList.innerHTML = ''; // Limpiar la lista existente
-        
-            rutas.forEach(ruta => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `Nombre: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`;
-                rutasList.appendChild(listItem);
-            });
-        }
-        
 
-        function loadRoutes() {
-            fetch('controllers/rutasControlador.php')
-                .then(response => response.json())
-                .then(rutas => {
-                    const rutasSelect = document.getElementById('ruta');
-                    rutasSelect.innerHTML = ''; // Limpiar las opciones existentes
-        
-                    // Agregar la opción predeterminada
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = '';
-                    defaultOption.disabled = true;
-                    defaultOption.selected = true;
-                    defaultOption.textContent = 'Selecciona una ruta';
-                    rutasSelect.appendChild(defaultOption);
-        
-                    // Agregar la opción duplicada
-                    const duplicateOption = document.createElement('option');
-                    duplicateOption.value = '';
-                    duplicateOption.textContent = 'Selecciona una ruta';
-                    rutasSelect.appendChild(duplicateOption);
-        
-                    // Agregar opciones para cada ruta
-                    rutas.forEach(ruta => {
-                        const option = document.createElement('option');
-                        option.value = ruta.IDRuta; // Usar IDRuta como valor de la opción
-                        option.textContent = `Nombre: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`;
-                        rutasSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error al cargar las rutas:', error));
+        fetch("controllers/rutasControlador.php")
+    .then(response => {
+        console.log("Estado de la respuesta:", response.status);
+        return response.json(); // Aquí podría estar el problema
+    })
+    .then(data => {
+        console.log("Datos recibidos:", data);
+        if (!Array.isArray(data)) {
+            throw new Error("La respuesta no es un array");
         }
+        printRoutes(data);
+    })
+    .catch(error => console.error("Error al cargar las rutas:", error));
+
+    fetch("controllers/rutasControlador.php")
+    .then(response => response.text())  // Obtén la respuesta como texto
+    .then(data => {
+        console.log("Respuesta del servidor:", data);
+        return JSON.parse(data); // Intenta convertir a JSON
+    })
+    .then(json => {
+        console.log("JSON parseado correctamente:", json);
+    })
+    .catch(error => {
+        console.error("Error al cargar las rutas:", error);
+    });
+
+
+
+    function loadRoutes() {
+        fetch('controllers/rutasControlador.php')
+            .then(response => response.json())
+            .then(rutas => {
+                const rutasSelect = document.getElementById('ruta');
+                rutasSelect.innerHTML = ''; // Limpiar las opciones existentes
+    
+                // Agregar la opción predeterminada
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Selecciona una ruta';
+                rutasSelect.appendChild(defaultOption);
+    
+                // Agregar la opción duplicada
+                const duplicateOption = document.createElement('option');
+                duplicateOption.value = '';
+                duplicateOption.textContent = 'Selecciona una ruta';
+                rutasSelect.appendChild(duplicateOption);
+    
+                // Agregar opciones para cada ruta
+                rutas.forEach(ruta => {
+                    const option = document.createElement('option');
+                    option.value = ruta.IDRuta; // Usar IDRuta como valor de la opción
+                    option.textContent = `Nombre: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`;
+                    rutasSelect.appendChild(option);
+                });
+    
+                // Llamar a printRoutes para mostrar las rutas
+                printRoutes(rutas);
+            })
+            .catch(error => console.error('Error al cargar las rutas:', error));
+    }
+    
+    function printRoutes(rutas) {
+        if (!Array.isArray(rutas)) {
+            console.error("Error: 'rutas' no es un array", rutas);
+            return;
+        }
+    
+        const rutasList = document.getElementById("rutasList");
+        rutasList.innerHTML = ""; // Limpiar antes de agregar nuevas rutas
+    
+        rutas.forEach(ruta => {
+            const li = document.createElement("li");
+            li.className = "bg-gray-800 p-2 rounded mt-2";
+            li.textContent = `Ruta: ${ruta.NombreRuta || "Sin nombre"} - Fondos: ${ruta.Monto || "0"}`;
+            rutasList.appendChild(li);
+        });
+    }
+    
         
         
         // Llama a CallRoutes para probar la funcionalidad
