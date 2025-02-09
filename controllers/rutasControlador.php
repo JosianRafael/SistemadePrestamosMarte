@@ -15,7 +15,7 @@ file_put_contents("debug_log.txt", "Datos recibidos: " . print_r($datos, true) .
 // Función para procesar los datos del cliente
 function ControladorGuardarRutas($datos, $link)
 {
-    if (!$datos || !isset($datos["nombreRuta"], $datos["fondos"])) {
+    if (!$datos || !isset($datos["nombreRuta"], $datos["fondosRuta"])) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
@@ -37,11 +37,11 @@ function ControladorGuardarRutas($datos, $link)
         GuardarRutasModulo($link,$nombre,$montoruta);
         // Confirmar la transacción si todo va bien
         mysqli_commit($link);
-        echo json_encode(['status' => 'success', 'message' => 'Cliente guardado correctamente']);
+        echo json_encode(['status' => 'success', 'message' => 'Ruta guardada correctamente']);
     } catch (Exception $e) {
         // Revertir cambios en caso de error
         mysqli_rollback($link);
-        echo json_encode(['status' => 'error', 'message' => 'Error al guardar cliente: ' . $e->getMessage()]);
+        echo json_encode(['status' => 'error', 'message' => 'Error al guardar Ruta: ' . $e->getMessage()]);
     }
 }
 
@@ -49,6 +49,7 @@ function ControladorConsultarRutas($link)
 {
     $resultado = ConsultarRutasModulo($link);
     $resultado = mysqli_fetch_array($resultado);
+    //NombreRuta Monto
     echo json_encode($resultado);
 }
 
@@ -92,13 +93,13 @@ if (!$link) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
-    if ($datos["accion"] = "lectura")
+    if ($datos["accion"] == "obtenerRutas")
     {
         ControladorConsultarRutas($link);
-    }elseif($datos["accion"] = "consultarRuta")
+    }elseif($datos["accion"] == "")
     {
         ControladorModificarRutasMonto($link,$datos);
-    }elseif($datos["accion"] = "")
+    }elseif($datos["accion"] == "lectura")
     {
         ControladorGuardarRutas($datos, $link);
     }

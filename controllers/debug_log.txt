@@ -1,0 +1,77 @@
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Ruta 1
+    [fondosRuta] => 20000
+    [accion] => lectura
+)
+
+Datos recibidos: Array
+(
+    [nombreRuta] => Ruta 1
+    [fondosRuta] => 20000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Ruta 1
+    [fondosRuta] => 20000
+    [accion] => lectura
+)
+
+Datos recibidos: Array
+(
+    [nombreRuta] => Ruta 1
+    [fondosRuta] => 20000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Ruta 1
+    [fondosRuta] => 20000
+    [accion] => lectura
+)
+
+Datos recibidos: Array
+(
+    [nombreRuta] => Ruta 1
+    [fondosRuta] => 20000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 

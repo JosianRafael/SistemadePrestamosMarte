@@ -852,7 +852,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                 };
         
                 // Enviar datos a PHP usando fetch
-                fetch("rutasControlador.php", {
+                fetch("controllers/rutasControlador.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -870,28 +870,81 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
             });
         }
         
-        function loadRoutes() {
-            fetch("rutasControlador.php")
-                .then(response => response.json())
-                .then(rutas => {
-                    const rutasList = document.getElementById("rutasList");
-                    rutasList.innerHTML = ""; // Limpiar la lista existente
+        function CallRoutes() {
+            const rutaData = {
+                accion: 'obtenerRutas' // Clave de acción
+            };
         
-                    rutas.forEach(ruta => {
-                        const listItem = document.createElement("li");
-                        listItem.textContent = `Nombre: ${ruta.nombreRuta}, Fondos: ${ruta.fondosRuta}, accion: "consultarRuta" `;
-                        rutasList.appendChild(listItem);
-                    });
-                })
-                .catch(error => console.error("Error al cargar las rutas:", error));
+            fetch('controllers/rutasControlador.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(rutaData)
+            })
+            .then(response => response.json())
+            .then(rutas => {
+                console.log(rutas); // Depuración: imprime los datos recibidos
+                printRoutes(rutas); // Llama a la función para imprimir las rutas
+            })
+            .catch(error => console.error('Error al enviar la solicitud:', error));
         }
         
         
+        function printRoutes(rutas) {
+            const rutasList = document.getElementById('rutasList');
+            rutasList.innerHTML = ''; // Limpiar la lista existente
         
-            
-        
+            rutas.forEach(ruta => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Nombre: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`;
+                rutasList.appendChild(listItem);
+            });
+        }
         
 
+        function loadRoutes() {
+            fetch('controllers/rutasControlador.php')
+                .then(response => response.json())
+                .then(rutas => {
+                    const rutasSelect = document.getElementById('ruta');
+                    rutasSelect.innerHTML = ''; // Limpiar las opciones existentes
+        
+                    // Agregar la opción predeterminada
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    defaultOption.textContent = 'Selecciona una ruta';
+                    rutasSelect.appendChild(defaultOption);
+        
+                    // Agregar la opción duplicada
+                    const duplicateOption = document.createElement('option');
+                    duplicateOption.value = '';
+                    duplicateOption.textContent = 'Selecciona una ruta';
+                    rutasSelect.appendChild(duplicateOption);
+        
+                    // Agregar opciones para cada ruta
+                    rutas.forEach(ruta => {
+                        const option = document.createElement('option');
+                        option.value = ruta.IDRuta; // Usar IDRuta como valor de la opción
+                        option.textContent = `Nombre: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`;
+                        rutasSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error al cargar las rutas:', error));
+        }
+        
+        
+        // Llama a CallRoutes para probar la funcionalidad
+        CallRoutes();
+        
+        // Llama a loadRoutes cuando la página se cargue
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loadRoutes();
+        });
+        
+        
         function renderClients() {
     const clients = getClients();
     $('clientTable').innerHTML = clients.map(client => {
