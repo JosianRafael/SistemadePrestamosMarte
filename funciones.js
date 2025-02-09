@@ -719,6 +719,7 @@ console.error("Mora button not found");
 
         function addClient(e) {
             e.preventDefault();
+            
             const cuotas = parseInt($('cuotas').value);
             if (cuotas > 12) {
                 Swal.fire('Error', 'El número máximo de cuotas es 12', 'error');
@@ -759,17 +760,10 @@ console.error("Mora button not found");
             $('clientForm').reset();
             renderClients();
             updateDashboard();
-            Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
             showSection('prestamos');
         
             // Enviar datos a PHP usando JSON
-<<<<<<< HEAD
             fetch('controllers/clientesControlador.php', {
-=======
-
-            fetch('controllers/clientesControlador.php', {
-
->>>>>>> 621ba3562241d10682f182f70cb847464b31074c
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -778,10 +772,23 @@ console.error("Mora button not found");
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Respuesta del servidor:', data);
+                if (data.success) {
+                    Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
+                } else {
+                    Swal.fire('Error', 'Hubo un problema con la conexión al servidor. Inténtalo mas tarde.'  || 'Ocurrió un problema al registrar el cliente', 'error');
+                }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema con la conexión al servidor. Inténtalo de nuevo.',
+                    icon: 'error'
+                });
+                console.error('Error:', error);
+            });
         }
+        
+            
         
         
 
