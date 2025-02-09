@@ -16,7 +16,7 @@ file_put_contents("debug_log.txt", "Datos recibidos: " . print_r($datos, true) .
 function ControladorGuardarClientes($datos, $link)
 {
     if (!$datos || !isset($datos["nombre"], $datos["apellido"], $datos["numero"], $datos["correo"], 
-                          $datos["direccion"], $datos["fechaprestamo"], $datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"],$datos["ruta"])) {
+                          $datos["direccion"], $datos["fechaPrestamo"], $datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"])) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
@@ -27,15 +27,15 @@ function ControladorGuardarClientes($datos, $link)
     $numero = htmlspecialchars($datos["numero"]);
     $email = htmlspecialchars($datos["correo"]);
     $direccion = htmlspecialchars($datos["direccion"]);
-    $fechaprestamo = htmlspecialchars($datos["fechaprestamo"]);
+    $fechaprestamo = htmlspecialchars($datos["fechaPrestamo"]);
     $montoPorCuota = htmlspecialchars($datos["montoPorCuota"]);
-    $fechasPago = htmlspecialchars($datos["fechasPago"]);
+    $fechasPago = $datos["fechasPago"];
     $mensaje = htmlspecialchars($datos["mensaje"]);
     $ruta = htmlspecialchars($datos["ruta"]);
     // Verificar que los datos no estén vacíos
     if (empty($nombre) || empty($apellido) || empty($numero) || empty($direccion) ||
         empty($fechaprestamo) || empty($montoPorCuota) || empty($fechasPago) || empty($mensaje)) {
-        echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
+        echo json_encode(['status' => 'error', 'message' => 'Favor complete todos los campos']);
         exit;
     }
 
