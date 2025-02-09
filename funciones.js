@@ -787,6 +787,69 @@ console.error("Mora button not found");
                 console.error('Error:', error);
             });
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initRouteForm();
+        });
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            initRouteForm();
+            loadRoutes(); // Cargar rutas al inicio
+        });
+        
+        function initRouteForm() {
+            const routeForm = document.getElementById("routeForm");
+        
+            routeForm.addEventListener("submit", (event) => {
+                event.preventDefault(); // Prevenir el envío del formulario por defecto
+        
+                // Obtener los valores del formulario
+                const nombreRuta = document.getElementById("nombreRuta").value;
+                const fondosRuta = document.getElementById("fondosRuta").value;
+        
+                // Crear un objeto JSON
+                const rutaData = {
+                    nombreRuta: nombreRuta,
+                    fondosRuta: parseFloat(fondosRuta),
+                    tipo: "lectura" // Cambiar a "escritura" o "lectura" según sea necesario 
+                };
+        
+                // Enviar datos a PHP usando fetch
+                fetch("ruta.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(rutaData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Manejar la respuesta de PHP aquí
+                    alert("Ruta creada exitosamente.");
+                    routeForm.reset(); // Limpiar el formulario después de enviar
+                    loadRoutes(); // Recargar las rutas después de agregar una nueva
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        }
+        
+        function loadRoutes() {
+            fetch("ruta.php")
+                .then(response => response.json())
+                .then(rutas => {
+                    const rutasList = document.getElementById("rutasList");
+                    rutasList.innerHTML = ""; // Limpiar la lista existente
+        
+                    rutas.forEach(ruta => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `Nombre: ${ruta.nombreRuta}, Fondos: ${ruta.fondosRuta}, Tipo: ${ruta.tipo}`;
+                        rutasList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error("Error al cargar las rutas:", error));
+        }
+        
+        
         
             
         
