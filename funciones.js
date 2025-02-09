@@ -787,6 +787,47 @@ console.error("Mora button not found");
                 console.error('Error:', error);
             });
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initRouteForm();
+        });
+        
+        function initRouteForm() {
+            const routeForm = document.getElementById("routeForm");
+        
+            routeForm.addEventListener("submit", (event) => {
+                event.preventDefault(); // Prevenir el envío del formulario por defecto
+        
+                // Obtener los valores del formulario
+                const nombreRuta = document.getElementById("nombreRuta").value;
+                const fondosRuta = document.getElementById("fondosRuta").value;
+        
+                // Crear un objeto JSON
+                const rutaData = {
+                    nombreRuta: nombreRuta,
+                    fondosRuta: parseFloat(fondosRuta),
+                    tipo: "lectura" // Cambiar a "escritura" o "lectura" según sea necesario 
+                    // Mendoza me debes una pizza. 
+                };
+        
+                // Enviar datos a PHP usando fetch
+                fetch("ruta.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(rutaData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Manejar la respuesta de PHP aca
+                    alert("Ruta creada exitosamente.");
+                    routeForm.reset(); // Limpiar el formulario después de enviar
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        }
+        
         
             
         
