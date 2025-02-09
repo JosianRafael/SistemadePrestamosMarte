@@ -92,10 +92,10 @@ if (!$link) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
-    if ($datos["accion"] = "consultarRuta")
+    if ($datos["accion"] = "lectura")
     {
         ControladorConsultarRutas($link);
-    }elseif($datos["accion"] = "")
+    }elseif($datos["accion"] = "consultarRuta")
     {
         ControladorModificarRutasMonto($link,$datos);
     }elseif($datos["accion"] = "")

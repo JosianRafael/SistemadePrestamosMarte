@@ -843,16 +843,16 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                 // Obtener los valores del formulario
                 const nombreRuta = document.getElementById("nombreRuta").value;
                 const fondosRuta = document.getElementById("fondosRuta").value;
-        
+                
                 // Crear un objeto JSON
                 const rutaData = {
                     nombreRuta: nombreRuta,
                     fondosRuta: parseFloat(fondosRuta),
-                    tipo: "lectura" // Cambiar a "escritura" o "lectura" según sea necesario 
+                    accion: "lectura" // Cambiar a "escritura" o "lectura" según sea necesario 
                 };
         
                 // Enviar datos a PHP usando fetch
-                fetch("ruta.php", {
+                fetch("rutasControlador.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
