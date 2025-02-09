@@ -1,6 +1,4 @@
 <?php
-require_once("../Config/config.php");
-
 
 function GuardarClientesModulo($link,$nombre,$apellido,$telefono,$correo,$direccion,$rutaID)
 {
@@ -10,7 +8,7 @@ function GuardarClientesModulo($link,$nombre,$apellido,$telefono,$correo,$direcc
 
 function CrearPrestamoModulo($link,$idCliente,$monto,$cuotas,$mensaje,$fechaconcesion)
 {
-    
+
 }
 
 ?>
