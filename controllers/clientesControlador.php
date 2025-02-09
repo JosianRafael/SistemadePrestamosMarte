@@ -45,12 +45,13 @@ function ControladorGuardarClientes($datos, $link)
     mysqli_begin_transaction($link);
     try {
         // Llamar a la función para guardar el cliente
-        GuardarClientesModulo($link, $nombre, $apellido, $numero, $email, $direccion, $ruta);
+        GuardarClientesModulo($link, $nombre, $apellido, $numero, $email, $direccion);
 
         $cliente_id = mysqli_insert_id($link);
 
         $resultado = ConsultarRutasModulo($link,true,$ruta);
         $datos_ruta = mysqli_fetch_array($resultado);
+        $ID_de_la_ruta = $datos_ruta["IDRuta"];
         $fondos_disponibles = $datos_ruta["Monto"];
 
         if ($fondos_disponibles < $monto)
@@ -61,7 +62,7 @@ function ControladorGuardarClientes($datos, $link)
         }else
         {
             //Crear el prestamo
-            CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo);
+            CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo,$ID_de_la_ruta);
     
             $prestamo_id = mysqli_insert_id($link);
             $monto_negativo = -1 * $monto;

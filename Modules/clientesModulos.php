@@ -1,14 +1,14 @@
 <?php
 
-function GuardarClientesModulo($link,$nombre,$apellido,$telefono,$correo,$direccion,$rutaID)
+function GuardarClientesModulo($link,$nombre,$apellido,$telefono,$correo,$direccion)
 {
-    $query = "INSERT INTO clientes (nombre, apellido,telefono,correo,direccion,ruta_ID) VALUES ('$nombre', '$apellido','$telefono','$correo','$direccion','$rutaID')";
+    $query = "INSERT INTO clientes (nombre, apellido,telefono,correo,direccion) VALUES ('$nombre', '$apellido','$telefono','$correo','$direccion')";
     mysqli_query($link,$query);
 }
 
-function CrearPrestamoModulo ($link,$cliente_id,$monto,$cuotas,$mensaje,$fecha_concesion)
+function CrearPrestamoModulo ($link,$cliente_id,$monto,$cuotas,$mensaje,$fecha_concesion,$ruta_id)
 {
-    $query = "INSERT INTO prestamos (id_cliente, monto,cuotas,mensaje,fecha_concesion) VALUES ('$cliente_id', '$monto','$cuotas','$mensaje','$fecha_concesion')";
+    $query = "INSERT INTO prestamos (id_cliente, monto,cuotas,mensaje,fecha_concesion,IDRuta) VALUES ('$cliente_id', '$monto','$cuotas','$mensaje','$fecha_concesion','$ruta_id')";
     mysqli_query($link,$query);
 }
 
