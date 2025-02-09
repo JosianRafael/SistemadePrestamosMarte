@@ -1,1 +1,23 @@
 Datos recibidos: 
+Datos recibidos: Array
+(
+    [id] => 1739107643791
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => Holaaaaa
+)
+
