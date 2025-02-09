@@ -724,16 +724,19 @@ console.error("Mora button not found");
                 Swal.fire('Error', 'El número máximo de cuotas es 12', 'error');
                 return;
             }
+        
             const clients = getClients();
             const monto = parseFloat($('monto').value);
             const montoPorCuota = monto / cuotas;
             const fechasPago = [];
             const fechaActual = new Date();
+        
             for (let i = 1; i <= cuotas; i++) {
                 const fechaPago = new Date(fechaActual);
                 fechaPago.setMonth(fechaActual.getMonth() + i);
                 fechasPago.push(fechaPago.toISOString().split('T')[0]);
             }
+        
             const newClient = {
                 id: Date.now(),
                 nombre: $('nombre').value,
@@ -746,8 +749,11 @@ console.error("Mora button not found");
                 cuotas: cuotas,
                 montoPorCuota: montoPorCuota,
                 fechasPago: fechasPago,
+                ruta: $('ruta').value,  // Nuevo campo de selección
                 mensaje: $('mensaje').value
             };
+        
+            // Guardar en local y actualizar UI
             clients.push(newClient);
             saveClients(clients);
             $('clientForm').reset();
@@ -755,7 +761,23 @@ console.error("Mora button not found");
             updateDashboard();
             Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
             showSection('prestamos');
+        
+            // Enviar datos a PHP usando JSON
+            fetch('guardar_cliente.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newClient)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Respuesta del servidor:', data);
+            })
+            .catch(error => console.error('Error:', error));
         }
+        
+        
 
         function renderClients() {
     const clients = getClients();
@@ -1540,5 +1562,7 @@ setInterval(() => {
     renderMultasRecargos();
     renderAnalisisRiesgo();
 }, 60000); // Cada minuto
+
+
 
 
