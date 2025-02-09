@@ -763,13 +763,9 @@ console.error("Mora button not found");
             showSection('prestamos');
         
             // Enviar datos a PHP usando JSON
-<<<<<<< HEAD
-            fetch('controllers/clientesControlador.php', {
-=======
 
             fetch('controllers/clientesControlador.php', {
 
->>>>>>> 621ba3562241d10682f182f70cb847464b31074c
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
