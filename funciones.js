@@ -834,7 +834,7 @@ console.error("Mora button not found");
         }
         
         function loadRoutes() {
-            fetch("ruta.php")
+            fetch("rutasControlador.php")
                 .then(response => response.json())
                 .then(rutas => {
                     const rutasList = document.getElementById("rutasList");
@@ -842,7 +842,7 @@ console.error("Mora button not found");
         
                     rutas.forEach(ruta => {
                         const listItem = document.createElement("li");
-                        listItem.textContent = `Nombre: ${ruta.nombreRuta}, Fondos: ${ruta.fondosRuta}, Tipo: ${ruta.tipo}`;
+                        listItem.textContent = `Nombre: ${ruta.nombreRuta}, Fondos: ${ruta.fondosRuta}, accion: "consultarRuta" `;
                         rutasList.appendChild(listItem);
                     });
                 })
