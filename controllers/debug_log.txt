@@ -24,3 +24,179 @@ Datos recibidos: Array
 )
 
 >>>>>>> 621ba3562241d10682f182f70cb847464b31074c
+Datos recibidos: Array
+(
+    [id] => 1739108512474
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => Jaudwqfqw
+)
+
+Datos recibidos: Array
+(
+    [id] => 1739108900622
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => holaaa
+)
+
+Datos recibidos: Array
+(
+    [id] => 1739108962312
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => pedro
+)
+
+Datos recibidos: Array
+(
+    [id] => 1739109031379
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => pedroski
+)
+
+Datos recibidos: Array
+(
+    [id] => 1739109088380
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => adios y hola
+)
+
+Datos recibidos: Array
+(
+    [id] => 1739109183124
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => Hola
+)
+
+Datos recibidos: Array
+(
+    [id] => 1739109281413
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => hihioh
+)
+
+Datos recibidos: Array
+(
+    [id] => 1739109942052
+    [nombre] => Cliente Nombre 3
+    [apellido] => Cliente Apellido 2
+    [numero] => 8293943239
+    [correo] => Josianrafael855@gmail.com
+    [direccion] => jojoo
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 10000
+    [cuotas] => 2
+    [montoPorCuota] => 5000
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+        )
+
+    [ruta] => 
+    [mensaje] => 
+)
+
