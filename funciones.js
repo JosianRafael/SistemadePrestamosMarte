@@ -717,76 +717,113 @@ console.error("Mora button not found");
             }
         }
 
-        function addClient(e) {
-            e.preventDefault();
-            
-            const cuotas = parseInt($('cuotas').value);
-            if (cuotas > 12) {
-                Swal.fire('Error', 'El número máximo de cuotas es 12', 'error');
-                return;
-            }
-        
-            const clients = getClients();
-            const monto = parseFloat($('monto').value);
-            const montoPorCuota = monto / cuotas;
-            const fechasPago = [];
-            const fechaActual = new Date();
-        
-            for (let i = 1; i <= cuotas; i++) {
-                const fechaPago = new Date(fechaActual);
-                fechaPago.setMonth(fechaActual.getMonth() + i);
-                fechasPago.push(fechaPago.toISOString().split('T')[0]);
-            }
-        
-            const newClient = {
-                id: Date.now(),
-                nombre: $('nombre').value,
-                apellido: $('apellido').value,
-                numero: $('numero').value,
-                correo: $('correo').value || 'No proporcionado',
-                direccion: $('direccion').value,
-                fechaPrestamo: new Date().toISOString().split('T')[0],
-                monto: monto,
-                cuotas: cuotas,
-                montoPorCuota: montoPorCuota,
-                fechasPago: fechasPago,
-                ruta: $('ruta').value,  // Nuevo campo de selección
-                mensaje: $('mensaje').value
-            };
-        
-            // Guardar en local y actualizar UI
-            clients.push(newClient);
-            saveClients(clients);
-            $('clientForm').reset();
-            renderClients();
-            updateDashboard();
-            showSection('prestamos');
-        
-            // Enviar datos a PHP usando JSON
-            fetch('controllers/clientesControlador.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newClient)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
-                } else {
-                    Swal.fire('Error', 'Hubo un problema con la conexión al servidor. Inténtalo mas tarde.'  || 'Ocurrió un problema al registrar el cliente', 'error');
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Hubo un problema con la conexión al servidor. Inténtalo de nuevo.',
-                    icon: 'error'
-                });
-                console.error('Error:', error);
-            });
+        // Función para agregar un nuevo cliente
+function addClient(e) {
+    e.preventDefault();
+    const cuotas = parseInt($('cuotas').value);
+    if (cuotas > 12) {
+        Swal.fire('Error', 'El número máximo de cuotas es 12', 'error');
+        return;
+    }
+
+    const clients = getClients();
+    const monto = parseFloat($('monto').value);
+    const montoPorCuota = monto / cuotas;
+    const fechasPago = [];
+    const fechaActual = new Date();
+
+    for (let i = 1; i <= cuotas; i++) {
+        const fechaPago = new Date(fechaActual);
+        fechaPago.setMonth(fechaActual.getMonth() + i);
+        fechasPago.push(fechaPago.toISOString().split('T')[0]);
+    }
+
+    const newClient = {
+        id: Date.now(),
+        nombre: $('nombre').value,
+        apellido: $('apellido').value,
+        numero: $('numero').value,
+        correo: $('correo').value || 'No proporcionado',
+        direccion: $('direccion').value,
+        fechaPrestamo: new Date().toISOString().split('T')[0],
+        monto: monto,
+        cuotas: cuotas,
+        montoPorCuota: montoPorCuota,
+        fechasPago: fechasPago,
+        ruta: $('ruta').value,  // Nuevo campo de selección
+        mensaje: $('mensaje').value
+    };
+
+    // Guardar en local y actualizar UI
+    clients.push(newClient);
+    saveClients(clients);
+    $('clientForm').reset();
+    renderClients();
+    updateDashboard();
+    Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
+    showSection('prestamos');
+
+    // Enviar datos a PHP usando JSON
+    fetch('controllers/clientesControlador.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newClient)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
+        } else {
+            Swal.fire('Error', 'Hubo un problema con la conexión al servidor. Inténtalo de nuevo.'  || 'Ocurrió un problema al registrar el cliente', 'error');
         }
+    })
+    .catch(error => {
+        Swal.fire('Error', 'Hubo un problema con la conexión al servidor. Inténtalo de nuevo.', 'error');
+        console.error('Error:', error);
+    });
+}
+
+// Función para abrir el formulario de edición
+function openEditRouteModal(clientId) {
+    const clients = getClients();
+    const clientToEdit = clients.find(client => client.id === clientId);
+
+    if (clientToEdit) {
+        $('editClientId').value = clientToEdit.id;
+        $('editRuta').value = clientToEdit.ruta;
+
+        document.getElementById('editRouteModal').style.display = 'block';
+    }
+}
+
+// Función para cerrar el modal de edición
+function closeEditModal() {
+    document.getElementById('editRouteModal').style.display = 'none';
+}
+
+// Evento para manejar la edición y actualización de la ruta
+document.getElementById('editRouteForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const clientId = parseInt($('editClientId').value);
+    const updatedRuta = $('editRuta').value;
+
+    const clients = getClients();
+    const clientIndex = clients.findIndex(client => client.id === clientId);
+
+    if (clientIndex !== -1) {
+        clients[clientIndex].ruta = updatedRuta;
+        saveClients(clients);
+        Swal.fire('Éxito', 'Ruta actualizada correctamente', 'success');
+        renderClients(); // Actualiza la lista de clientes
+        closeEditModal(); // Cierra el modal
+    } else {
+        Swal.fire('Error', 'No se encontró el cliente', 'error');
+    }
+});
+
 
         document.addEventListener("DOMContentLoaded", () => {
             initRouteForm();
