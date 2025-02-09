@@ -792,6 +792,11 @@ console.error("Mora button not found");
             initRouteForm();
         });
         
+        document.addEventListener("DOMContentLoaded", () => {
+            initRouteForm();
+            loadRoutes(); // Cargar rutas al inicio
+        });
+        
         function initRouteForm() {
             const routeForm = document.getElementById("routeForm");
         
@@ -807,7 +812,6 @@ console.error("Mora button not found");
                     nombreRuta: nombreRuta,
                     fondosRuta: parseFloat(fondosRuta),
                     tipo: "lectura" // Cambiar a "escritura" o "lectura" según sea necesario 
-                    // Mendoza me debes una pizza. 
                 };
         
                 // Enviar datos a PHP usando fetch
@@ -820,13 +824,31 @@ console.error("Mora button not found");
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data); // Manejar la respuesta de PHP aca
+                    console.log(data); // Manejar la respuesta de PHP aquí
                     alert("Ruta creada exitosamente.");
                     routeForm.reset(); // Limpiar el formulario después de enviar
+                    loadRoutes(); // Recargar las rutas después de agregar una nueva
                 })
                 .catch(error => console.error("Error:", error));
             });
         }
+        
+        function loadRoutes() {
+            fetch("ruta.php")
+                .then(response => response.json())
+                .then(rutas => {
+                    const rutasList = document.getElementById("rutasList");
+                    rutasList.innerHTML = ""; // Limpiar la lista existente
+        
+                    rutas.forEach(ruta => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `Nombre: ${ruta.nombreRuta}, Fondos: ${ruta.fondosRuta}, Tipo: ${ruta.tipo}`;
+                        rutasList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error("Error al cargar las rutas:", error));
+        }
+        
         
         
             
