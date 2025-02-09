@@ -871,7 +871,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
         }
         
         function loadRoutes() {
-            fetch("ruta.php")
+            fetch("rutasControlador.php")
                 .then(response => response.json())
                 .then(rutas => {
                     const rutasList = document.getElementById("rutasList");
@@ -879,7 +879,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
         
                     rutas.forEach(ruta => {
                         const listItem = document.createElement("li");
-                        listItem.textContent = `Nombre: ${ruta.nombreRuta}, Fondos: ${ruta.fondosRuta}, Tipo: ${ruta.tipo}`;
+                        listItem.textContent = `Nombre: ${ruta.nombreRuta}, Fondos: ${ruta.fondosRuta}, accion: "consultarRuta" `;
                         rutasList.appendChild(listItem);
                     });
                 })
