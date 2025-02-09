@@ -1,300 +1,3 @@
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => Ruta 1
-    [fondosRuta] => 20000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => Ruta 1
-    [fondosRuta] => 20000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => Ruta 1
-    [fondosRuta] => 20000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => Ruta 1
-    [fondosRuta] => 20000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => Ruta 1
-    [fondosRuta] => 20000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => Ruta 1
-    [fondosRuta] => 20000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => Cartera 1
-    [fondosRuta] => 10000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-rray
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => cartera 5
-    [fondosRuta] => 30000
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => cartera 5
-    [fondosRuta] => 30000
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-rray
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => cartera 7
-    [fondosRuta] => 10
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-rray
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [nombreRuta] => cartera 9
-    [fondosRuta] => 104
-    [accion] => lectura
-)
-
-Datos recibidos: Array
-(
-    [nombreRuta] => cartera 9
-    [fondosRuta] => 104
-    [accion] => lectura
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
 Datos recibidos: Array
 (
     [accion] => obtenerRutas
@@ -306,59 +9,58 @@ Datos recibidos:
 Datos recibidos: 
 Datos recibidos: Array
 (
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [accion] => obtenerRutas
-)
-
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: 
-Datos recibidos: Array
-(
-    [id] => 1739124942916
-    [nombre] => Cliente Nombre 3
-    [apellido] => Cliente Apellido 2
-    [numero] => 8293943239
-    [correo] => Josianrafael855@gmail.com
-    [direccion] => jojoo
+    [id] => 1739126657031
+    [nombre] => pepe
+    [apellido] => mendez
+    [numero] => 809302131
+    [correo] => fesdasd@gmail.com
+    [direccion] => sadasd
     [fechaPrestamo] => 2025-02-09
-    [monto] => 10000
-    [cuotas] => 2
-    [montoPorCuota] => 5000
+    [monto] => 1000
+    [cuotas] => 4
+    [montoPorCuota] => 250
     [fechasPago] => Array
         (
             [0] => 2025-03-09
             [1] => 2025-04-09
+            [2] => 2025-05-09
+            [3] => 2025-06-09
         )
 
     [ruta] => 1
-    [mensaje] => Hola
+    [mensaje] => asdasdas
+)
+
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [id] => 1739126881905
+    [nombre] => peep
+    [apellido] => mendez
+    [numero] => 98321312
+    [correo] => fadaq@gmail.com
+    [direccion] => sadada
+    [fechaPrestamo] => 2025-02-09
+    [monto] => 1000
+    [cuotas] => 4
+    [montoPorCuota] => 250
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-09
+            [1] => 2025-04-09
+            [2] => 2025-05-09
+            [3] => 2025-06-09
+        )
+
+    [ruta] => 1
+    [mensaje] => sdasda
 )
 

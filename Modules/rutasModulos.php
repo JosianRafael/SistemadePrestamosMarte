@@ -14,7 +14,7 @@ function ConsultarRutasModulo($link,$varios = false, $nombreruta = "")
         return mysqli_query($link,$query);
     }else
     {
-        $query = "SELECT * FROM vista_rutas WHERE NombreRuta = '$nombreruta'";
+        $query = "SELECT * FROM vista_rutas WHERE IDRuta = '$nombreruta'";
         return mysqli_query($link,$query);
     }
    
