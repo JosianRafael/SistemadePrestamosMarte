@@ -1,4 +1,9 @@
 <?php
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
 header("Content-Type: application/json"); // Indica que la respuesta será JSON
 require_once("../Modules/rutasModulos.php");
 require_once("../Config/config.php"); // Asegúrate de incluir la conexión a la base de datos
@@ -45,12 +50,44 @@ function ControladorGuardarRutas($datos, $link)
     }
 }
 
+
+header('Content-Type: application/json');
+
+$resultado = ConsultarRutasModulo($link);
+
+if (!$resultado) {
+    echo json_encode(["error" => "Error en la consulta"]);
+    exit;
+}
+
+$rutas = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+
+// Verificar si hay datos
+if (empty($rutas)) {
+    echo json_encode([]); // Devolver un array vacío en lugar de una respuesta vacía
+    exit;
+}
+
+echo json_encode($rutas);
+
+
+
 function ControladorConsultarRutas($link)
 {
     $resultado = ConsultarRutasModulo($link);
-    $resultado = mysqli_fetch_array($resultado);
-    //NombreRuta Monto
-    echo json_encode($resultado);
+    
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron rutas']);
+        return;
+    }
+
+    $rutas = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $rutas[] = $fila;
+    }
+    file_put_contents("depuracionderutas.txt", "Datos recibidos: " . print_r($rutas, true) . "\n", FILE_APPEND);
+
+    echo json_encode($rutas);
 }
 
 function ControladorModificarRutasMonto($link,$datos)
@@ -104,6 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         ControladorGuardarRutas($datos, $link);
     }
 }
+
 
 
 ?>
