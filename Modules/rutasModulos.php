@@ -6,10 +6,18 @@ function GuardarRutasModulo($link,$nombreruta,$monto)
     mysqli_query($link,$query);
 }
 
-function ConsultarRutasModulo($link)
-{
-    $query = "SELECT * FROM vista_rutas";
-    return mysqli_query($link,$query);
+function ConsultarRutasModulo($link,$varios = false, $nombreruta = "")
+{   
+    if (!$varios)
+    {
+         $query = "SELECT * FROM vista_rutas";
+        return mysqli_query($link,$query);
+    }else
+    {
+        $query = "SELECT * FROM vista_rutas WHERE NombreRuta = '$nombreruta'";
+        return mysqli_query($link,$query);
+    }
+   
 }
 
 function ModificarRutasMontoModulo($link,$montocambiar,$nombreruta)

@@ -49,14 +49,33 @@ function ControladorGuardarClientes($datos, $link)
 
         $cliente_id = mysqli_insert_id($link);
 
-        CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo);
+        $resultado = ConsultarRutasModulo($link,true,$ruta);
+        $datos_ruta = mysqli_fetch_array($resultado);
+        $fondos_disponibles = $datos_ruta["Monto"];
 
-        $prestamo_id = mysqli_insert_id($link);
+        if ($fondos_disponibles < $monto)
+        {
+            // No hay fondos suficientes
+            echo json_encode(['status' => 'error', 'message' => 'No hay fondos suficientes para otorgar el préstamo']);
+            mysqli_rollback($link);
+        }else
+        {
+            //Crear el prestamo
+            CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo);
+    
+            $prestamo_id = mysqli_insert_id($link);
+            $monto_negativo = -1 * $monto;
+            
+            //Modificar el monto de la ruta
+            ModificarRutasMontoModulo($link,$monto_negativo,$ruta);
 
-        CrearCalendarioDePagos($link,$prestamo_id,$montoPorCuota,$fechasPago,$cuotas);
-        // Confirmar la transacción si todo va bien
-        mysqli_commit($link);
-        echo json_encode(['status' => 'success', 'message' => 'Cliente guardado correctamente']);
+            //Crear el calendario de pagos
+            CrearCalendarioDePagos($link,$prestamo_id,$montoPorCuota,$fechasPago,$cuotas);
+            
+            // Confirmar la transacción si todo va bien
+            mysqli_commit($link);
+            echo json_encode(['status' => 'success', 'message' => 'Cliente guardado correctamente']);
+        }
     } catch (Exception $e) {
         // Revertir cambios en caso de error
         mysqli_rollback($link);
