@@ -75,3 +75,16 @@ Datos recibidos: Array
 
 Datos recibidos: 
 Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
