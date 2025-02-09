@@ -16,7 +16,7 @@ file_put_contents("debug_log.txt", "Datos recibidos: " . print_r($datos, true) .
 function ControladorGuardarClientes($datos, $link)
 {
     if (!$datos || !isset($datos["nombre"], $datos["apellido"], $datos["numero"], $datos["correo"], 
-                          $datos["direccion"], $datos["fechaPrestamo"], $datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"])) {
+                          $datos["direccion"], $datos["fechaPrestamo"], $datos["monto"],$datos["cuotas"],$datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"])) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
@@ -28,13 +28,15 @@ function ControladorGuardarClientes($datos, $link)
     $email = htmlspecialchars($datos["correo"]);
     $direccion = htmlspecialchars($datos["direccion"]);
     $fechaprestamo = htmlspecialchars($datos["fechaPrestamo"]);
+    $monto = htmlspecialchars($datos["monto"]);
+    $cuotas = htmlspecialchars($datos["monto"]);
     $montoPorCuota = htmlspecialchars($datos["montoPorCuota"]);
     $fechasPago = $datos["fechasPago"];
     $mensaje = htmlspecialchars($datos["mensaje"]);
     $ruta = htmlspecialchars($datos["ruta"]);
     // Verificar que los datos no estén vacíos
     if (empty($nombre) || empty($apellido) || empty($numero) || empty($direccion) ||
-        empty($fechaprestamo) || empty($montoPorCuota) || empty($fechasPago) || empty($mensaje)) {
+        empty($fechaprestamo) || empty($montoPorCuota) || empty($fechasPago) || empty($mensaje) || empty($datos["monto"])) {
         echo json_encode(['status' => 'error', 'message' => 'Favor complete todos los campos']);
         exit;
     }
@@ -44,6 +46,14 @@ function ControladorGuardarClientes($datos, $link)
     try {
         // Llamar a la función para guardar el cliente
         GuardarClientesModulo($link, $nombre, $apellido, $numero, $email, $direccion, $ruta);
+
+        $cliente_id = mysqli_insert_id($link);
+
+        CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo);
+
+        $prestamo_id = mysqli_insert_id($link);
+
+        CrearCalendarioDePagos($link,$prestamo_id,$montoPorCuota,$fechasPago,$cuotas);
         // Confirmar la transacción si todo va bien
         mysqli_commit($link);
         echo json_encode(['status' => 'success', 'message' => 'Cliente guardado correctamente']);
