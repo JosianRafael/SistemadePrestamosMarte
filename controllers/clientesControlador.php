@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json"); // Indica que la respuesta será JSON
 require_once("../Modules/clientesModulos.php");
-require_once("../config/database.php"); // Asegúrate de incluir la conexión a la base de datos
+require_once("../Config/config.php"); // Asegúrate de incluir la conexión a la base de datos
 
 date_default_timezone_set("America/Santo_Domingo"); // Zona horaria
 
@@ -52,6 +52,11 @@ function ControladorGuardarClientes($datos, $link)
         mysqli_rollback($link);
         echo json_encode(['status' => 'error', 'message' => 'Error al guardar cliente: ' . $e->getMessage()]);
     }
+}
+
+if (!$link) {
+    echo json_encode(['status' => 'error', 'message' => 'Error en la conexión a la base de datos']);
+    exit;
 }
 
 ControladorGuardarClientes($datos, $link);
