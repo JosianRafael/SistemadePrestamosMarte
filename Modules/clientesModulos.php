@@ -13,7 +13,7 @@ function CrearPrestamoModulo ($link,$cliente_id,$monto,$cuotas,$mensaje,$fecha_c
 }
 
 function CrearCalendarioDePagos ($link,$id_prestamo,$montocuotas,$fechas_pago,$cuotas)
-{ 
+{
     for ($i=1; $i < $cuotas; $i++) { 
         $fecha = $fechas_pago[$i-1];
         $query = "INSERT INTO calendario_pagos (id_prestamo, numero_cuota, fecha_vencimiento, monto) VALUES ('$id_prestamo','$montocuotas','$fecha','$montocuotas')";
