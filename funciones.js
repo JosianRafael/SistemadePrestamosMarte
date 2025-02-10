@@ -751,44 +751,52 @@ console.error("Mora button not found");
 
 
         // Función para agregar un nuevo cliente
-// Función para agregar un nuevo cliente
+/// Función para agregar un nuevo cliente
 function addClient(e) {
     e.preventDefault();
-    const cuotas = parseInt($('cuotas').value);
+    
+    const cuotas = parseInt(document.getElementById('cuotas').value);
     if (cuotas > 12) {
         Swal.fire('Error', 'El número máximo de cuotas es 12', 'error');
         return;
     }
 
     const clients = getClients();
-    const monto = parseFloat($('monto').value);
-    const montoPorCuota = monto / cuotas;
-    const frecuenciaCobro = $('frecuenciaCobro').value;  // Obtener frecuencia de cobro
-    const fechasPago = calcularFechasPago(new Date(), cuotas, frecuenciaCobro); // Generar fechas dinámicamente
+    const monto = parseFloat(document.getElementById('monto').value);
+    if (isNaN(monto) || monto <= 0) {
+        Swal.fire('Error', 'El monto debe ser un número positivo', 'error');
+        return;
+    }
 
+    const montoPorCuota = monto / cuotas;
+    const frecuenciaCobro = document.getElementById('frecuenciaCobro').value;  // Obtener frecuencia de cobro
+
+    // Generar fechas dinámicamente
+    const fechasPago = calcularFechasPago(new Date(), cuotas, frecuenciaCobro);
+    
     const newClient = {
         id: Date.now(),
-        nombre: $('nombre').value,
-        apellido: $('apellido').value,
-        numero: $('numero').value,
-        correo: $('correo').value || 'No proporcionado',
-        direccion: $('direccion').value,
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        numero: document.getElementById('numero').value,
+        correo: document.getElementById('correo').value || 'No proporcionado',
+        direccion: document.getElementById('direccion').value,
         fechaPrestamo: new Date().toISOString().split('T')[0],
         monto: monto,
         cuotas: cuotas,
         montoPorCuota: montoPorCuota,
         fechasPago: fechasPago,  // Fechas adaptadas a la frecuencia de cobro
-        ruta: $('ruta').value,
-        mensaje: $('mensaje').value,
-        interesMora: parseFloat($('interesMora').value),
+        ruta: document.getElementById('ruta').value,
+        mensaje: document.getElementById('mensaje').value,
+        interesMora: parseFloat(document.getElementById('interesMora').value) || 0,
         frecuenciaCobro: frecuenciaCobro
     };
 
     // Guardar en local y actualizar UI
     clients.push(newClient);
     saveClients(clients);
-    $('clientForm').reset();
-    renderClients();
+    document.getElementById('clientForm').reset();
+    renderClients(); // Asegúrate de que esto esté después de guardar el cliente
     updateDashboard();
     Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
     showSection('prestamos');
@@ -814,6 +822,7 @@ function addClient(e) {
         console.error('Error:', error);
     });
 }
+
 
 function calcularFechasPago(fechaInicio, cuotas, frecuencia) {
     let fechas = [];
@@ -1055,20 +1064,28 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
         
         function renderClients() {
             const clients = getClients();
+            console.log("Clientes obtenidos:", clients); // Verifica si hay clientes
         
             fetch('controllers/rutasControlador.php')
                 .then(response => response.json())
                 .then(rutas => {
-                    // **Actualizar el total de rutas**
-                    updateTotalRutas(rutas.length); // Actualiza el total de rutas
+                    console.log("Rutas obtenidas:", rutas); // Verifica si las rutas se obtienen correctamente
         
-                    // **TABLA COMPLETA (Préstamos Activos)**
-                    $('clientTable').innerHTML = `
+                    updateTotalRutas(rutas.length);
+        
+                    // Verifica que 'clientTable' existe antes de modificar el innerHTML
+                    const clientTable = document.getElementById('clientTable');
+                    if (!clientTable) {
+                        console.error("Elemento clientTable no encontrado");
+                        return;
+                    }
+        
+                    clientTable.innerHTML = `
                         <tbody>
                             ${clients.map(client => {
                                 const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]);
                                 const rutaNombre = getRouteNameById(client.ruta, rutas);
-        
+                                
                                 return `
                                     <tr class="text-xs">
                                         <td class="p-2">${client.nombre}</td>
@@ -1090,7 +1107,13 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                         </tbody>
                     `;
         
-                    // **TABLA REDUCIDA DIVIDIDA POR RUTAS**
+                    // Tabla reducida dividida por rutas
+                    const clientTableReducedContainer = document.getElementById('clientTableReducedContainer');
+                    if (!clientTableReducedContainer) {
+                        console.error("Elemento clientTableReducedContainer no encontrado");
+                        return;
+                    }
+        
                     const clientsByRoute = {};
                     clients.forEach(client => {
                         const rutaNombre = getRouteNameById(client.ruta, rutas);
@@ -1100,7 +1123,6 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                         clientsByRoute[rutaNombre].push(client);
                     });
         
-                    // Crear tablas por ruta
                     let reducedTablesHTML = '';
                     Object.keys(clientsByRoute).forEach(ruta => {
                         reducedTablesHTML += `
@@ -1112,40 +1134,48 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                                             <th class="p-2 border">Nombre</th>
                                             <th class="p-2 border">Apellido</th>
                                             <th class="p-2 border">Teléfono</th>
-                                            <th class="p-2 border">Monto</th>
+                                            <th class="p-2 border">Monto Final</th> <!-- Monto Final con Interés -->
                                             <th class="p-2 border">Ruta</th>
-                                            <th class="p-2 border">Direccion</th>
+                                            <th class="p-2 border">Dirección</th>
                                             <th class="p-2 border">WhatsApp Mensaje</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${clientsByRoute[ruta].map(client => {
-                                            return `
-                                                <tr class="text-sm">
-                                                    <td class="p-2 border">${client.nombre}</td>
-                                                    <td class="p-2 border">${client.apellido}</td>
-                                                    <td class="p-2 border">${client.numero}</td>
-                                                    <td class="p-2 border">$${client.monto.toFixed(2)}</td>
-                                                    <td class="p-2 border">${ruta}</td>
-                                                    <td class="p-2 border">${client.direccion}</td>
-                                                    <td class="p-2 border">
-                                                        <input type="text" id="mensaje-${client.numero}" class="p-1 w-28 text-xs bg-gray-700 rounded" placeholder="Mensaje">
-                                                        <button onclick="sendWhatsAppMessageReduced(${client.numero})" class="bg-green-600 text-white text-xs px-2 py-1 rounded">Enviar</button>
-                                                    </td>
-                                                </tr>
-                                            `;
-                                        }).join('')}
+                                    ${clientsByRoute[ruta].map(client => {
+                                        // Asegúrate de que el interés sea un número y maneja el caso donde no esté definido
+                                        const interes = parseFloat(client.interes) || 0; // Si no es un número, establece como 0
+                                        const monto = parseFloat(client.monto) || 0; // Asegúrate de que el monto también sea un número
+                                        const montoFinal = monto + (monto * (interes / 100)); // Calcula el monto final incluyendo el interés
+                                    
+                                        return `
+                                            <tr class="text-sm">
+                                                <td class="p-2 border">${client.nombre}</td>
+                                                <td class="p-2 border">${client.apellido}</td>
+                                                <td class="p-2 border">${client.numero}</td>
+                                                <td class="p-2 border">$${montoFinal.toFixed(2)}</td> <!-- Muestra el monto final -->
+                                                <td class="p-2 border">${ruta}</td>
+                                                <td class="p-2 border">${client.direccion}</td>
+                                                <td class="p-2 border">
+                                                    <input type="text" id="mensaje-${client.numero}" class="p-1 w-28 text-xs bg-gray-700 rounded" placeholder="Mensaje">
+                                                    <button onclick="sendWhatsAppMessageReduced(${client.numero})" class="bg-green-600 text-white text-xs px-2 py-1 rounded">Enviar</button>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                    
                                     </tbody>
                                 </table>
                             </div>
                         `;
                     });
         
-                    // Inserta las tablas reducidas
-                    $('clientTableReducedContainer').innerHTML = reducedTablesHTML;
+                    clientTableReducedContainer.innerHTML = reducedTablesHTML;
                 })
                 .catch(error => console.error('Error al obtener rutas:', error));
         }
+        
+        
+        
 
         function mostrarRutaMasPopular() {
             fetch('controllers/rutasControlador.php')
@@ -1395,6 +1425,20 @@ function sendWhatsAppMessage(clientId) {
                 }
             });
         }
+
+        function updateDashboard() {
+            const clients = getClients(); // Obtén la lista actual de clientes activos
+            const totalPrestamos = clients.reduce((sum, client) => sum + client.monto, 0);
+            
+            $('totalPrestamos').textContent = `$${totalPrestamos.toFixed(2)}`;
+            $('clientesActivos').textContent = clients.length;
+            $('prestamosPendientes').textContent = clients.length; // Este campo puede necesitar ajuste
+            $('currentDate').textContent = new Date().toLocaleDateString();
+        
+            updatePrestamosChart(); // Asegúrate de que estas funciones existan
+            updateClientesChart();
+        }
+        
         
 
         function finishLoan(id) {
@@ -1414,54 +1458,31 @@ function sendWhatsAppMessage(clientId) {
                     if (index !== -1) {
                         const finishedLoan = {
                             ...clients[index],
-                            fechaFinalizacion: new Date().toISOString().split('T')[0]
+                            fechaFinalizacion: new Date().toISOString().split('T')[0] // Fecha de finalización
                         };
         
-                        // Registrar el monto del préstamo pagado
-                        // const totalPagosElement = document.getElementById('totalPagosRealizados');
-                        const montoPagado = finishedLoan.monto; // Suponiendo que el monto se guarda en `monto`
-                        const currentTotal = parseFloat(totalPagosElement.textContent.replace('$', '')) || 0;
-                        const newTotal = currentTotal + montoPagado;
-                        totalPagosElement.textContent = `$${newTotal.toFixed(2)}`; // Actualizar el total
-        
-                        // Guardar el nuevo total en el localStorage
-                        // localStorage.setItem('totalPagosRealizados', newTotal.toFixed(2));
-        
+                        // Actualizar la lista de préstamos terminados
                         const finishedLoans = getFinishedLoans();
                         finishedLoans.push(finishedLoan);
                         saveFinishedLoans(finishedLoans);
+        
+                        // Eliminar el cliente de los activos
                         clients.splice(index, 1);
                         saveClients(clients);
-                        renderClients();
-                        renderFinishedLoans();
+        
+                        // Re-renderizar ambas tablas
+                        renderClients(); // Actualizar la tabla de clientes activos
+                        renderFinishedLoans(); // Actualizar la tabla de préstamos terminados
+        
+                        // Actualizar el dashboard
                         updateDashboard();
+        
                         Swal.fire('Éxito', 'Préstamo marcado como terminado', 'success');
                     }
                 }
             });
         }
         
-        // Al cargar la página, recuperar el total de pagos realizados del localStorage
-        window.onload = function() {
-            const totalPagos = localStorage.getItem('totalPagosRealizados');
-            const totalPagosElement = document.getElementById('totalPagosRealizados');
-            if (totalPagos) {
-                totalPagosElement.textContent = `$${parseFloat(totalPagos).toFixed(2)}`;
-            }
-        };
-        
-        
-        function updateDashboard() {
-            const clients = getClients();
-            const totalPrestamos = clients.reduce((sum, client) => sum + client.monto, 0);
-            $('totalPrestamos').textContent = `$${totalPrestamos.toFixed(2)}`;
-            $('clientesActivos').textContent = clients.length;
-            $('prestamosPendientes').textContent = clients.length;
-            $('currentDate').textContent = new Date().toLocaleDateString();
-
-            updatePrestamosChart();
-            updateClientesChart();
-        }
 
         function updatePrestamosChart() {
             const clients = getClients();
