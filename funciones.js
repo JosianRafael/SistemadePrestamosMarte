@@ -1073,7 +1073,6 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
         
                     updateTotalRutas(rutas.length);
         
-                    // Verifica que 'clientTable' existe antes de modificar el innerHTML
                     const clientTable = document.getElementById('clientTable');
                     if (!clientTable) {
                         console.error("Elemento clientTable no encontrado");
@@ -1085,7 +1084,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                             ${clients.map(client => {
                                 const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]);
                                 const rutaNombre = getRouteNameById(client.ruta, rutas);
-                                
+        
                                 return `
                                     <tr class="text-xs">
                                         <td class="p-2">${client.nombre}</td>
@@ -1134,7 +1133,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                                             <th class="p-2 border">Nombre</th>
                                             <th class="p-2 border">Apellido</th>
                                             <th class="p-2 border">Teléfono</th>
-                                            <th class="p-2 border">Monto Final</th> <!-- Monto Final con Interés -->
+                                            <th class="p-2 border">Monto Final</th>
                                             <th class="p-2 border">Ruta</th>
                                             <th class="p-2 border">Dirección</th>
                                             <th class="p-2 border">WhatsApp Mensaje</th>
@@ -1143,16 +1142,16 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                                     <tbody>
                                     ${clientsByRoute[ruta].map(client => {
                                         // Asegúrate de que el interés sea un número y maneja el caso donde no esté definido
-                                        const interes = parseFloat(client.interes) || 0; // Si no es un número, establece como 0
+                                        const interes = parseFloat(client.interesMora) || 0; // Usar interesMora en lugar de interes
                                         const monto = parseFloat(client.monto) || 0; // Asegúrate de que el monto también sea un número
                                         const montoFinal = monto + (monto * (interes / 100)); // Calcula el monto final incluyendo el interés
-                                    
+        
                                         return `
                                             <tr class="text-sm">
                                                 <td class="p-2 border">${client.nombre}</td>
                                                 <td class="p-2 border">${client.apellido}</td>
                                                 <td class="p-2 border">${client.numero}</td>
-                                                <td class="p-2 border">$${montoFinal.toFixed(2)}</td> <!-- Muestra el monto final -->
+                                                <td class="p-2 border">$${montoFinal.toFixed(2)}</td>
                                                 <td class="p-2 border">${ruta}</td>
                                                 <td class="p-2 border">${client.direccion}</td>
                                                 <td class="p-2 border">
@@ -1173,6 +1172,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                 })
                 .catch(error => console.error('Error al obtener rutas:', error));
         }
+        
         
         
         

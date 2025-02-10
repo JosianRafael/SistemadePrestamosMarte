@@ -3280,3 +3280,548 @@ Datos recibidos: Array
 
 Datos recibidos: 
 Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [id] => 1739214736913
+    [nombre] => Josian Rafael Vina
+    [apellido] => Rosa
+    [numero] => 8097
+    [correo] => Josianrafael@gmail.com
+    [direccion] => Calle 4, casa #14, en la loteria 
+    [fechaPrestamo] => 2025-02-10
+    [monto] => 10000
+    [cuotas] => 3
+    [montoPorCuota] => 3333.3333333333
+    [fechasPago] => Array
+        (
+            [0] => 2025-03-10
+            [1] => 2025-04-10
+            [2] => 2025-05-10
+        )
+
+    [ruta] => 9
+    [mensaje] => 
+    [interesMora] => 11
+    [frecuenciaCobro] => mensual
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [id] => 1739215546586
+    [nombre] => Josian Rafael Vina
+    [apellido] => Rosa
+    [numero] => 8097
+    [correo] => Josianrafael@gmail.com
+    [direccion] => Calle 4, casa #14, en la loteria 
+    [fechaPrestamo] => 2025-02-10
+    [monto] => 10000
+    [cuotas] => 4
+    [montoPorCuota] => 2500
+    [fechasPago] => Array
+        (
+            [0] => 2025-02-11
+            [1] => 2025-02-12
+            [2] => 2025-02-13
+            [3] => 2025-02-14
+        )
+
+    [ruta] => 3
+    [mensaje] => 
+    [interesMora] => 11
+    [frecuenciaCobro] => diario
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
