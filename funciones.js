@@ -1,4 +1,4 @@
-
+// Aqui estaran todas las funciones de Js que hacen que la pagina funcione. No borrar nada sin previo aviso.
 // Variables globales
 let prestamo = {};
 let tablaAmortizacion = [];
@@ -685,6 +685,37 @@ console.error("Mora button not found");
             metodos: ['email']
         };
 
+        function verificarPagosVencidos() {
+            const clients = getClients();
+            const hoy = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+        
+            clients.forEach(client => {
+                client.fechasPago.forEach((fecha, index) => {
+                    if (fecha < hoy) { // Si la fecha de pago ya pasó
+                        let montoVencido = client.montoPorCuota * (1 + INTERES_POR_MORA); // Aplica interés
+                        let pagoVencido = {
+                            id: client.id,
+                            nombre: client.nombre,
+                            apellido: client.apellido,
+                            montoOriginal: client.montoPorCuota,
+                            montoConMora: montoVencido.toFixed(2),
+                            fechaVencimiento: fecha,
+                            diasAtraso: Math.floor((new Date(hoy) - new Date(fecha)) / (1000 * 60 * 60 * 24)) // Días de atraso
+                        };
+        
+                        // Evita agregar duplicados en la lista de pagos vencidos
+                        if (!pagosVencidos.some(p => p.id === client.id && p.fechaVencimiento === fecha)) {
+                            pagosVencidos.push(pagoVencido);
+                        }
+                    }
+                });
+            });
+        
+            savePagosVencidos(); // Guarda la lista en localStorage
+            renderPagosVencidos(); // Actualiza la UI
+        }
+        
+
         function $(id) { return document.getElementById(id); }
         function getClients() { return JSON.parse(localStorage.getItem('clients')) || []; }
         function saveClients(clients) { localStorage.setItem('clients', JSON.stringify(clients)); }
@@ -717,48 +748,55 @@ console.error("Mora button not found");
             }
         }
 
+
+
         // Función para agregar un nuevo cliente
+/// Función para agregar un nuevo cliente
 function addClient(e) {
     e.preventDefault();
-    const cuotas = parseInt($('cuotas').value);
+    
+    const cuotas = parseInt(document.getElementById('cuotas').value);
     if (cuotas > 12) {
         Swal.fire('Error', 'El número máximo de cuotas es 12', 'error');
         return;
     }
 
     const clients = getClients();
-    const monto = parseFloat($('monto').value);
-    const montoPorCuota = monto / cuotas;
-    const fechasPago = [];
-    const fechaActual = new Date();
-
-    for (let i = 1; i <= cuotas; i++) {
-        const fechaPago = new Date(fechaActual);
-        fechaPago.setMonth(fechaActual.getMonth() + i);
-        fechasPago.push(fechaPago.toISOString().split('T')[0]);
+    const monto = parseFloat(document.getElementById('monto').value);
+    if (isNaN(monto) || monto <= 0) {
+        Swal.fire('Error', 'El monto debe ser un número positivo', 'error');
+        return;
     }
 
+    const montoPorCuota = monto / cuotas;
+    const frecuenciaCobro = document.getElementById('frecuenciaCobro').value;  // Obtener frecuencia de cobro
+
+    // Generar fechas dinámicamente
+    const fechasPago = calcularFechasPago(new Date(), cuotas, frecuenciaCobro);
+    
     const newClient = {
         id: Date.now(),
-        nombre: $('nombre').value,
-        apellido: $('apellido').value,
-        numero: $('numero').value,
-        correo: $('correo').value || 'No proporcionado',
-        direccion: $('direccion').value,
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        numero: document.getElementById('numero').value,
+        correo: document.getElementById('correo').value || 'No proporcionado',
+        direccion: document.getElementById('direccion').value,
         fechaPrestamo: new Date().toISOString().split('T')[0],
         monto: monto,
         cuotas: cuotas,
         montoPorCuota: montoPorCuota,
-        fechasPago: fechasPago,
-        ruta: $('ruta').value,  // Nuevo campo de selección
-        mensaje: $('mensaje').value
+        fechasPago: fechasPago,  // Fechas adaptadas a la frecuencia de cobro
+        ruta: document.getElementById('ruta').value,
+        mensaje: document.getElementById('mensaje').value,
+        interesMora: parseFloat(document.getElementById('interesMora').value) || 0,
+        frecuenciaCobro: frecuenciaCobro
     };
 
     // Guardar en local y actualizar UI
     clients.push(newClient);
     saveClients(clients);
-    $('clientForm').reset();
-    renderClients();
+    document.getElementById('clientForm').reset();
+    renderClients(); // Asegúrate de que esto esté después de guardar el cliente
     updateDashboard();
     Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
     showSection('prestamos');
@@ -776,14 +814,43 @@ function addClient(e) {
         if (data.success) {
             Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
         } else {
-            Swal.fire('Error', 'Hubo un problema con la conexión al servidor. Inténtalo de nuevo.'  || 'Ocurrió un problema al registrar el cliente', 'error');
+            Swal.fire('Error', 'Hubo un problema con la conexión al servidor.', 'error');
         }
     })
     .catch(error => {
-        Swal.fire('Error', 'Hubo un problema con la conexión al servidor. Inténtalo de nuevo.', 'error');
+        Swal.fire('Error', 'Hubo un problema con la conexión al servidor.', 'error');
         console.error('Error:', error);
     });
 }
+
+
+function calcularFechasPago(fechaInicio, cuotas, frecuencia) {
+    let fechas = [];
+    let fecha = new Date(fechaInicio);
+
+    for (let i = 0; i < cuotas; i++) {
+        switch (frecuencia) {
+            case "diario":
+                fecha.setDate(fecha.getDate() + 1);
+                break;
+            case "semanal":
+                fecha.setDate(fecha.getDate() + 7);
+                break;
+            case "mensual":
+                fecha.setMonth(fecha.getMonth() + 1);
+                break;
+            case "anual":
+                fecha.setFullYear(fecha.getFullYear() + 1);
+                break;
+            default:
+                fecha.setMonth(fecha.getMonth() + 1); // Por defecto, mensual
+        }
+        fechas.push(new Date(fecha).toISOString().split('T')[0]); // Guardar en formato YYYY-MM-DD
+    }
+
+    return fechas;
+}
+
 
 // Función para abrir el formulario de edición
 function openEditRouteModal(clientId) {
@@ -917,6 +984,8 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
         console.error("Error al cargar las rutas:", error);
     });
 
+    
+
 
 
     function loadRoutes() {
@@ -982,33 +1051,176 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
         });
         
         
+        
+        function getRouteNameById(routeId, rutas) {
+            const ruta = rutas.find(r => r.IDRuta == routeId);
+            return ruta ? ruta.NombreRuta : "Ruta no encontrada";
+        }
+        
+        function sendWhatsAppMessageReduced(numero) {
+            const mensaje = encodeURIComponent($(`mensaje-${numero}`).value);
+            window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank');
+        }
+        
         function renderClients() {
-    const clients = getClients();
-    $('clientTable').innerHTML = clients.map(client => {
-        const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]);
-        return `
-            <tr class="text-xs">
-                <td class="p-2">${client.nombre}</td>
-                <td class="p-2">${client.apellido}</td>
-                <td class="p-2">${client.numero}</td>
-                <td class="p-2">${client.correo}</td>
-                <td class="p-2">$${client.monto.toFixed(2)}</td>
-                <td class="p-2">${client.cuotas}</td>
-                <td class="p-2">${client.fechasPago.join(', ')}</td>
-                <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
-                <td class="p-2">
-                    <input type="text" id="mensaje-${client.id}" value="${client.mensaje}" class="w-full p-1 bg-gray-700 rounded text-xs">
-                    <button onclick="sendWhatsAppMessage(${client.id})" class="action-button mt-1 text-xs">Enviar WhatsApp</button>
-                </td>
-                <td class="p-2">
-                    <button onclick="editClient(${client.id})" class="action-button mb-1 text-xs">Editar</button>
-                    <button onclick="deleteClient(${client.id})" class="action-button mb-1 text-xs">Borrar</button>
-                    <button onclick="finishLoan(${client.id})" class="action-button text-xs">Terminar</button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
+            const clients = getClients();
+            console.log("Clientes obtenidos:", clients); // Verifica si hay clientes
+        
+            fetch('controllers/rutasControlador.php')
+                .then(response => response.json())
+                .then(rutas => {
+                    console.log("Rutas obtenidas:", rutas); // Verifica si las rutas se obtienen correctamente
+        
+                    updateTotalRutas(rutas.length);
+        
+                    // Verifica que 'clientTable' existe antes de modificar el innerHTML
+                    const clientTable = document.getElementById('clientTable');
+                    if (!clientTable) {
+                        console.error("Elemento clientTable no encontrado");
+                        return;
+                    }
+        
+                    clientTable.innerHTML = `
+                        <tbody>
+                            ${clients.map(client => {
+                                const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]);
+                                const rutaNombre = getRouteNameById(client.ruta, rutas);
+                                
+                                return `
+                                    <tr class="text-xs">
+                                        <td class="p-2">${client.nombre}</td>
+                                        <td class="p-2">${client.apellido}</td>
+                                        <td class="p-2">${client.numero}</td>
+                                        <td class="p-2">${rutaNombre}</td>
+                                        <td class="p-2">$${client.monto.toFixed(2)}</td>
+                                        <td class="p-2">${client.cuotas}</td>
+                                        <td class="p-2">${client.fechasPago.join(',<br> ')}</td>
+                                        <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
+                                        <td class="p-2">
+                                            <button onclick="editClient(${client.id})" class="action-button mb-1 text-xs">Editar</button>
+                                            <button onclick="deleteClient(${client.id})" class="action-button mb-1 text-xs">Borrar</button>
+                                            <button onclick="finishLoan(${client.id})" class="action-button text-xs">Terminar</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    `;
+        
+                    // Tabla reducida dividida por rutas
+                    const clientTableReducedContainer = document.getElementById('clientTableReducedContainer');
+                    if (!clientTableReducedContainer) {
+                        console.error("Elemento clientTableReducedContainer no encontrado");
+                        return;
+                    }
+        
+                    const clientsByRoute = {};
+                    clients.forEach(client => {
+                        const rutaNombre = getRouteNameById(client.ruta, rutas);
+                        if (!clientsByRoute[rutaNombre]) {
+                            clientsByRoute[rutaNombre] = [];
+                        }
+                        clientsByRoute[rutaNombre].push(client);
+                    });
+        
+                    let reducedTablesHTML = '';
+                    Object.keys(clientsByRoute).forEach(ruta => {
+                        reducedTablesHTML += `
+                            <div class="mb-5">
+                                <h2 class="text-lg font-bold mb-2">Ruta: ${ruta}</h2>
+                                <table class="w-full border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th class="p-2 border">Nombre</th>
+                                            <th class="p-2 border">Apellido</th>
+                                            <th class="p-2 border">Teléfono</th>
+                                            <th class="p-2 border">Monto Final</th> <!-- Monto Final con Interés -->
+                                            <th class="p-2 border">Ruta</th>
+                                            <th class="p-2 border">Dirección</th>
+                                            <th class="p-2 border">WhatsApp Mensaje</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    ${clientsByRoute[ruta].map(client => {
+                                        // Asegúrate de que el interés sea un número y maneja el caso donde no esté definido
+                                        const interes = parseFloat(client.interes) || 0; // Si no es un número, establece como 0
+                                        const monto = parseFloat(client.monto) || 0; // Asegúrate de que el monto también sea un número
+                                        const montoFinal = monto + (monto * (interes / 100)); // Calcula el monto final incluyendo el interés
+                                    
+                                        return `
+                                            <tr class="text-sm">
+                                                <td class="p-2 border">${client.nombre}</td>
+                                                <td class="p-2 border">${client.apellido}</td>
+                                                <td class="p-2 border">${client.numero}</td>
+                                                <td class="p-2 border">$${montoFinal.toFixed(2)}</td> <!-- Muestra el monto final -->
+                                                <td class="p-2 border">${ruta}</td>
+                                                <td class="p-2 border">${client.direccion}</td>
+                                                <td class="p-2 border">
+                                                    <input type="text" id="mensaje-${client.numero}" class="p-1 w-28 text-xs bg-gray-700 rounded" placeholder="Mensaje">
+                                                    <button onclick="sendWhatsAppMessageReduced(${client.numero})" class="bg-green-600 text-white text-xs px-2 py-1 rounded">Enviar</button>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    });
+        
+                    clientTableReducedContainer.innerHTML = reducedTablesHTML;
+                })
+                .catch(error => console.error('Error al obtener rutas:', error));
+        }
+        
+        
+        
+
+        function mostrarRutaMasPopular() {
+            fetch('controllers/rutasControlador.php')
+                .then(response => response.json())
+                .then(rutas => {
+                    const clients = getClients();
+                    const rutaCount = {};
+        
+                    // Contar los clientes por ruta
+                    clients.forEach(client => {
+                        const rutaId = client.ruta;
+                        if (!rutaCount[rutaId]) {
+                            rutaCount[rutaId] = 0;
+                        }
+                        rutaCount[rutaId]++;
+                    });
+        
+                    // Encontrar la ruta con más clientes
+                    let maxClientes = 0;
+                    let rutaMasPopular = '';
+        
+                    for (const rutaId in rutaCount) {
+                        if (rutaCount[rutaId] > maxClientes) {
+                            maxClientes = rutaCount[rutaId];
+                            rutaMasPopular = getRouteNameById(rutaId, rutas); // Obtener el nombre de la ruta
+                        }
+                    }
+        
+                    // Mostrar la ruta más popular en el cuadro
+                    const rutaMasPopularElement = document.getElementById('rutaMasPopular');
+                    rutaMasPopularElement.textContent = `Ruta: ${rutaMasPopular} (N° Clientes: ${maxClientes})`;
+                })
+                .catch(error => console.error('Error al obtener rutas:', error));
+        }
+        
+        // Llamar a la función para mostrar la ruta más popular cuando se carga el dashboard
+        mostrarRutaMasPopular();
+
+        
+        
+        
+        // Función para actualizar el total de rutas
+        function updateTotalRutas(total) {
+            document.getElementById('totalRutas').innerText = total; // Cambiar a un nuevo ID
+        }
 
 
 function sendWhatsAppMessage(clientId) {
@@ -1180,6 +1392,55 @@ function sendWhatsAppMessage(clientId) {
             }
         }
 
+        function returnLoan(id) {
+            Swal.fire({
+                title: '¿Devolver préstamo?',
+                text: "Este préstamo se marcará como activo nuevamente",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, devolver',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const finishedLoans = getFinishedLoans(); // Obtiene los préstamos terminados
+                    const index = finishedLoans.findIndex(l => l.id === id); // Encuentra el índice del préstamo
+        
+                    if (index !== -1) {
+                        const loan = finishedLoans[index]; // Obtiene el préstamo encontrado
+                        delete loan.fechaFinalizacion; // Elimina la fecha de finalización
+                        const clients = getClients(); // Obtiene la lista de clientes
+                        clients.push(loan); // Agrega el préstamo devuelto a la lista de clientes
+                        saveClients(clients); // Guarda la lista actualizada de clientes
+                        finishedLoans.splice(index, 1); // Elimina el préstamo de la lista de terminados
+                        saveFinishedLoans(finishedLoans); // Guarda la lista actualizada de préstamos terminados
+                        renderClients(); // Actualiza la tabla de clientes activos
+                        renderFinishedLoans(); // Actualiza la tabla de préstamos terminados
+                        updateDashboard(); // Actualiza el dashboard
+                        Swal.fire('Éxito', 'Préstamo devuelto a activos', 'success');
+                    } else {
+                        Swal.fire('Error', 'No se encontró el préstamo para devolver.', 'error');
+                    }
+                }
+            });
+        }
+
+        function updateDashboard() {
+            const clients = getClients(); // Obtén la lista actual de clientes activos
+            const totalPrestamos = clients.reduce((sum, client) => sum + client.monto, 0);
+            
+            $('totalPrestamos').textContent = `$${totalPrestamos.toFixed(2)}`;
+            $('clientesActivos').textContent = clients.length;
+            $('prestamosPendientes').textContent = clients.length; // Este campo puede necesitar ajuste
+            $('currentDate').textContent = new Date().toLocaleDateString();
+        
+            updatePrestamosChart(); // Asegúrate de que estas funciones existan
+            updateClientesChart();
+        }
+        
+        
+
         function finishLoan(id) {
             Swal.fire({
                 title: '¿Finalizar préstamo?',
@@ -1197,64 +1458,31 @@ function sendWhatsAppMessage(clientId) {
                     if (index !== -1) {
                         const finishedLoan = {
                             ...clients[index],
-                            fechaFinalizacion: new Date().toISOString().split('T')[0]
+                            fechaFinalizacion: new Date().toISOString().split('T')[0] // Fecha de finalización
                         };
+        
+                        // Actualizar la lista de préstamos terminados
                         const finishedLoans = getFinishedLoans();
                         finishedLoans.push(finishedLoan);
                         saveFinishedLoans(finishedLoans);
+        
+                        // Eliminar el cliente de los activos
                         clients.splice(index, 1);
                         saveClients(clients);
-                        renderClients();
-                        renderFinishedLoans();
+        
+                        // Re-renderizar ambas tablas
+                        renderClients(); // Actualizar la tabla de clientes activos
+                        renderFinishedLoans(); // Actualizar la tabla de préstamos terminados
+        
+                        // Actualizar el dashboard
                         updateDashboard();
+        
                         Swal.fire('Éxito', 'Préstamo marcado como terminado', 'success');
                     }
                 }
             });
         }
-
-        function returnLoan(id) {
-            Swal.fire({
-                title: '¿Devolver préstamo?',
-                text: "Este préstamo se marcará como activo nuevamente",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, devolver',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const finishedLoans = getFinishedLoans();
-                    const index = finishedLoans.findIndex(l => l.id === id);
-                    if (index !== -1) {
-                        const loan = finishedLoans[index];
-                        delete loan.fechaFinalizacion;
-                        const clients = getClients();
-                        clients.push(loan);
-                        saveClients(clients);
-                        finishedLoans.splice(index, 1);
-                        saveFinishedLoans(finishedLoans);
-                        renderClients();
-                        renderFinishedLoans();
-                        updateDashboard();
-                        Swal.fire('Éxito', 'Préstamo devuelto a activos', 'success');
-                    }
-                }
-            });
-        }
-
-        function updateDashboard() {
-            const clients = getClients();
-            const totalPrestamos = clients.reduce((sum, client) => sum + client.monto, 0);
-            $('totalPrestamos').textContent = `$${totalPrestamos.toFixed(2)}`;
-            $('clientesActivos').textContent = clients.length;
-            $('prestamosPendientes').textContent = clients.length;
-            $('currentDate').textContent = new Date().toLocaleDateString();
-
-            updatePrestamosChart();
-            updateClientesChart();
-        }
+        
 
         function updatePrestamosChart() {
             const clients = getClients();
@@ -1417,24 +1645,41 @@ function sendWhatsAppMessage(clientId) {
         }
 
         function renderPagosVencidos() {
-            const tablaVencidos = `
-                ${pagosVencidos.map(pago => `
-                    <tr>
-                        <td class="p-2">${pago.nombre}</td>
-                        <td class="p-2">${pago.apellido}</td>
-                        <td class="p-2">$${pago.montoOriginal.toFixed(2)}</td>
-                        <td class="p-2">$${(pago.montoTotal - pago.montoOriginal).toFixed(2)}</td>
-                        <td class="p-2">$${pago.montoTotal.toFixed(2)}</td>
-                        <td class="p-2">${pago.diasRetraso}</td>
-                        <td class="p-2">
-                            <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
-                        </td>
-                    </tr>
-                `).join('')}
-            `;
+            const hoy = new Date().toISOString().split('T')[0]; // Fecha actual YYYY-MM-DD
+        
+            pagosVencidos = pagosVencidos.map(pago => {
+                const diasAtraso = Math.max(0, Math.floor((new Date(hoy) - new Date(pago.fechaVencimiento)) / (1000 * 60 * 60 * 24)));
+                const interesMora = pago.interesMora ?? 0.10; // Usa el interés personalizado o 5% por defecto
+                const montoMora = pago.montoOriginal * interesMora * diasAtraso;
+        
+                return {
+                    ...pago,
+                    diasRetraso: diasAtraso,
+                    montoTotal: pago.montoOriginal + montoMora
+                };
+            });
+        
+            savePagosVencidos(); // Guardar la lista actualizada en localStorage
+        
+            const tablaVencidos = pagosVencidos.map(pago => `
+                <tr>
+                    <td class="p-2">${pago.nombre}</td>
+                    <td class="p-2">${pago.apellido}</td>
+                    <td class="p-2">$${pago.montoOriginal.toFixed(2)}</td>
+                    <td class="p-2">$${(pago.montoTotal - pago.montoOriginal).toFixed(2)}</td>
+                    <td class="p-2">$${pago.montoTotal.toFixed(2)}</td>
+                    <td class="p-2">${pago.diasRetraso}</td>
+                    <td class="p-2">
+                        <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        
             $('pagosVencidosTable').innerHTML = tablaVencidos;
             $('multasRecargosTable').innerHTML = tablaVencidos;
         }
+        
+
 
         function updateMultasRecargosCharts() {
             const ctx1 = $('multasChart').getContext('2d');
@@ -1756,6 +2001,28 @@ function renderProximosPagos() {
         </tr>
     `).join('');
 }
+
+function mostrarPrestamosVencidos() {
+    const clients = getClients(); // Obtener todos los clientes
+    let countVencidos = 0; // Contador para préstamos vencidos
+
+    clients.forEach(client => {
+        const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]);
+        if (diasRestantes <= 0) {
+            countVencidos++; // Aumentar el contador si el préstamo está vencido
+        }
+    });
+
+    // Mostrar la cantidad de préstamos vencidos en el cuadro
+    const prestamosVencidosElement = document.getElementById('prestamosVencidos');
+    prestamosVencidosElement.textContent = countVencidos;
+}
+
+// Llamar a la función para mostrar la cantidad de préstamos vencidos cuando se carga el dashboard
+mostrarPrestamosVencidos();
+
+
+
 
 setInterval(checkPagosVencidos, 86400000); // Cada 24 horas
 setInterval(aplicarInteresPorMora, 86400000); // Cada 24 horas

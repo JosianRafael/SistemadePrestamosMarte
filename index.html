@@ -53,7 +53,7 @@
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('historial-prestamos')">Historial de Préstamos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('analisis-riesgo')">Análisis de Riesgo</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('prestamos-calculadora')">EMI Calculadora</button>
-                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('carteras-prestamos')">Rutas / Carteras Prestamos</button>
+               
             </nav>
         </aside>
 
@@ -205,6 +205,21 @@
                         <h3 class="text-sm text-gray-400">Préstamos Pendientes</h3>
                         <p class="text-2xl font-bold" id="prestamosPendientes">0</p>
                     </div>
+                    <div class="bg-card p-4 rounded">
+                        <h3 class="text-sm text-gray-400">Total de Rutas</h3> <!-- Título para total de rutas -->
+                        <p class="text-2xl font-bold" id="totalRutas">0</p> <!-- Usando el nuevo ID totalRutas -->
+                    </div>
+                    <div class="bg-card p-4 rounded">
+                        <h3 class="text-xs text-gray-400">Ruta Más Popular</h3>
+                        <p class="text-xl font-bold" id="rutaMasPopular">Ruta: X (N° Clientes: 0)</p>
+                    </div>
+                    <div class="bg-card p-4 rounded">
+                        <h3 class="text-sm text-gray-400">Préstamos Vencidos</h3>
+                        <p class="text-2xl font-bold" id="prestamosVencidos">0</p>
+                    </div>
+                    
+                    
+                    
                 </div>
                 <div class="grid gap-4 md:grid-cols-2 mt-6">
                     <div class="bg-card p-4 rounded">
@@ -221,6 +236,7 @@
 
                 <h3 class="text-xl font-bold mt-4">Lista de Rutas</h3>
     <ul id="rutasList" class="mt-2 bg-gray-700 p-4 rounded"></ul>
+
 
     <div id="editRouteModal" style="display: none;">
         <h2>Editar Ruta</h2>
@@ -242,23 +258,38 @@
         <button onclick="openEditRouteModal(client.id)">Editar Ruta</button>
 
     </form>
-                <h2 class="text-2xl font-bold mb-4">Registro de Clientes</h2>
-                
-                <form id="clientForm" class="bg-card p-4 rounded space-y-4">
-                    <input type="text" id="nombre" placeholder="Nombre" class="w-full p-2 bg-gray-800 rounded" required>
-                    <input type="text" id="apellido" placeholder="Apellido" class="w-full p-2 bg-gray-800 rounded" required>
-                    <input type="number" id="numero" placeholder="Número de teléfono. Ej: 8095730808" class="w-full p-2 bg-gray-800 rounded" required>
-                    <input type="email" id="correo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-800 rounded">
-                    <input type="text" id="direccion" placeholder="Dirección, donde vive ?" class="w-full p-2 bg-gray-800 rounded" required>
-                    <input type="number" id="monto" placeholder="Monto del préstamo" class="w-full p-2 bg-gray-800 rounded" required>
-                    <input type="number" id="cuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-800 rounded" required min="1" max="12">
-                    <select id="ruta" class="w-full p-2 bg-gray-800 rounded" required>
-                        <option value="" disabled selected>Selecciona una ruta</option>
-                        <option value="">Selecciona una ruta</option>
-                    </select>
-                    <textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded"></textarea>
-                    <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Registrar Cliente</button>
-                </form>
+    <h2 class="text-2xl font-bold mb-4">Registro de Clientes</h2>
+
+    <form id="clientForm" class="bg-card p-4 rounded space-y-4">
+        <input type="text" id="nombre" placeholder="Nombre" class="w-full p-2 bg-gray-800 rounded" required>
+        <input type="text" id="apellido" placeholder="Apellido" class="w-full p-2 bg-gray-800 rounded" required>
+        <input type="number" id="numero" placeholder="Número de teléfono. Ej: 8095730808" class="w-full p-2 bg-gray-800 rounded" required>
+        <input type="email" id="correo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-800 rounded">
+        <input type="text" id="direccion" placeholder="Dirección, donde vive ?" class="w-full p-2 bg-gray-800 rounded" required>
+        <input type="number" id="monto" placeholder="Monto del préstamo" class="w-full p-2 bg-gray-800 rounded" required>
+        <input type="number" id="cuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-800 rounded" required min="1" max="12">
+    
+        <!-- Nuevo campo: Interés por mora -->
+        <input type="number" id="interesMora" placeholder="Interés por mora (%)" class="w-full p-2 bg-gray-800 rounded" required min="0">
+    
+        <!-- Nuevo campo: Frecuencia de cobro -->
+        <select id="frecuenciaCobro" class="w-full p-2 bg-gray-800 rounded" required>
+            <option value="" disabled selected>Selecciona la frecuencia de cobro</option>
+            <option value="diario">Diario</option>
+            <option value="semanal">Semanal</option>
+            <option value="mensual">Mensual</option>
+            <option value="anual">Anual</option>
+        </select>
+    
+        <select id="ruta" class="w-full p-2 bg-gray-800 rounded" required>
+            <option value="" disabled selected>Selecciona una ruta</option>
+            <option value="">Selecciona una ruta</option>
+        </select>
+    
+        <textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded"></textarea>
+        <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Registrar Cliente</button>
+    </form>
+    
                 
             </div>
             
@@ -272,18 +303,35 @@
                                 <th class="p-2">Nombre</th>
                                 <th class="p-2">Apellido</th>
                                 <th class="p-2">Telefono</th>
-                                <th class="p-2">Correo</th>
+                                <th class="p-2">Ruta pertenece</th>
                                 <th class="p-2">Monto</th>
                                 <th class="p-2">Cuotas</th>
                                 <th class="p-2">Fechas de Pago</th>
                                 <th class="p-2">Días Restantes</th>
-                                <th class="p-2">Mensaje</th>
                                 <th class="p-2">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="clientTable"></tbody>
                     </table>
+                    
+                    
+                    
+
                 </div>
+                <br>
+                        <br>
+                        <br>
+                        <br>
+                <!-- Contenedor centrado para la segunda tabla -->
+<!-- Contenedor para la tabla de préstamos activos -->
+<table id="clientTable" class="w-full border-collapse">
+    <!-- El cuerpo de la tabla se llenará dinámicamente -->
+</table>
+
+<!-- Contenedor para las tablas reducidas divididas por rutas -->
+<div id="clientTableReducedContainer"></div>
+
+
             </div>
 
             
@@ -292,6 +340,9 @@
         
             <div id="prestamos-terminados" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Préstamos Terminados</h2>
+                • <strong>Aviso:</strong> No se Recomienda borrar la informacion de los prestamos terminados.
+                <br>
+                <br>
                 <div class="bg-card p-4 rounded overflow-x-auto">
                     <table class="w-full">
                         <thead>
@@ -373,6 +424,8 @@
                     </div>
                 </div>
             </div>
+
+<!--El apartado de Rutas y carteras no se esta usando en la pagina, se mantendra el codigo pero no se usara-->
 
                 <div id="carteras-prestamos" class="section hidden max-w-4xl mx-auto">
                     <h2 class="text-2xl font-bold mb-4">Carteras Préstamos</h2>
@@ -556,8 +609,8 @@
     </div>
 
     <footer style="color: white;" class="text-center p-4 bg-gray-900 text-white dark:text-black">
-        © 2025 Inversiones P&P Marte E.I.R.L. Todos los derechos reservados.<br>
-        By: Josian Rafael Viñas
+        © 2025 Inversiones P&P Marte. Todos los derechos reservados.<br>
+        By: Josian Viñas & Felix Mendoza
     </footer>
     <script src="funciones.js"></script>
 </body>
