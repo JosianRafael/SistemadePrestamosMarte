@@ -6,7 +6,7 @@ function GuardarRutasModulo($link,$nombreruta,$monto)
     mysqli_query($link,$query);
 }
 
-function ConsultarRutasModulo($link,$varios = false, $nombreruta = "")
+function ConsultarRutasModulo($link,$varios = false, $rutaid = "")
 {   
     if (!$varios)
     {
@@ -14,7 +14,7 @@ function ConsultarRutasModulo($link,$varios = false, $nombreruta = "")
         return mysqli_query($link,$query);
     }else
     {
-        $query = "SELECT * FROM vista_rutas WHERE IDRuta = '$nombreruta'";
+        $query = "SELECT * FROM vista_rutas WHERE IDRuta = '$rutaid'";
         return mysqli_query($link,$query);
     }
    
@@ -22,15 +22,20 @@ function ConsultarRutasModulo($link,$varios = false, $nombreruta = "")
 
 function ModificarRutasMontoModulo($link,$montocambiar,$nombreruta)
 {
-    $query = "SELECT  Monto FROM rutas WHERE NombreRuta = '$nombreruta'";
+    $query = "SELECT  Monto FROM rutas WHERE IDRuta = '$nombreruta'";
     $resultado = mysqli_query($link,$query);
     $total = 0;
     if (mysqli_num_rows($resultado) == 1)
     {
         $resultado = mysqli_fetch_array($resultado);
         $total = $resultado["Monto"] + $montocambiar;
+        $query = "UPDATE rutas SET Monto = '$total'";
+        $resultado = mysqli_query($link,$query);
+        return true;
+    }else
+    {
+        return false;
     }
-    $query = "UPDATE rutas SET Monto = '$total'";
 }
 
 ?>

@@ -18,7 +18,8 @@ function ControladorGuardarClientes($datos, $link)
 {
     if (!$datos || !isset($datos["nombre"], $datos["apellido"], $datos["numero"], $datos["correo"], 
                           $datos["direccion"], $datos["fechaPrestamo"], $datos["monto"],$datos["cuotas"],
-                          $datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"],$datos["ruta"])) {
+                          $datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"],$datos["ruta"]
+                          ,$datos["interesMora"],$datos["frecuenciaCobro"],$datos["InteresPrestamo"],$datos["TipoInteres"])) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
@@ -36,10 +37,15 @@ function ControladorGuardarClientes($datos, $link)
     $fechasPago = $datos["fechasPago"];
     $mensaje = htmlspecialchars($datos["mensaje"]);
     $ruta = htmlspecialchars($datos["ruta"]);
+    $interesMora = htmlspecialchars($datos["interesMora"]);
+    $frecuenciaCobro = htmlspecialchars($datos["frecuenciaCobro"]);
+    $interesPrestamo = htmlspecialchars($datos["InteresPrestamo"]);
+    $tipoInteres = htmlspecialchars($datos["TipoInteres"]);
     // Verificar que los datos no estén vacíos
     if (empty($nombre) || empty($apellido) || empty($numero) || empty($direccion) ||
         empty($fechaprestamo) || empty($monto) || empty($cuotas) || empty($montoPorCuota) 
-        || empty($fechasPago) || empty($mensaje) || empty($ruta)) {
+        || empty($fechasPago) || empty($mensaje) || empty($ruta) || empty($interesMora)
+        ||empty($frecuenciaCobro) || empty($fechaprestamo) ||empty($tipoInteres)) {
         echo json_encode(['status' => 'error', 'message' => 'Favor complete todos los campos']);
         exit;
     }
@@ -65,13 +71,21 @@ function ControladorGuardarClientes($datos, $link)
         }else
         {
             //Crear el prestamo
-            CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo,$ID_de_la_ruta);
-    
+            CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo,
+            $ID_de_la_ruta,$interesMora,$frecuenciaCobro,$interesPrestamo,$tipoInteres);
+            
             $prestamo_id = mysqli_insert_id($link);
             $monto_negativo = -1 * $monto;
             
             //Modificar el monto de la ruta
-            ModificarRutasMontoModulo($link,$monto_negativo,$ruta);
+            $confirmando_cambio = ModificarRutasMontoModulo($link,$monto_negativo,$ruta);
+
+            if (!$confirmando_cambio)
+            {
+                //No se pudo modificar los fondos
+                echo json_encode(['status' => 'error', 'message' => 'No se pudo modificar el saldo de la ruta']);
+                mysqli_rollback($link);
+            }
 
             //Crear el calendario de pagos
             CrearCalendarioDePagos($link,$prestamo_id,$montoPorCuota,$fechasPago,$cuotas);
@@ -87,10 +101,83 @@ function ControladorGuardarClientes($datos, $link)
     }
 }
 
+function EnviarResultadosClientesActivos($link)
+{   
+    $resultado = ConsultarClientesActivos($link);
+
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron clientes activos']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados: " . print_r($contenido, true) . "\n", FILE_APPEND);
+
+    echo json_encode($contenido);
+}
+
+function EnviarResultadosClientesActivosPrestamosDetalle($link)
+{   
+    $resultado = ConsultarClientesActivosconPrestamoDetalle($link);
+
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron clientes activos']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados: " . print_r($contenido, true) . "\n", FILE_APPEND);
+    echo json_encode($contenido);
+}
+
+function EnviarResultadosClientesPagosPendientes($link)
+{   
+    $resultado = ConsultarClientesPagosPendientes($link);
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron clientes con pagos pendientes']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados: " . print_r($contenido, true) . "\n", FILE_APPEND);
+    echo json_encode($contenido);
+}
+
+
 if (!$link) {
     echo json_encode(['status' => 'error', 'message' => 'Error en la conexión a la base de datos']);
     exit;
 }
 
-ControladorGuardarClientes($datos, $link);
+if ($_SERVER["REQUEST_METHOD"] == "POST")
+{
+    switch ($datos["accion"]) {
+        case 'guardar':
+            ControladorGuardarClientes($datos, $link);
+            break;
+        
+        case 'leerclienteactivo';
+            EnviarResultadosClientesActivos($link);
+            break;
+        case 'leerclientedetalle';
+            EnviarResultadosClientesActivosPrestamosDetalle($link);
+            break;
+        case 'leerclientepagospendiente';
+            EnviarResultadosClientesActivosPrestamosDetalle($link);
+            break;
+        default:
+            echo json_encode(['status' => 'error', 'message' => 'Error en la clave accion']);
+            break;
+    }
+}
+
 ?>
