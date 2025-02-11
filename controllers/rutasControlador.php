@@ -93,13 +93,13 @@ function ControladorConsultarRutas($link)
 function ControladorModificarRutasMonto($link,$datos)
 {   
 
-    if (!$datos || !isset($datos["nombreRuta"], $datos["fondos"])) {
+    if (!$datos || !isset($datos["IDRuta"], $datos["fondosRuta"])) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
     
     // Sanitizar los datos
-    $nombreRuta = htmlspecialchars($datos["nombreRuta"]);
+    $nombreRuta = htmlspecialchars($datos["IDRuta"]);
     $montoruta = htmlspecialchars($datos["fondosRuta"]);
 
     // Verificar que los datos no estén vacíos
@@ -112,10 +112,18 @@ function ControladorModificarRutasMonto($link,$datos)
     mysqli_begin_transaction($link);
     try {
         // Llamar a la función para modificar la ruta
-        ModificarRutasMontoModulo($link,$montoruta,$nombreRuta);
-        // Confirmar la transacción si todo va bien
-        mysqli_commit($link);
-        echo json_encode(['status' => 'success', 'message' => 'Ruta Actualizada correctamente']);
+        $resultado = ModificarRutasMontoModulo($link,$montoruta,$nombreRuta);
+        if ($resultado)
+        {
+            // Confirmar la transacción si todo va bien
+            mysqli_commit($link);
+            echo json_encode(['status' => 'success', 'message' => 'Ruta Actualizada correctamente']);
+        }else
+        {
+             // Lanzar una excepción si la modificación falla
+            throw new Exception('No se pudo actualizar la ruta.');
+        }
+
     } catch (Exception $e) {
         // Revertir cambios en caso de error
         mysqli_rollback($link);
@@ -133,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     if ($datos["accion"] == "obtenerRutas")
     {
         ControladorConsultarRutas($link);
-    }elseif($datos["accion"] == "")
+    }elseif($datos["accion"] == "modificar")
     {
         ControladorModificarRutasMonto($link,$datos);
     }elseif($datos["accion"] == "lectura")

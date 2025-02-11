@@ -1,0 +1,23 @@
+Consultar clientes activos devuelve las siguientes claves:
+
+cliente:
+id , Nombre, Apellido , Telefono, Correo, Direccion
+
+Consultar clientes activos con detalles prestamo devuelve las siguientes claves:
+
+Cliente:
+cliente_id, cliente_nombre, cliente_apellido, cliente_telefono, cliente_correo, cliente_direccion
+
+Préstamo:
+prestamo_id, prestamo_monto, prestamo_cuotas, prestamo_interes, prestamo_interes_mora, prestamo_tipo_interes, prestamo_mensaje, prestamo_estado, prestamo_fecha_concesion, prestamo_fecha_finalizacion, prestamo_frecuencia_pago
+
+Ruta:
+ruta_id, ruta_nombre
+
+Consultar clientes con pagos pendientes devuelve las siguientes claves:
+
+Calendario de pagos:
+Id, Id Prestamo, Numero Cuota, Fecha Vencimiento, Monto, Estado, Mora
+
+Cliente:
+Nombre, Apellido

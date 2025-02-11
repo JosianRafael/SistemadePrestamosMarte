@@ -9359,3 +9359,9 @@ Datos recibidos: Array
 
 )
 
+Datos recibidos: Array
+(
+    [0] => Array
+        (
+            [IDRuta] => 1
+   
