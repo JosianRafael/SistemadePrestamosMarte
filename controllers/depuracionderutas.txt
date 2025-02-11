@@ -9364,9 +9364,4 @@ Datos recibidos: Array
     [0] => Array
         (
             [IDRuta] => 1
-            [NombreRuta] => Ruta 1
-            [Monto] => 10000.00
-        )
-
-)
-
+   
