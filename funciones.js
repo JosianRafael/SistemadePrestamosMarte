@@ -1586,17 +1586,16 @@ function sendWhatsAppMessage(clientId) {
             });
         }
 
-        function checkPagosVencidos() {
+        async function checkPagosVencidos() {
             const clients = getClients();
-            const hoy = new Date();
             let clientesActualizados = false;
-            
+            let pagosVencidos = [];
+        
             clients.forEach(client => {
                 client.fechasPago = client.fechasPago.filter(fechaPago => {
                     const diasRetraso = calcularDiasRestantes(fechaPago) * -1;
                     if (diasRetraso > 0) {
                         const pagoVencido = {
-                            id: Date.now(), 
                             clientId: client.id,
                             nombre: client.nombre,
                             apellido: client.apellido,
@@ -1612,54 +1611,37 @@ function sendWhatsAppMessage(clientId) {
                     return true;
                 });
             });
-
+        
             if (clientesActualizados) {
-                saveClients(clients);
-                savePagosVencidos();
+                await fetch('guardar_pagos_vencidos.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagosVencidos })
+                });
+        
+                await syncPagosVencidosConServidor(); // Recargar pagos vencidos desde PHP
             }
             renderCalendarioPagos();
             renderMultasRecargos();
         }
-
-        function aplicarInteresPorMora() {
-            let actualizados = false;
-            pagosVencidos.forEach(pago => {
-                const diasTranscurridos = Math.floor((new Date() - new Date(pago.fechaVencimiento)) / (1000 * 60 * 60 * 24));
-                const semanasCompletas = Math.floor(diasTranscurridos / 7);
-                if (semanasCompletas > Math.floor(pago.diasRetraso / 7)) {
-                    pago.montoTotal *= (1 + INTERES_POR_MORA);
-                    pago.diasRetraso = diasTranscurridos;
-                    actualizados = true;
-                }
-            });
-            if (actualizados) {
-                savePagosVencidos();
-                renderPagosVencidos();
-                renderMultasRecargos();
+        
+        async function aplicarInteresPorMora() {
+            const response = await fetch('aplicar_interes.php', { method: 'POST' });
+            const data = await response.json();
+            if (data.success) {
+                syncPagosVencidosConServidor();
             }
         }
-
-        function renderMultasRecargos() {
+        
+        async function syncPagosVencidosConServidor() {
+            const response = await fetch('obtener_pagos_vencidos.php');
+            pagosVencidos = await response.json();
             renderPagosVencidos();
-            updateMultasRecargosCharts();
+            renderMultasRecargos();
         }
-
-        function renderPagosVencidos() {
-            const hoy = new Date().toISOString().split('T')[0]; // Fecha actual YYYY-MM-DD
         
-            pagosVencidos = pagosVencidos.map(pago => {
-                const diasAtraso = Math.max(0, Math.floor((new Date(hoy) - new Date(pago.fechaVencimiento)) / (1000 * 60 * 60 * 24)));
-                const interesMora = pago.interesMora ?? 0.11; // Usa el interés personalizado o 5% por defecto
-                const montoMora = pago.montoOriginal * interesMora * diasAtraso;
-        
-                return {
-                    ...pago,
-                    diasRetraso: diasAtraso,
-                    montoTotal: pago.montoOriginal + montoMora
-                };
-            });
-        
-            savePagosVencidos(); // Guardar la lista actualizada en localStorage
+        async function renderPagosVencidos() {
+            await syncPagosVencidosConServidor(); // Asegurar que cargamos desde el servidor
         
             const tablaVencidos = pagosVencidos.map(pago => `
                 <tr>
@@ -1679,62 +1661,19 @@ function sendWhatsAppMessage(clientId) {
             $('multasRecargosTable').innerHTML = tablaVencidos;
         }
         
-
-
-        function updateMultasRecargosCharts() {
-            const ctx1 = $('multasChart').getContext('2d');
-            const ctx2 = $('recargosChart').getContext('2d');
-            
-            if (multasChart) multasChart.destroy();
-            if (recargosChart) recargosChart.destroy();
-
-            const montosOriginales = pagosVencidos.map(pago => pago.montoOriginal);
-            const intereses = pagosVencidos.map(pago => pago.montoTotal - pago.montoOriginal);
-
-            multasChart = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: pagosVencidos.map(pago => `${pago.nombre} ${pago.apellido}`),
-                    datasets: [{
-                        label: 'Monto Original',
-                        data: montosOriginales,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
+        async function deleteLatePayment(id) {
+            const response = await fetch('eliminar_pago_vencido.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
             });
-
-            recargosChart = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: pagosVencidos.map(pago => `${pago.nombre} ${pago.apellido}`),
-                    datasets: [{
-                        label: 'Interés por Mora',
-                        data: intereses,
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+        
+            const data = await response.json();
+            if (data.success) {
+                syncPagosVencidosConServidor();
+            }
         }
+        
 
         function renderRecordatoriosPago() {
             $('diasAnticipacion').value = configuracionRecordatorios.diasAnticipacion;
