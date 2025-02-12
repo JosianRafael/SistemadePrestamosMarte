@@ -9364,6 +9364,7 @@ Datos recibidos: Array
     [0] => Array
         (
             [IDRuta] => 1
+<<<<<<< HEAD
             [NombreRuta] => Ruta 1
             [Monto] => 20000.00
         )
@@ -11475,3 +11476,6 @@ Datos recibidos: Array
 
 )
 
+=======
+   
+>>>>>>> 3a48a75b766015d59b77be43c4cb91f594e0c3da
