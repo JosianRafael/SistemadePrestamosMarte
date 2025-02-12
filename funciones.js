@@ -1649,7 +1649,7 @@ function sendWhatsAppMessage(clientId) {
         
             pagosVencidos = pagosVencidos.map(pago => {
                 const diasAtraso = Math.max(0, Math.floor((new Date(hoy) - new Date(pago.fechaVencimiento)) / (1000 * 60 * 60 * 24)));
-                const interesMora = pago.interesMora ?? 0.10; // Usa el interés personalizado o 5% por defecto
+                const interesMora = pago.interesMora ?? 0.11; // Usa el interés personalizado o 5% por defecto
                 const montoMora = pago.montoOriginal * interesMora * diasAtraso;
         
                 return {
