@@ -40,4 +40,22 @@ function ConsultarClientesPagosPendientes($link)
     return mysqli_query($link,$query);
 }
 
+function BorrarCliente($link,$cliente_id)
+{
+    $query = "DELETE * FROM  clientes_historico WHERE id = '$cliente_id'";
+    return mysqli_query($link,$query);
+}
+
+function ConsultarClientesInactivosDetalles($link)
+{
+    $query = "SELECT * FROM vista_cliente_prestamo_historico";
+    return mysqli_query($link,$query);
+}
+
+function ConsultarClientesInactivosCalendario($link)
+{
+    $query = "SELECT * FROM vista_calendario_pagos_historico";
+    return mysqli_query($link,$query);
+}
+
 ?>

@@ -152,6 +152,62 @@ function EnviarResultadosClientesPagosPendientes($link)
     echo json_encode($contenido);
 }
 
+function EnviarClientesInactivosDetalles($link)
+{
+    $resultado = ConsultarClientesInactivosDetalles($link);
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron clientes inactivos']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados clietnes inactivos: " . print_r($contenido, true) . "\n", FILE_APPEND);
+    echo json_encode($contenido);
+}
+
+function EnviarClientesInactivosCalendarioPagos($link)
+{
+    $resultado = ConsultarClientesInactivosCalendario($link);
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron calendarios inactivos']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados calendario clientes inactivos: " . print_r($contenido, true) . "\n", FILE_APPEND);
+    echo json_encode($contenido);
+}
+
+function BorrarClientesInactivos($link,$datos)
+{
+    mysqli_begin_transaction($link);
+
+    try
+    {
+        if (empty($datos["id"]))
+        {
+            echo json_encode(['status' => 'error', 'message' => 'Variable id vacia']);
+            exit;
+        }
+
+        $cliente_id = $datos["id"];
+        BorrarCliente($link,$cliente_id);
+        mysqli_commit($link);
+        echo json_encode(['status' => 'success', 'message' => 'Cliente borrado correctamente']);
+    }
+    catch(Exception $e)
+    {
+        mysqli_rollback($link);
+        echo json_encode(['status' => 'error', 'message' => 'Error al borrar cliente: ' . $e->getMessage()]);
+    }
+}
+
 
 if (!$link) {
     echo json_encode(['status' => 'error', 'message' => 'Error en la conexión a la base de datos']);
@@ -173,6 +229,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             break;
         case 'leerclientepagospendiente';
             EnviarResultadosClientesActivosPrestamosDetalle($link);
+            break;
+        case 'leerclientesinactivosdetalles';
+            EnviarClientesInactivosDetalles($link);
+            break;
+        case 'leerclienteinactivocalendariopago';
+            EnviarClientesInactivosCalendarioPagos($link);
             break;
         default:
             echo json_encode(['status' => 'error', 'message' => 'Error en la clave accion']);
