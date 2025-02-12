@@ -2,3 +2,4 @@
 /dist
 *.txt
 controllers/debug_log.txt
+controllers/depuracionderutas.txt
