@@ -3878,3 +3878,290 @@ Datos recibidos:
 Datos recibidos: 
 Datos recibidos: 
 Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [id] => 1739227762532
+    [nombre] => Jose Francisco
+    [apellido] => Rosa
+    [numero] => 8095733369
+    [correo] => JosianRafel@gmail.com
+    [direccion] => Cale 12, ne l a loeteria
+    [fechaPrestamo] => 2025-02-10
+    [monto] => 10000
+    [cuotas] => 3
+    [montoPorCuota] => 3333.3333333333
+    [fechasPago] => Array
+        (
+            [0] => 2025-02-17
+            [1] => 2025-02-24
+            [2] => 2025-03-03
+        )
+
+    [ruta] => 9
+    [mensaje] => Adioa
+    [interesMora] => 10
+    [frecuenciaCobro] => semanal
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [id] => 1739229492609
+    [nombre] => Juan 
+    [apellido] => Vazques
+    [numero] => 8097
+    [correo] => Josianrafael@gmail.com
+    [direccion] => Calle 4, casa #14, en la loteria 
+    [fechaPrestamo] => 2025-02-10
+    [monto] => 70000
+    [cuotas] => 4
+    [montoPorCuota] => 17500
+    [fechasPago] => Array
+        (
+            [0] => 2025-02-17
+            [1] => 2025-02-24
+            [2] => 2025-03-03
+            [3] => 2025-03-10
+        )
+
+    [ruta] => 1
+    [mensaje] => 
+    [interesMora] => 11
+    [frecuenciaCobro] => semanal
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [id] => 1739229557759
+    [nombre] => Juan 
+    [apellido] => dwdwqd
+    [numero] => 8097
+    [correo] => Josianrafael@gmail.com
+    [direccion] => Calle 4, casa #14, en la loteria 
+    [fechaPrestamo] => 2025-02-10
+    [monto] => 300000
+    [cuotas] => 12
+    [montoPorCuota] => 25000
+    [fechasPago] => Array
+        (
+            [0] => 2026-02-10
+            [1] => 2027-02-10
+            [2] => 2028-02-10
+            [3] => 2029-02-10
+            [4] => 2030-02-10
+            [5] => 2031-02-10
+            [6] => 2032-02-10
+            [7] => 2033-02-10
+            [8] => 2034-02-10
+            [9] => 2035-02-10
+            [10] => 2036-02-10
+            [11] => 2037-02-10
+        )
+
+    [ruta] => 9
+    [mensaje] => 
+    [interesMora] => 2
+    [frecuenciaCobro] => anual
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
