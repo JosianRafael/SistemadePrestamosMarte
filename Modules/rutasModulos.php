@@ -38,4 +38,10 @@ function ModificarRutasMontoModulo($link,$montocambiar,$nombreruta)
     }
 }
 
+function BorrarRuta ($link,$idRuta)
+{
+    $query = "DELETE FROM rutas WHERE IDRuta = '$idRuta'";
+    return mysqli_query($link,$query);
+}
+
 ?>

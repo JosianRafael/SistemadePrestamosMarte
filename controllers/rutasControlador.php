@@ -50,28 +50,6 @@ function ControladorGuardarRutas($datos, $link)
     }
 }
 
-
-header('Content-Type: application/json');
-
-$resultado = ConsultarRutasModulo($link);
-
-if (!$resultado) {
-    echo json_encode(["error" => "Error en la consulta"]);
-    exit;
-}
-
-$rutas = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
-
-// Verificar si hay datos
-if (empty($rutas)) {
-    echo json_encode([]); // Devolver un array vacío en lugar de una respuesta vacía
-    exit;
-}
-
-echo json_encode($rutas);
-
-
-
 function ControladorConsultarRutas($link)
 {
     $resultado = ConsultarRutasModulo($link);
@@ -131,6 +109,45 @@ function ControladorModificarRutasMonto($link,$datos)
     }
 }
 
+function BorrarRutaControlador($link,$datos)
+{
+    if (!$datos || !isset($datos["IDRuta"])) {
+        echo json_encode(['status' => 'error', 'message' => 'Dato inválido']);
+        exit;
+    }
+
+    $idRuta = htmlspecialchars($datos["IDRuta"]);
+
+     // Verificar que los datos no estén vacíos
+     if (empty($idRuta)) {
+        echo json_encode(['status' => 'error', 'message' => 'El campo id Ruta esta vacio']);
+        exit;
+    }
+
+    // Iniciar transacción
+    mysqli_begin_transaction($link);
+    try {
+        // Llamar a la función para modificar la ruta
+        $resultado = BorrarRuta($link,$idRuta);
+        if ($resultado)
+        {
+            // Confirmar la transacción si todo va bien
+            mysqli_commit($link);
+            echo json_encode(['status' => 'success', 'message' => 'Ruta Actualizada correctamente']);
+        }else
+        {
+             // Lanzar una excepción si la modificación falla
+            throw new Exception('No se pudo borrar la ruta.');
+        }
+
+    } catch (Exception $e) {
+        // Revertir cambios en caso de error
+        mysqli_rollback($link);
+        echo json_encode(['status' => 'error', 'message' => 'Error al borrar ruta: ' . $e->getMessage()]);
+    }
+
+}
+
 if (!$link) {
     echo json_encode(['status' => 'error', 'message' => 'Error en la conexión a la base de datos']);
     exit;
@@ -148,8 +165,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
         ControladorGuardarRutas($datos, $link);
     }
+    elseif($datos["accion"] == "borrar")
+    {
+        BorrarRutaControlador($link,$datos);
+    }
 }
-
-
 
 ?>
