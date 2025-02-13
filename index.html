@@ -233,6 +233,7 @@
 
             <div id="registro" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4 mt-6">Crear Rutas</h2>
+                
 
                 <h3 class="text-xl font-bold mt-4">Lista de Rutas</h3>
     <ul id="rutasList" class="mt-2 bg-gray-700 p-4 rounded"></ul>
@@ -250,14 +251,26 @@
     </div>
     
     
-    <!-- Formulario para Crear Rutas -->
-    <form id="routeForm" class="bg-card p-4 rounded space-y-4">
-        <input type="text" id="nombreRuta" placeholder="Nombre de la ruta" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="number" id="fondosRuta" placeholder="Fondos que tendrá la ruta" class="w-full p-2 bg-gray-800 rounded" required>
-        <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">Crear Ruta</button>
-        <button onclick="openEditRouteModal(client.id)">Editar Ruta</button>
+    <form id="routeForm" class="bg-card p-6 rounded-lg shadow-md space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" id="nombreRuta" placeholder="Nombre de la ruta"
+            class="w-full p-3 bg-gray-800 text-white rounded-lg focus:ring focus:ring-blue-500" required>
+        <input type="number" id="fondosRuta" placeholder="Fondos de la ruta"
+            class="w-full p-3 bg-gray-800 text-white rounded-lg focus:ring focus:ring-blue-500" required>
+    </div>
 
-    </form>
+    <div class="flex flex-wrap gap-2 justify-center">
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+            Crear Ruta
+        </button>
+        <button type="button" id="editRoute" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+            Editar Ruta
+        </button>
+        <button type="button" id="deleteRoute" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+            Borrar Ruta
+        </button>
+    </div>
+</form>
     <h2 class="text-2xl font-bold mb-4">Registro de Clientes</h2>
 
     <form id="clientForm" class="bg-card p-4 rounded space-y-4">
@@ -270,7 +283,7 @@
         <input type="number" id="cuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-800 rounded" required min="1" max="12">
     
         <!-- Nuevo campo: Interés por mora -->
-        <input type="number" id="interesMora" placeholder="Interés por mora (%)" class="w-full p-2 bg-gray-800 rounded" required min="0">
+        <input type="number" id="interesMora" placeholder="Interés de prestamos (%)" class="w-full p-2 bg-gray-800 rounded" required min="0">
     
         <!-- Nuevo campo: Frecuencia de cobro -->
         <select id="frecuenciaCobro" class="w-full p-2 bg-gray-800 rounded" required>
@@ -286,7 +299,7 @@
             <option value="">Selecciona una ruta</option>
         </select>
     
-        <textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded"></textarea>
+        <textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded" required></textarea>
         <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Registrar Cliente</button>
     </form>
     
@@ -296,6 +309,7 @@
         
             <div id="prestamos" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Préstamos Activos</h2>
+                <input type="text" id="filterInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border border-white bg-black text-white">
                 <div class="bg-card p-4 rounded overflow-x-auto">
                     <table class="w-full">
                         <thead>
@@ -340,6 +354,7 @@
         
             <div id="prestamos-terminados" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Préstamos Terminados</h2>
+                <input type="text" id="filterFinishedInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border bg-black text-white border-white"> <br>
                 • <strong>Aviso:</strong> No se Recomienda borrar la informacion de los prestamos terminados.
                 <br>
                 <br>
@@ -363,6 +378,7 @@
                 <h2 class="text-2xl font-bold mb-4">Calendario de Pagos</h2>
                 <div class="bg-card p-4 rounded overflow-x-auto mb-6">
                     <h3 class="text-xl font-semibold mb-2">Pagos Próximos</h3>
+                    <input type="text" id="filterProximosInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border bg-black text-white border-white">
                     <table class="w-full">
                         <thead>
                             <tr class="text-left">
@@ -398,6 +414,7 @@
 
             <div id="multas-recargos" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Multas y Recargos</h2>
+                <input type="text" id="filterLatePaymentsInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border bg-black text-white border-white">
                 <div class="bg-card p-4 rounded overflow-x-auto mb-6">
                     <h3 class="text-xl font-semibold mb-2">Pagos Vencidos</h3>
                     <table class="w-full">
@@ -548,6 +565,7 @@
 
             <div id="historial-prestamos" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Historial de Préstamos / Facturación</h2>
+                <input type="text" id="filterHistorialInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border border-white bg-black text-white">
                 <div class="bg-card p-4 rounded overflow-x-auto">
                     <table class="w-full">
                         <thead>
@@ -568,6 +586,7 @@
 
             <div id="analisis-riesgo" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Análisis de Riesgo</h2>
+                <input type="text" id="filterAnalisisInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border bg-black text-white border-white">
                 <div class="bg-card p-4 rounded overflow-x-auto">
                     <table class="w-full">
                         <thead>
