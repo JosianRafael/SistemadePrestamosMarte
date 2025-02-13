@@ -891,10 +891,6 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
     }
 });
 
-
-        document.addEventListener("DOMContentLoaded", () => {
-            initRouteForm();
-        });
         
         document.addEventListener("DOMContentLoaded", () => {
             initRouteForm();

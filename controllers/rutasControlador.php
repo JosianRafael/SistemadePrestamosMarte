@@ -109,6 +109,7 @@ function ControladorModificarRutasMonto($link,$datos)
     }
 }
 
+<<<<<<< HEAD
 function BorrarRutaControlador($link,$datos)
 {
     if (!$datos || !isset($datos["IDRuta"])) {
@@ -152,17 +153,24 @@ if (!$link) {
     echo json_encode(['status' => 'error', 'message' => 'Error en la conexión a la base de datos']);
     exit;
 }
+=======
+>>>>>>> bcf310f (Cambios realizados:)
 
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
-    if ($datos["accion"] == "obtenerRutas")
-    {
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if ($datos["accion"] == "obtenerRutas") {
         ControladorConsultarRutas($link);
+<<<<<<< HEAD
     }elseif($datos["accion"] == "modificar")
     {
         ControladorModificarRutasMonto($link,$datos);
     }elseif($datos["accion"] == "lectura")
     {
+=======
+    } elseif ($datos["accion"] == "") {
+        ControladorModificarRutasMonto($link, $datos);
+    } elseif ($datos["accion"] == "lectura") {
+>>>>>>> bcf310f (Cambios realizados:)
         ControladorGuardarRutas($datos, $link);
     }
     elseif($datos["accion"] == "borrar")

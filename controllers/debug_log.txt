@@ -3441,3 +3441,374 @@ Datos recibidos:
 Datos recibidos: 
 Datos recibidos: 
 Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+rray
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => juan
+    [fondosRuta] => 10000
+    [accion] => lectura
+)
+
+Datos recibidos: Array
+(
+    [nombreRuta] => juan
+    [fondosRuta] => 10000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Cartera 1
+    [fondosRuta] => 78
+    [accion] => lectura
+)
+
+Datos recibidos: Array
+(
+    [nombreRuta] => Cartera 1
+    [fondosRuta] => 78
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Josian
+    [fondosRuta] => 7000
+    [accion] => escritura
+)
+
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => juan
+    [fondosRuta] => 1111
+    [accion] => escritura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => juan1
+    [fondosRuta] => 111
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Juan2
+    [fondosRuta] => 222
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => juan
+    [fondosRuta] => 222
+    [accion] => lectura
+)
+
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => hola
+    [fondosRuta] => 2000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Josian
+    [fondosRuta] => 70000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Josian
+    [fondosRuta] => 70000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Josian
+    [fondosRuta] => 7777
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => jun
+    [fondosRuta] => 7777
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => Josian
+    [fondosRuta] => 7000
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [accion] => obtenerRutas
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: Array
+(
+    [nombreRuta] => jun
+    [fondosRuta] => 8888
+    [accion] => lectura
+)
+
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
+Datos recibidos: 
