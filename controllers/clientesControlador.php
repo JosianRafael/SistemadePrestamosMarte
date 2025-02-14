@@ -19,7 +19,7 @@ function ControladorGuardarClientes($datos, $link)
     if (!$datos || !isset($datos["nombre"], $datos["apellido"], $datos["numero"], $datos["correo"], 
                           $datos["direccion"], $datos["fechaPrestamo"], $datos["monto"],$datos["cuotas"],
                           $datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"],$datos["ruta"]
-                          ,$datos["interesMora"],$datos["frecuenciaCobro"],$datos["InteresPrestamo"],$datos["TipoInteres"])) {
+                         ,$datos["frecuenciaCobro"],$datos["InteresPrestamo"],$datos["interesMora"])) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
@@ -37,15 +37,13 @@ function ControladorGuardarClientes($datos, $link)
     $fechasPago = $datos["fechasPago"];
     $mensaje = htmlspecialchars($datos["mensaje"]);
     $ruta = htmlspecialchars($datos["ruta"]);
-    $interesMora = htmlspecialchars($datos["interesMora"]);
     $frecuenciaCobro = htmlspecialchars($datos["frecuenciaCobro"]);
-    $interesPrestamo = htmlspecialchars($datos["InteresPrestamo"]);
-    $tipoInteres = htmlspecialchars($datos["TipoInteres"]);
+    $interesPrestamo = htmlspecialchars($datos["interesMora"]);
     // Verificar que los datos no estén vacíos
     if (empty($nombre) || empty($apellido) || empty($numero) || empty($direccion) ||
         empty($fechaprestamo) || empty($monto) || empty($cuotas) || empty($montoPorCuota) 
-        || empty($fechasPago) || empty($mensaje) || empty($ruta) || empty($interesMora)
-        ||empty($frecuenciaCobro) || empty($fechaprestamo) ||empty($tipoInteres)) {
+        || empty($fechasPago) || empty($mensaje) || empty($ruta)||empty($frecuenciaCobro) 
+        || empty($fechaprestamo) ) {
         echo json_encode(['status' => 'error', 'message' => 'Favor complete todos los campos']);
         exit;
     }
@@ -72,7 +70,7 @@ function ControladorGuardarClientes($datos, $link)
         {
             //Crear el prestamo
             CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo,
-            $ID_de_la_ruta,$interesMora,$frecuenciaCobro,$interesPrestamo,$tipoInteres);
+            $ID_de_la_ruta,$frecuenciaCobro,$interesPrestamo);
             
             $prestamo_id = mysqli_insert_id($link);
             $monto_negativo = -1 * $monto;
@@ -86,6 +84,8 @@ function ControladorGuardarClientes($datos, $link)
                 echo json_encode(['status' => 'error', 'message' => 'No se pudo modificar el saldo de la ruta']);
                 mysqli_rollback($link);
             }
+            
+            $montoPorCuota = ($monto + ($monto* $interesPrestamo))/$cuotas;
 
             //Crear el calendario de pagos
             CrearCalendarioDePagos($link,$prestamo_id,$montoPorCuota,$fechasPago,$cuotas);
@@ -236,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         case 'leerclienteinactivocalendariopago';
             EnviarClientesInactivosCalendarioPagos($link);
             break;
-            case 'borrar';
+        case 'borrar';
                 BorrarClientesInactivos($link,$datos);
             break;
         default:

@@ -6,10 +6,10 @@ function GuardarClientesModulo($link,$nombre,$apellido,$telefono,$correo,$direcc
     mysqli_query($link,$query);
 }
 
-function CrearPrestamoModulo ($link,$cliente_id,$monto,$cuotas,$mensaje,$fecha_concesion,$ruta_id,$interesmora,$frecuenciaPago,$interesPrestamo,$TipoInteres)
+function CrearPrestamoModulo ($link,$cliente_id,$monto,$cuotas,$mensaje,$fecha_concesion,$ruta_id,$frecuenciaPago,$interesPrestamo)
 {
-    $query = "INSERT INTO prestamos (id_cliente, monto,cuotas,interes,interes_mora,tipo_interes,mensaje,fecha_concesion,frecuencia_pago,IDRuta) VALUES 
-    ('$cliente_id', '$monto','$cuotas','$interesPrestamo','$interesmora','$TipoInteres','$mensaje','$fecha_concesion','$frecuenciaPago','$ruta_id')";
+    $query = "INSERT INTO prestamos (id_cliente, monto,cuotas,interes,mensaje,fecha_concesion,frecuencia_pago,IDRuta) VALUES 
+    ('$cliente_id', '$monto','$cuotas','$interesPrestamo','$mensaje','$fecha_concesion','$frecuenciaPago','$ruta_id')";
     mysqli_query($link,$query);
 }
 
@@ -56,6 +56,11 @@ function ConsultarClientesInactivosCalendario($link)
 {
     $query = "SELECT * FROM vista_calendario_pagos_historico";
     return mysqli_query($link,$query);
+}
+
+function PagarCuota($link,$ID_CalendarioPago,$monto)
+{
+    
 }
 
 ?>
