@@ -1035,10 +1035,67 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
         rutas.forEach(ruta => {
             const li = document.createElement("li");
             li.className = "bg-gray-800 p-2 rounded mt-2";
-            li.textContent = `Ruta: ${ruta.NombreRuta || "Sin nombre"} - Fondos: ${ruta.Monto || "0"}`;
+            li.textContent = `Nombre de la Ruta: ${ruta.NombreRuta || "Sin nombre"} - Fondos de Rutas: ${ruta.Monto || "0"}`;
             rutasList.appendChild(li);
         });
     }
+
+    // Aqui es donde interactua el boton de editar y borrar las Rutas. Json a Php.
+
+    document.getElementById("editRoute").addEventListener("click", async () => {
+        const { value: nuevoNombre } = await Swal.fire({
+            title: "Editar Ruta",
+            input: "text",
+            inputLabel: "Nuevo nombre de la ruta",
+            showCancelButton: true,
+        });
+    
+        if (nuevoNombre) {
+            const { value: nuevoMonto } = await Swal.fire({
+                title: "Editar Fondos",
+                input: "number",
+                inputLabel: "Nuevo monto de la ruta",
+                showCancelButton: true,
+            });
+    
+            if (nuevoMonto !== null) {
+                const data = { action: "edit", NombreRuta: nuevoNombre, Monto: nuevoMonto };
+                
+                fetch("server.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => Swal.fire("Éxito", "Ruta editada correctamente", "success"))
+                .catch(error => Swal.fire("Error", "No se pudo editar la ruta", "error"));
+            }
+        }
+    });
+    
+    document.getElementById("deleteRoute").addEventListener("click", async () => {
+        const confirmacion = await Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción eliminará la ruta permanentemente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, borrar",
+            cancelButtonText: "Cancelar",
+        });
+    
+        if (confirmacion.isConfirmed) {
+            const data = { action: "delete" };
+    
+            fetch("server.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => Swal.fire("Eliminado", "La ruta ha sido eliminada", "success"))
+            .catch(error => Swal.fire("Error", "No se pudo eliminar la ruta", "error"));
+        }
+    });
     
         
         
@@ -1062,6 +1119,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
             window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank');
         }
         
+
         function renderClients() {
             const clients = getClients();
             console.log("Clientes obtenidos:", clients); // Verifica si hay clientes
@@ -1171,7 +1229,140 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                     clientTableReducedContainer.innerHTML = reducedTablesHTML;
                 })
                 .catch(error => console.error('Error al obtener rutas:', error));
+
+        // Almacenar la lista original de clientes
+let originalClients = [];
+
+function renderClients() {
+    const clients = getClients();
+    originalClients = clients; // Guardar la lista original de clientes
+    console.log("Clientes obtenidos:", clients); // Verifica si hay clientes
+
+    fetch('controllers/rutasControlador.php')
+        .then(response => response.json())
+        .then(rutas => {
+            console.log("Rutas obtenidas:", rutas); // Verifica si las rutas se obtienen correctamente
+
+            updateTotalRutas(rutas.length);
+
+            // Verifica que 'clientTable' existe antes de modificar el innerHTML
+            const clientTable = document.getElementById('clientTable');
+            if (!clientTable) {
+                console.error("Elemento clientTable no encontrado");
+                return;
+            }
+
+            // Llama a la función para actualizar la tabla
+            updateClientTable(clients, rutas);
+
+            // Agregar evento de entrada para el filtro
+            const filterInput = document.getElementById('filterInput');
+            filterInput.addEventListener('input', function() {
+                const filterValue = filterInput.value.toLowerCase();
+                const filteredClients = originalClients.filter(client =>
+                    client.nombre.toLowerCase().includes(filterValue)
+                );
+                updateClientTable(filteredClients, rutas); // Actualizar la tabla con los clientes filtrados
+            });
+        })
+        .catch(error => console.error('Error al obtener rutas:', error));
+}
+
+// Función para actualizar la tabla de clientes
+function updateClientTable(clients, rutas) {
+    const clientTable = document.getElementById('clientTable');
+    clientTable.innerHTML = 
+        `<tbody>
+            ${clients.map(client => {
+                const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]);
+                const rutaNombre = getRouteNameById(client.ruta, rutas);
+                
+                return `
+                    <tr class="text-xs">
+                        <td class="p-2">${client.nombre}</td>
+                        <td class="p-2">${client.apellido}</td>
+                        <td class="p-2">${client.numero}</td>
+                        <td class="p-2">${rutaNombre}</td>
+                        <td class="p-2">$${client.monto.toFixed(2)}</td>
+                        <td class="p-2">${client.cuotas}</td>
+                        <td class="p-2">${client.fechasPago.join(',<br> ')}</td>
+                        <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
+                        <td class="p-2">
+                            <button onclick="editClient(${client.id})" class="action-button mb-1 text-xs">Editar</button>
+                            <button onclick="deleteClient(${client.id})" class="action-button mb-1 text-xs">Borrar</button>
+                            <button onclick="finishLoan(${client.id})" class="action-button text-xs">Terminar</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('')}
+        </tbody>
+    `;
+
+    // Tabla reducida dividida por rutas
+    const clientTableReducedContainer = document.getElementById('clientTableReducedContainer');
+    if (!clientTableReducedContainer) {
+        console.error("Elemento clientTableReducedContainer no encontrado");
+        return;
+    }
+
+    const clientsByRoute = {};
+    clients.forEach(client => {
+        const rutaNombre = getRouteNameById(client.ruta, rutas);
+        if (!clientsByRoute[rutaNombre]) {
+            clientsByRoute[rutaNombre] = [];
+
         }
+        clientsByRoute[rutaNombre].push(client);
+    });
+
+    let reducedTablesHTML = '';
+    Object.keys(clientsByRoute).forEach(ruta => {
+        reducedTablesHTML += 
+            `<div class="mb-5">
+                <h2 class="text-lg font-bold mb-2">Ruta: ${ruta}</h2>
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="p-2 border">Nombre</th>
+                            <th class="p-2 border">Apellido</th>
+                            <th class="p-2 border">Teléfono</th>
+                            <th class="p-2 border">Monto Final</th> <!-- Monto Final con Interés -->
+                            <th class="p-2 border">Ruta</th>
+                            <th class="p-2 border">Dirección</th>
+                            <th class="p-2 border">WhatsApp Mensaje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    ${clientsByRoute[ruta].map(client => {
+                        const interes = parseFloat(client.interes) || 0; // Si no es un número, establece como 0
+                        const monto = parseFloat(client.monto) || 0; // Asegúrate de que el monto también sea un número
+                        const montoFinal = monto + (monto * (interes / 100)); // Calcula el monto final incluyendo el interés
+                    
+                        return `
+                            <tr class="text-sm">
+                                <td class="p-2 border">${client.nombre}</td>
+                                <td class="p-2 border">${client.apellido}</td>
+                                <td class="p-2 border">${client.numero}</td>
+                                <td class="p-2 border">$${montoFinal.toFixed(2)}</td> <!-- Muestra el monto final -->
+                                <td class="p-2 border">${ruta}</td>
+                                <td class="p-2 border">${client.direccion}</td>
+                                <td class="p-2 border">
+                                    <input type="text" id="mensaje-${client.numero}" class="p-1 w-28 text-xs bg-gray-700 rounded" placeholder="Mensaje">
+                                    <button onclick="sendWhatsAppMessageReduced(${client.numero})" class="bg-green-600 text-white text-xs px-2 py-1 rounded">Enviar</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                    
+                    </tbody>
+                </table>
+            </div>
+        `;
+    });
+
+    clientTableReducedContainer.innerHTML = reducedTablesHTML;
+}
+
         
         
         
@@ -1232,23 +1423,38 @@ function sendWhatsAppMessage(clientId) {
     window.open(whatsappUrl, '_blank');
 }
 
-        function renderFinishedLoans() {
-            const finishedLoans = getFinishedLoans();
-            $('finishedLoansTable').innerHTML = finishedLoans.map(loan => `
-                <tr>
-                    <td class="p-2">${loan.nombre}</td>
-                    <td class="p-2">${loan.apellido}</td>
-                    <td class="p-2">${loan.correo}</td>
-                    <td class="p-2">$${loan.monto.toFixed(2)}</td>
-                    <td class="p-2">${loan.fechaFinalizacion}</td>
-                    <td class="p-2">
-                        <button onclick="editFinishedLoan(${loan.id})" class="action-button mb-1">Editar</button>
-                        <button onclick="returnLoan(${loan.id})" class="action-button mb-1">Devolver</button>
-                        <button onclick="deleteFinishedLoan(${loan.id})" class="action-button">Eliminar</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+function renderFinishedLoans() {
+    const finishedLoans = getFinishedLoans();
+
+    // Obtener el valor del input de filtrado
+    const filterInput = document.getElementById('filterFinishedInput');
+    const filterValue = filterInput.value.toLowerCase();
+
+    // Filtrar los préstamos finalizados según el nombre o apellido
+    const filteredLoans = finishedLoans.filter(loan => 
+        `${loan.nombre} ${loan.apellido}`.toLowerCase().includes(filterValue)
+    );
+
+    // Generar el HTML de la tabla basada en los préstamos filtrados
+    $('finishedLoansTable').innerHTML = filteredLoans.map(loan => `
+        <tr>
+            <td class="p-2">${loan.nombre}</td>
+            <td class="p-2">${loan.apellido}</td>
+            <td class="p-2">${loan.correo}</td>
+            <td class="p-2">$${loan.monto.toFixed(2)}</td>
+            <td class="p-2">${loan.fechaFinalizacion}</td>
+            <td class="p-2">
+                <button onclick="editFinishedLoan(${loan.id})" class="action-button mb-1">Editar</button>
+                <button onclick="returnLoan(${loan.id})" class="action-button mb-1">Devolver</button>
+                <button onclick="deleteFinishedLoan(${loan.id})" class="action-button">Eliminar</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Agregar un evento al input de filtrado para actualizar la tabla al escribir
+document.getElementById('filterFinishedInput').addEventListener('input', renderFinishedLoans);
+
 
         function calcularDiasRestantes(fechaUltimoPago) {
             const hoy = new Date();
@@ -1640,10 +1846,37 @@ function sendWhatsAppMessage(clientId) {
             renderMultasRecargos();
         }
         
+
         async function renderPagosVencidos() {
             await syncPagosVencidosConServidor(); // Asegurar que cargamos desde el servidor
+
+            // Mapear los pagos vencidos para calcular los días de retraso y el monto total
+            pagosVencidos = pagosVencidos.map(pago => {
+                const diasAtraso = Math.max(0, Math.floor((new Date(hoy) - new Date(pago.fechaVencimiento)) / (1000 * 60 * 60 * 24)));
+                const interesMora = pago.interesMora ?? 0.10; // Usa el interés personalizado o 10% por defecto
+                const montoMora = pago.montoOriginal * interesMora * diasAtraso;
         
-            const tablaVencidos = pagosVencidos.map(pago => `
+                return {
+                    ...pago,
+                    diasRetraso: diasAtraso,
+                    montoTotal: pago.montoOriginal + montoMora
+                };
+            });
+        
+            savePagosVencidos(); // Guardar la lista actualizada en localStorage
+
+        
+            // Obtener el valor del input de filtrado
+            const filterInput = document.getElementById('filterLatePaymentsInput');
+            const filterValue = filterInput.value.toLowerCase();
+        
+            // Filtrar los pagos vencidos según el nombre o apellido
+            const filteredPagosVencidos = pagosVencidos.filter(pago => 
+                `${pago.nombre} ${pago.apellido}`.toLowerCase().includes(filterValue)
+            );
+        
+            // Generar el HTML de la tabla basada en los pagos vencidos filtrados
+            const tablaVencidos = filteredPagosVencidos.map(pago => `
                 <tr>
                     <td class="p-2">${pago.nombre}</td>
                     <td class="p-2">${pago.apellido}</td>
@@ -1657,6 +1890,7 @@ function sendWhatsAppMessage(clientId) {
                 </tr>
             `).join('');
         
+            // Actualizar el contenido de la tabla
             $('pagosVencidosTable').innerHTML = tablaVencidos;
             $('multasRecargosTable').innerHTML = tablaVencidos;
         }
@@ -1666,6 +1900,66 @@ function sendWhatsAppMessage(clientId) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
+
+        // Agregar un evento al input de filtrado para actualizar la tabla al escribir
+        document.getElementById('filterLatePaymentsInput').addEventListener('input', renderPagosVencidos);
+        
+        
+
+
+        function updateMultasRecargosCharts() {
+            const ctx1 = $('multasChart').getContext('2d');
+            const ctx2 = $('recargosChart').getContext('2d');
+            
+            if (multasChart) multasChart.destroy();
+            if (recargosChart) recargosChart.destroy();
+
+            const montosOriginales = pagosVencidos.map(pago => pago.montoOriginal);
+            const intereses = pagosVencidos.map(pago => pago.montoTotal - pago.montoOriginal);
+
+            multasChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: pagosVencidos.map(pago => `${pago.nombre} ${pago.apellido}`),
+                    datasets: [{
+                        label: 'Monto Original',
+                        data: montosOriginales,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            recargosChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: pagosVencidos.map(pago => `${pago.nombre} ${pago.apellido}`),
+                    datasets: [{
+                        label: 'Interés por Mora',
+                        data: intereses,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+
             });
         
             const data = await response.json();
@@ -1719,8 +2013,17 @@ function sendWhatsAppMessage(clientId) {
             const clients = getClients();
             const finishedLoans = getFinishedLoans();
             const allLoans = [...clients, ...finishedLoans].sort((a, b) => new Date(b.fechaPrestamo) - new Date(a.fechaPrestamo));
-
-            $('historialPrestamosTable').innerHTML = allLoans.map(loan => `
+        
+            // Obtener el valor del input de filtrado
+            const filterInput = document.getElementById('filterHistorialInput');
+            const filterValue = filterInput.value.toLowerCase();
+        
+            // Filtrar los préstamos según el nombre del cliente
+            const filteredLoans = allLoans.filter(loan => 
+                `${loan.nombre} ${loan.apellido}`.toLowerCase().includes(filterValue)
+            );
+        
+            document.getElementById('historialPrestamosTable').innerHTML = filteredLoans.map(loan => `
                 <tr>
                     <td class="p-2">${loan.id}</td>
                     <td class="p-2">${loan.nombre} ${loan.apellido}</td>
@@ -1734,6 +2037,10 @@ function sendWhatsAppMessage(clientId) {
                 </tr>
             `).join('');
         }
+        
+        // Agregar un evento al input de filtrado para actualizar la tabla al escribir
+        document.getElementById('filterHistorialInput').addEventListener('input', renderHistorialPrestamos);
+        
 
         function viewLoanDetails(id) {
     const clients = getClients();
@@ -1877,22 +2184,38 @@ function imprimirFactura() {
         }
 
         function renderAnalisisRiesgo() {
-    const clients = getClients();
-    $('riskAnalysisTable').innerHTML = clients.map(client => {
-        const cuotasAtrasadas = pagosVencidos.filter(pago => pago.clientId === client.id).length;
-        const porcentajeRiesgo = calcularPorcentajeRiesgo(client.cuotas, cuotasAtrasadas);
-        const rowClass = porcentajeRiesgo <= 70 ? 'text-red-500' : '';
-        return `
-            <tr class="${rowClass}">
-                <td class="p-2">${client.nombre}</td>
-                <td class="p-2">${client.apellido}</td>
-                <td class="p-2">${client.cuotas}</td>
-                <td class="p-2">${cuotasAtrasadas}</td>
-                <td class="p-2">${porcentajeRiesgo.toFixed(2)}%</td>
-            </tr>
-        `;
-    }).join('');
-}
+            const clients = getClients();
+            
+            // Obtener el valor del input de filtrado
+            const filterInput = document.getElementById('filterAnalisisInput');
+            const filterValue = filterInput.value.toLowerCase();
+        
+            // Filtrar los clientes según el nombre o apellido
+            const filteredClients = clients.filter(client => 
+                `${client.nombre} ${client.apellido}`.toLowerCase().includes(filterValue)
+            );
+        
+            // Generar el HTML de la tabla basada en los clientes filtrados
+            $('riskAnalysisTable').innerHTML = filteredClients.map(client => {
+                const cuotasAtrasadas = pagosVencidos.filter(pago => pago.clientId === client.id).length;
+                const porcentajeRiesgo = calcularPorcentajeRiesgo(client.cuotas, cuotasAtrasadas);
+                const rowClass = porcentajeRiesgo <= 70 ? 'text-red-500' : '';
+                
+                return `
+                    <tr class="${rowClass}">
+                        <td class="p-2">${client.nombre}</td>
+                        <td class="p-2">${client.apellido}</td>
+                        <td class="p-2">${client.cuotas}</td>
+                        <td class="p-2">${cuotasAtrasadas}</td>
+                        <td class="p-2">${porcentajeRiesgo.toFixed(2)}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Agregar un evento al input de filtrado para actualizar la tabla al escribir
+        document.getElementById('filterAnalisisInput').addEventListener('input', renderAnalisisRiesgo);
+        
 
 function calcularPorcentajeRiesgo(cuotasIniciales, cuotasAtrasadas) {
     const puntosAFavor = cuotasAtrasadas * 10; // Restar 8 puntos por cada cuota atrasada
@@ -1927,7 +2250,17 @@ function renderProximosPagos() {
     ).filter(pago => pago.diasRestantes >= 0)
     .sort((a, b) => a.diasRestantes - b.diasRestantes);
 
-    $('proximosPagosTable').innerHTML = proximosPagos.map(pago => `
+    // Obtener el valor del input de filtrado
+    const filterInput = document.getElementById('filterProximosInput');
+    const filterValue = filterInput.value.toLowerCase();
+
+    // Filtrar los pagos según el nombre o apellido
+    const filteredPagos = proximosPagos.filter(pago => 
+        `${pago.nombre} ${pago.apellido}`.toLowerCase().includes(filterValue)
+    );
+
+    // Generar el HTML de la tabla basada en los pagos filtrados
+    $('proximosPagosTable').innerHTML = filteredPagos.map(pago => `
         <tr>
             <td class="p-2">${pago.nombre}</td>
             <td class="p-2">${pago.apellido}</td>
@@ -1940,6 +2273,10 @@ function renderProximosPagos() {
         </tr>
     `).join('');
 }
+
+// Agregar un evento al input de filtrado para actualizar la tabla al escribir
+document.getElementById('filterProximosInput').addEventListener('input', renderProximosPagos);
+
 
 function mostrarPrestamosVencidos() {
     const clients = getClients(); // Obtener todos los clientes
