@@ -236,6 +236,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         case 'leerclienteinactivocalendariopago';
             EnviarClientesInactivosCalendarioPagos($link);
             break;
+            case 'borrar';
+                BorrarClientesInactivos($link,$datos);
+            break;
         default:
             echo json_encode(['status' => 'error', 'message' => 'Error en la clave accion']);
             break;
