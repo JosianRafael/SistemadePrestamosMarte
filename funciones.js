@@ -1258,23 +1258,42 @@ function sendWhatsAppMessage(clientId) {
     window.open(whatsappUrl, '_blank');
 }
 
-        function renderFinishedLoans() {
-            const finishedLoans = getFinishedLoans();
-            $('finishedLoansTable').innerHTML = finishedLoans.map(loan => `
-                <tr>
-                    <td class="p-2">${loan.nombre}</td>
-                    <td class="p-2">${loan.apellido}</td>
-                    <td class="p-2">${loan.correo}</td>
-                    <td class="p-2">$${loan.monto.toFixed(2)}</td>
-                    <td class="p-2">${loan.fechaFinalizacion}</td>
-                    <td class="p-2">
-                        <button onclick="editFinishedLoan(${loan.id})" class="action-button mb-1">Editar</button>
-                        <button onclick="returnLoan(${loan.id})" class="action-button mb-1">Devolver</button>
-                        <button onclick="deleteFinishedLoan(${loan.id})" class="action-button">Eliminar</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+async function renderFinishedLoans() {
+    try {
+        const finishedLoans = getFinishedLoans();
+
+        // Convertir los préstamos finalizados en JSON
+        const response = await fetch('server.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ loans: finishedLoans })
+        });
+
+        const data = await response.json(); // Recibir la respuesta del servidor
+        if (!data.success) throw new Error(data.message);
+
+        // Renderizar la tabla con la respuesta del servidor
+        $('finishedLoansTable').innerHTML = data.loans.map(loan => `
+            <tr>
+                <td class="p-2">${loan.nombre}</td>
+                <td class="p-2">${loan.apellido}</td>
+                <td class="p-2">${loan.correo}</td>
+                <td class="p-2">$${loan.monto.toFixed(2)}</td>
+                <td class="p-2">${loan.fechaFinalizacion}</td>
+                <td class="p-2">
+                    <button onclick="editFinishedLoan(${loan.id})" class="action-button mb-1">Editar</button>
+                    <button onclick="returnLoan(${loan.id})" class="action-button mb-1">Devolver</button>
+                    <button onclick="deleteFinishedLoan(${loan.id})" class="action-button">Eliminar</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        console.error('Error al obtener los préstamos finalizados:', error);
+    }
+}
+
 
         function calcularDiasRestantes(fechaUltimoPago) {
             const hoy = new Date();
@@ -1667,25 +1686,44 @@ function sendWhatsAppMessage(clientId) {
         }
         
         async function renderPagosVencidos() {
-            await syncPagosVencidosConServidor(); // Asegurar que cargamos desde el servidor
+            try {
+                // Obtener pagos vencidos desde el servidor
+                const response = await fetch('server.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'getPagosVencidos' })
+                });
         
-            const tablaVencidos = pagosVencidos.map(pago => `
-                <tr>
-                    <td class="p-2">${pago.nombre}</td>
-                    <td class="p-2">${pago.apellido}</td>
-                    <td class="p-2">$${pago.montoOriginal.toFixed(2)}</td>
-                    <td class="p-2">$${(pago.montoTotal - pago.montoOriginal).toFixed(2)}</td>
-                    <td class="p-2">$${pago.montoTotal.toFixed(2)}</td>
-                    <td class="p-2">${pago.diasRetraso}</td>
-                    <td class="p-2">
-                        <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
-                    </td>
-                </tr>
-            `).join('');
+                const data = await response.json();
+                if (!data.success) throw new Error(data.message);
         
-            $('pagosVencidosTable').innerHTML = tablaVencidos;
-            $('multasRecargosTable').innerHTML = tablaVencidos;
+                const pagosVencidos = data.pagos;
+        
+                // Generar la tabla con los datos obtenidos
+                const tablaVencidos = pagosVencidos.map(pago => `
+                    <tr>
+                        <td class="p-2">${pago.nombre}</td>
+                        <td class="p-2">${pago.apellido}</td>
+                        <td class="p-2">$${pago.montoOriginal.toFixed(2)}</td>
+                        <td class="p-2">$${(pago.montoTotal - pago.montoOriginal).toFixed(2)}</td>
+                        <td class="p-2">$${pago.montoTotal.toFixed(2)}</td>
+                        <td class="p-2">${pago.diasRetraso}</td>
+                        <td class="p-2">
+                            <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
+                        </td>
+                    </tr>
+                `).join('');
+        
+                $('pagosVencidosTable').innerHTML = tablaVencidos;
+                $('multasRecargosTable').innerHTML = tablaVencidos;
+        
+            } catch (error) {
+                console.error('Error al obtener los pagos vencidos:', error);
+            }
         }
+        
         
         async function deleteLatePayment(id) {
             const response = await fetch('eliminar_pago_vencido.php', {
@@ -1741,25 +1779,42 @@ function sendWhatsAppMessage(clientId) {
             renderRecordatoriosPago();
         }
 
-        function renderHistorialPrestamos() {
-            const clients = getClients();
-            const finishedLoans = getFinishedLoans();
-            const allLoans = [...clients, ...finishedLoans].sort((a, b) => new Date(b.fechaPrestamo) - new Date(a.fechaPrestamo));
-
-            $('historialPrestamosTable').innerHTML = allLoans.map(loan => `
-                <tr>
-                    <td class="p-2">${loan.id}</td>
-                    <td class="p-2">${loan.nombre} ${loan.apellido}</td>
-                    <td class="p-2">$${loan.monto.toFixed(2)}</td>
-                    <td class="p-2">${loan.fechaPrestamo}</td>
-                    <td class="p-2">${loan.fechaFinalizacion || 'Activo'}</td>
-                    <td class="p-2">${loan.fechaFinalizacion ? 'Terminado' : 'Activo'}</td>
-                    <td class="p-2">
-                        <button onclick="viewLoanDetails(${loan.id})" class="action-button">Imprimir</button>
-                    </td>
-                </tr>
-            `).join('');
+        async function renderHistorialPrestamos() {
+            try {
+                // Obtener historial de préstamos desde el servidor
+                const response = await fetch('server.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'getHistorialPrestamos' })
+                });
+        
+                const data = await response.json();
+                if (!data.success) throw new Error(data.message);
+        
+                const allLoans = data.historial.sort((a, b) => new Date(b.fechaPrestamo) - new Date(a.fechaPrestamo));
+        
+                // Generar la tabla con los datos obtenidos
+                $('historialPrestamosTable').innerHTML = allLoans.map(loan => `
+                    <tr>
+                        <td class="p-2">${loan.id}</td>
+                        <td class="p-2">${loan.nombre} ${loan.apellido}</td>
+                        <td class="p-2">$${loan.monto.toFixed(2)}</td>
+                        <td class="p-2">${loan.fechaPrestamo}</td>
+                        <td class="p-2">${loan.fechaFinalizacion || 'Activo'}</td>
+                        <td class="p-2">${loan.fechaFinalizacion ? 'Terminado' : 'Activo'}</td>
+                        <td class="p-2">
+                            <button onclick="viewLoanDetails(${loan.id})" class="action-button">Imprimir</button>
+                        </td>
+                    </tr>
+                `).join('');
+        
+            } catch (error) {
+                console.error('Error al obtener el historial de préstamos:', error);
+            }
         }
+        
 
         function viewLoanDetails(id) {
     const clients = getClients();
@@ -1902,23 +1957,39 @@ function imprimirFactura() {
             });
         }
 
-        function renderAnalisisRiesgo() {
-    const clients = getClients();
-    $('riskAnalysisTable').innerHTML = clients.map(client => {
-        const cuotasAtrasadas = pagosVencidos.filter(pago => pago.clientId === client.id).length;
-        const porcentajeRiesgo = calcularPorcentajeRiesgo(client.cuotas, cuotasAtrasadas);
-        const rowClass = porcentajeRiesgo <= 70 ? 'text-red-500' : '';
-        return `
-            <tr class="${rowClass}">
-                <td class="p-2">${client.nombre}</td>
-                <td class="p-2">${client.apellido}</td>
-                <td class="p-2">${client.cuotas}</td>
-                <td class="p-2">${cuotasAtrasadas}</td>
-                <td class="p-2">${porcentajeRiesgo.toFixed(2)}%</td>
-            </tr>
-        `;
-    }).join('');
-}
+        async function renderAnalisisRiesgo() {
+            try {
+                // Obtener datos de análisis de riesgo desde el servidor
+                const response = await fetch('server.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'getAnalisisRiesgo' })
+                });
+        
+                const data = await response.json();
+                if (!data.success) throw new Error(data.message);
+        
+                // Generar la tabla con los datos obtenidos
+                $('riskAnalysisTable').innerHTML = data.analisis.map(client => {
+                    const rowClass = client.porcentajeRiesgo <= 70 ? 'text-red-500' : '';
+                    return `
+                        <tr class="${rowClass}">
+                            <td class="p-2">${client.nombre}</td>
+                            <td class="p-2">${client.apellido}</td>
+                            <td class="p-2">${client.cuotas}</td>
+                            <td class="p-2">${client.cuotasAtrasadas}</td>
+                            <td class="p-2">${client.porcentajeRiesgo.toFixed(2)}%</td>
+                        </tr>
+                    `;
+                }).join('');
+        
+            } catch (error) {
+                console.error('Error al obtener el análisis de riesgo:', error);
+            }
+        }
+        
 
 function calcularPorcentajeRiesgo(cuotasIniciales, cuotasAtrasadas) {
     const puntosAFavor = cuotasAtrasadas * 10; // Restar 8 puntos por cada cuota atrasada
@@ -1940,31 +2011,37 @@ function renderCalendarioPagos() {
     renderProximosPagos();
     renderPagosVencidos();
 }
+async function renderProximosPagos() {
+    try {
+        // Obtener los datos de los próximos pagos desde el servidor
+        const response = await fetch('server.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'getProximosPagos' })
+        });
 
-function renderProximosPagos() {
-    const clients = getClients();
-    const hoy = new Date();
-    const proximosPagos = clients.flatMap(client => 
-        client.fechasPago.map(fecha => ({
-            ...client,
-            fechaPago: fecha,
-            diasRestantes: calcularDiasRestantes(fecha)
-        }))
-    ).filter(pago => pago.diasRestantes >= 0)
-    .sort((a, b) => a.diasRestantes - b.diasRestantes);
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message);
 
-    $('proximosPagosTable').innerHTML = proximosPagos.map(pago => `
-        <tr>
-            <td class="p-2">${pago.nombre}</td>
-            <td class="p-2">${pago.apellido}</td>
-            <td class="p-2">$${pago.montoPorCuota.toFixed(2)}</td>
-            <td class="p-2">${pago.fechaPago}</td>
-            <td class="p-2">${pago.diasRestantes}</td>
-            <td class="p-2">
-                <button onclick="deletePayment(${pago.id}, '${pago.fechaPago}')" class="action-button">Eliminar</button>
-            </td>
-        </tr>
-    `).join('');
+        // Generar la tabla con los datos obtenidos
+        $('proximosPagosTable').innerHTML = data.proximosPagos.map(pago => `
+            <tr>
+                <td class="p-2">${pago.nombre}</td>
+                <td class="p-2">${pago.apellido}</td>
+                <td class="p-2">$${pago.montoPorCuota.toFixed(2)}</td>
+                <td class="p-2">${pago.fechaPago}</td>
+                <td class="p-2">${pago.diasRestantes}</td>
+                <td class="p-2">
+                    <button onclick="deletePayment(${pago.id}, '${pago.fechaPago}')" class="action-button">Eliminar</button>
+                </td>
+            </tr>
+        `).join('');
+
+    } catch (error) {
+        console.error('Error al obtener los próximos pagos:', error);
+    }
 }
 
 function mostrarPrestamosVencidos() {
