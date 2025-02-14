@@ -800,7 +800,9 @@ function addClient(e) {
     updateDashboard();
     Swal.fire('Éxito', 'Cliente registrado correctamente', 'success');
     showSection('prestamos');
-
+    
+    // Agregar la etiqueta 'accion' al objeto newClient
+    newClient.accion = 'guardar';
     // Enviar datos a PHP usando JSON
     fetch('controllers/clientesControlador.php', {
         method: 'POST',
@@ -915,7 +917,7 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                 const rutaData = {
                     nombreRuta: nombreRuta,
                     fondosRuta: parseFloat(fondosRuta),
-                    accion: "lectura" // Cambiar a "escritura" o "lectura" según sea necesario 
+                    accion: "guardar" // Cambiar a "escritura" o "lectura" según sea necesario 
                 };
         
                 // Enviar datos a PHP usando fetch
@@ -957,39 +959,48 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
             .catch(error => console.error('Error al enviar la solicitud:', error));
         }
 
-        fetch("controllers/rutasControlador.php")
-    .then(response => {
-        console.log("Estado de la respuesta:", response.status);
-        return response.json(); // Aquí podría estar el problema
-    })
-    .then(data => {
-        console.log("Datos recibidos:", data);
-        if (!Array.isArray(data)) {
-            throw new Error("La respuesta no es un array");
-        }
-        printRoutes(data);
-    })
-    .catch(error => console.error("Error al cargar las rutas:", error));
+    //     fetch("controllers/rutasControlador.php")
+    // .then(response => {
+    //     console.log("Estado de la respuesta:", response.status);
+    //     return response.json(); // Aquí podría estar el problema
+    // })
+    // .then(data => {
+    //     console.log("Datos recibidos:", data);
+    //     if (!Array.isArray(data)) {
+    //         throw new Error("La respuesta no es un array");
+    //     }
+    //     printRoutes(data);
+    // })
+    // .catch(error => console.error("Error al cargar las rutas:", error));
 
-    fetch("controllers/rutasControlador.php")
-    .then(response => response.text())  // Obtén la respuesta como texto
-    .then(data => {
-        console.log("Respuesta del servidor:", data);
-        return JSON.parse(data); // Intenta convertir a JSON
-    })
-    .then(json => {
-        console.log("JSON parseado correctamente:", json);
-    })
-    .catch(error => {
-        console.error("Error al cargar las rutas:", error);
-    });
+    // fetch("controllers/rutasControlador.php")
+    // .then(response => response.text())  // Obtén la respuesta como texto
+    // .then(data => {
+    //     console.log("Respuesta del servidor:", data);
+    //     return JSON.parse(data); // Intenta convertir a JSON
+    // })
+    // .then(json => {
+    //     console.log("JSON parseado correctamente:", json);
+    // })
+    // .catch(error => {
+    //     console.error("Error al cargar las rutas:", error);
+    // });
 
     
 
 
 
     function loadRoutes() {
-        fetch('controllers/rutasControlador.php')
+        fetch('controllers/rutasControlador.php',
+            {
+                method: 'POST', // o 'GET', dependiendo de lo que necesites
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    accion: 'obtenerRutas'
+                })
+            })
             .then(response => response.json())
             .then(rutas => {
                 const rutasSelect = document.getElementById('ruta');
@@ -1066,7 +1077,16 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
             const clients = getClients();
             console.log("Clientes obtenidos:", clients); // Verifica si hay clientes
         
-            fetch('controllers/rutasControlador.php')
+            fetch('controllers/rutasControlador.php',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        accion: 'obtenerRutas'
+                    })
+                })
                 .then(response => response.json())
                 .then(rutas => {
                     console.log("Rutas obtenidas:", rutas); // Verifica si las rutas se obtienen correctamente
@@ -1172,43 +1192,49 @@ document.getElementById('editRouteForm').addEventListener('submit', function (e)
                 })
                 .catch(error => console.error('Error al obtener rutas:', error));
         }
-        
-        
-        
-        
-
+             
         function mostrarRutaMasPopular() {
-            fetch('controllers/rutasControlador.php')
-                .then(response => response.json())
-                .then(rutas => {
-                    const clients = getClients();
-                    const rutaCount = {};
+            const rutaData = {
+                accion: 'obtenerRutas' // Clave de acción
+            };
         
-                    // Contar los clientes por ruta
-                    clients.forEach(client => {
-                        const rutaId = client.ruta;
-                        if (!rutaCount[rutaId]) {
-                            rutaCount[rutaId] = 0;
-                        }
-                        rutaCount[rutaId]++;
-                    });
+            fetch('controllers/rutasControlador.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(rutaData) // Enviar datos al servidor
+            })
+            .then(response => response.json())
+            .then(rutas => {
+                const clients = getClients();
+                const rutaCount = {};
         
-                    // Encontrar la ruta con más clientes
-                    let maxClientes = 0;
-                    let rutaMasPopular = '';
-        
-                    for (const rutaId in rutaCount) {
-                        if (rutaCount[rutaId] > maxClientes) {
-                            maxClientes = rutaCount[rutaId];
-                            rutaMasPopular = getRouteNameById(rutaId, rutas); // Obtener el nombre de la ruta
-                        }
+                // Contar los clientes por ruta
+                clients.forEach(client => {
+                    const rutaId = client.ruta;
+                    if (!rutaCount[rutaId]) {
+                        rutaCount[rutaId] = 0;
                     }
+                    rutaCount[rutaId]++;
+                });
         
-                    // Mostrar la ruta más popular en el cuadro
-                    const rutaMasPopularElement = document.getElementById('rutaMasPopular');
-                    rutaMasPopularElement.textContent = `Ruta: ${rutaMasPopular} (N° Clientes: ${maxClientes})`;
-                })
-                .catch(error => console.error('Error al obtener rutas:', error));
+                // Encontrar la ruta con más clientes
+                let maxClientes = 0;
+                let rutaMasPopular = '';
+        
+                for (const rutaId in rutaCount) {
+                    if (rutaCount[rutaId] > maxClientes) {
+                        maxClientes = rutaCount[rutaId];
+                        rutaMasPopular = getRouteNameById(rutaId, rutas); // Obtener el nombre de la ruta
+                    }
+                }
+        
+                // Mostrar la ruta más popular en el cuadro
+                const rutaMasPopularElement = document.getElementById('rutaMasPopular');
+                rutaMasPopularElement.textContent = `Ruta: ${rutaMasPopular} (N° Clientes: ${maxClientes})`;
+            })
+            .catch(error => console.error('Error al obtener rutas:', error));
         }
         
         // Llamar a la función para mostrar la ruta más popular cuando se carga el dashboard

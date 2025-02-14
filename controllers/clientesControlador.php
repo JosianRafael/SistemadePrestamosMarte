@@ -19,7 +19,7 @@ function ControladorGuardarClientes($datos, $link)
     if (!$datos || !isset($datos["nombre"], $datos["apellido"], $datos["numero"], $datos["correo"], 
                           $datos["direccion"], $datos["fechaPrestamo"], $datos["monto"],$datos["cuotas"],
                           $datos["montoPorCuota"], $datos["fechasPago"], $datos["mensaje"],$datos["ruta"]
-                         ,$datos["frecuenciaCobro"],$datos["InteresPrestamo"],$datos["interesMora"])) {
+                         ,$datos["frecuenciaCobro"],$datos["interesMora"])) {
         echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
         exit;
     }
@@ -58,9 +58,8 @@ function ControladorGuardarClientes($datos, $link)
 
         $resultado = ConsultarRutasModulo($link,true,$ruta);
         $datos_ruta = mysqli_fetch_array($resultado);
-        $ID_de_la_ruta = $datos_ruta["IDRuta"];
         $fondos_disponibles = $datos_ruta["Monto"];
-
+        file_put_contents("depurandocliente.txt", "Datos fondo: " . print_r($fondos_disponibles, true) . "\n", FILE_APPEND);
         if ($fondos_disponibles < $monto)
         {
             // No hay fondos suficientes
@@ -70,7 +69,7 @@ function ControladorGuardarClientes($datos, $link)
         {
             //Crear el prestamo
             CrearPrestamoModulo($link,$cliente_id,$monto,$cuotas,$mensaje,$fechaprestamo,
-            $ID_de_la_ruta,$frecuenciaCobro,$interesPrestamo);
+            $ruta,$frecuenciaCobro,$interesPrestamo);
             
             $prestamo_id = mysqli_insert_id($link);
             $monto_negativo = -1 * $monto;
@@ -85,8 +84,8 @@ function ControladorGuardarClientes($datos, $link)
                 mysqli_rollback($link);
             }
             
-            $montoPorCuota = ($monto + ($monto* $interesPrestamo))/$cuotas;
-
+            $montoPorCuota = ($monto + ($monto* ($interesPrestamo/100)))/$cuotas;
+            file_put_contents("depurandocliente.txt", "Datos fondo calculo monto por cuota: " . print_r($montoPorCuota, true) . "\n", FILE_APPEND);
             //Crear el calendario de pagos
             CrearCalendarioDePagos($link,$prestamo_id,$montoPorCuota,$fechasPago,$cuotas);
             

@@ -20,22 +20,22 @@ function ConsultarRutasModulo($link,$varios = false, $rutaid = "")
    
 }
 
-function ModificarRutasMontoModulo($link,$montocambiar,$nombreruta)
+function ModificarRutasMontoModulo($link,$montocambiar,$rutaid)
 {
-    $query = "SELECT  Monto FROM rutas WHERE IDRuta = '$nombreruta'";
-    $resultado = mysqli_query($link,$query);
-    $total = 0;
-    if (mysqli_num_rows($resultado) == 1)
+
+    $montoRuta = ConsultarRutasModulo($link,true,$rutaid);
+    if (mysqli_num_rows($montoRuta) == 1)
     {
-        $resultado = mysqli_fetch_array($resultado);
-        $total = $resultado["Monto"] + $montocambiar;
-        $query = "UPDATE rutas SET Monto = '$total'";
-        $resultado = mysqli_query($link,$query);
-        return true;
+        $montoRuta = mysqli_fetch_array($montoRuta);
+        $montoRuta = $montoRuta["Monto"];
+        $total = $montoRuta + $montocambiar;
+        $query = "UPDATE rutas SET Monto = '$total' WHERE IDRuta = '$rutaid'";
+        return mysqli_query($link,$query);
     }else
     {
         return false;
     }
+
 }
 
 function BorrarRuta ($link,$idRuta)
