@@ -199,6 +199,33 @@ function EnviarClientesPagosatrasados($link)
     echo json_encode($contenido);
 }
 
+function EnviarAnalisisRiesgo($link)
+{
+    $resultado = ConsultarAnalisisRiesgo($link);
+if (!$resultado) {
+    // Si no se encuentran resultados, se devuelve un error
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'No se encontraron pagos atrasados'
+    ]);
+    return;
+}
+
+$contenido = [];
+while ($fila = mysqli_fetch_assoc($resultado)) {
+    $contenido[] = $fila;
+}
+
+// Log para depuración
+file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviado analisis riesgo: " . print_r($contenido, true) . "\n", FILE_APPEND);
+
+// Devolviendo la respuesta en el formato adecuado
+echo json_encode([
+    'status' => 'success',
+    'analisis' => $contenido  // Aquí se devuelve la clave 'analisis' que el frontend espera
+]);
+
+}
 
 function BorrarClientesInactivos($link,$datos)
 {
@@ -243,9 +270,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         case 'leerclientedetalle';
             EnviarResultadosClientesActivosPrestamosDetalle($link);
             break;
-        case 'leerclientepagospendiente';
-            EnviarClientesInactivosCalendarioPagos($link);
-            break;
         case 'leerclientesinactivosdetalles';
             EnviarClientesInactivosDetalles($link);
             break;
@@ -254,6 +278,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             break;
         case 'leerclientespagosatrasados';
             EnviarClientesPagosatrasados($link);
+        break;
+        case 'leeranalisisriesgo';
+            EnviarAnalisisRiesgo($link);
         break;
         case 'borrar';
                 BorrarClientesInactivos($link,$datos);

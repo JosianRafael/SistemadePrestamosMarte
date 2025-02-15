@@ -64,6 +64,11 @@ function ConsultarClientespagosatrasados($link)
     return mysqli_query($link,$query);
 }
 
+function ConsultarAnalisisRiesgo($link)
+{
+    $query = "SELECT * FROM vista_analisis_riesgo";
+    return mysqli_query($link,$query);
+}
 
 function PagarCuota($link,$ID_CalendarioPago,$monto)
 {
