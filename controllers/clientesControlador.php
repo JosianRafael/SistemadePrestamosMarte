@@ -183,6 +183,23 @@ function EnviarClientesInactivosCalendarioPagos($link)
     echo json_encode($contenido);
 }
 
+function EnviarClientesPagosatrasados($link)
+{
+    $resultado = ConsultarClientespagosatrasados($link);
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron pagos atrasados']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviado clientes pagos atrasados: " . print_r($contenido, true) . "\n", FILE_APPEND);
+    echo json_encode($contenido);
+}
+
+
 function BorrarClientesInactivos($link,$datos)
 {
     mysqli_begin_transaction($link);
@@ -227,7 +244,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             EnviarResultadosClientesActivosPrestamosDetalle($link);
             break;
         case 'leerclientepagospendiente';
-            EnviarResultadosClientesActivosPrestamosDetalle($link);
+            EnviarClientesInactivosCalendarioPagos($link);
             break;
         case 'leerclientesinactivosdetalles';
             EnviarClientesInactivosDetalles($link);
@@ -235,6 +252,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         case 'leerclienteinactivocalendariopago';
             EnviarClientesInactivosCalendarioPagos($link);
             break;
+        case 'leerclientespagosatrasados';
+            EnviarClientesPagosatrasados($link);
+        break;
         case 'borrar';
                 BorrarClientesInactivos($link,$datos);
             break;

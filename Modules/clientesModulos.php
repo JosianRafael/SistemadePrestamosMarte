@@ -58,6 +58,13 @@ function ConsultarClientesInactivosCalendario($link)
     return mysqli_query($link,$query);
 }
 
+function ConsultarClientespagosatrasados($link)
+{
+    $query = "SELECT * FROM clientes_pagos_atrasados";
+    return mysqli_query($link,$query);
+}
+
+
 function PagarCuota($link,$ID_CalendarioPago,$monto)
 {
     
