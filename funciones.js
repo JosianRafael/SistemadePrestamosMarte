@@ -1688,42 +1688,45 @@ async function renderFinishedLoans() {
         async function renderPagosVencidos() {
             try {
                 // Obtener pagos vencidos desde el servidor
-                const response = await fetch('server.php', {
+                const response = await fetch('controllers/clientesControlador.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ action: 'getPagosVencidos' })
+                    body: JSON.stringify({ accion: 'leerclientespagosatrasados' })
                 });
         
                 const data = await response.json();
-                if (!data.success) throw new Error(data.message);
         
-                const pagosVencidos = data.pagos;
+                // Si la respuesta es un array, no necesitas verificar 'success' ni 'pagos'
+                if (!Array.isArray(data)) throw new Error('Datos mal formateados');
+        
+                // Usamos el array directamente
+                const pagosVencidos = data;
         
                 // Generar la tabla con los datos obtenidos
                 const tablaVencidos = pagosVencidos.map(pago => `
                     <tr>
                         <td class="p-2">${pago.nombre}</td>
                         <td class="p-2">${pago.apellido}</td>
-                        <td class="p-2">$${pago.montoOriginal.toFixed(2)}</td>
-                        <td class="p-2">$${(pago.montoTotal - pago.montoOriginal).toFixed(2)}</td>
-                        <td class="p-2">$${pago.montoTotal.toFixed(2)}</td>
-                        <td class="p-2">${pago.diasRetraso}</td>
+                        <td class="p-2">$${parseFloat(pago.monto).toFixed(2)}</td>
+                        <td class="p-2">${pago.mensaje || 'No disponible'}</td> <!-- Puedes cambiar esto según el campo -->
+                        <td class="p-2">${pago.estado_prestamo}</td>
                         <td class="p-2">
                             <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
                         </td>
                     </tr>
                 `).join('');
         
-                $('pagosVencidosTable').innerHTML = tablaVencidos;
-                $('multasRecargosTable').innerHTML = tablaVencidos;
+                // Actualizar las tablas con los datos renderizados
+                document.getElementById('pagosVencidosTable').innerHTML = tablaVencidos;
+                document.getElementById('multasRecargosTable').innerHTML = tablaVencidos;
         
             } catch (error) {
                 console.error('Error al obtener los pagos vencidos:', error);
             }
         }
-        
+                
         
         async function deleteLatePayment(id) {
             const response = await fetch('eliminar_pago_vencido.php', {
