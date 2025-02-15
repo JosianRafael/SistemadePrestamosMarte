@@ -527,39 +527,40 @@ function sendWhatsAppMessage(clientId) {
 
 async function renderFinishedLoans() {
     try {
-        const finishedLoans = getFinishedLoans();
-
-        // Convertir los préstamos finalizados en JSON
-        const response = await fetch('server.php', {
+        const response = await fetch('controllers/clientesControlador.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ loans: finishedLoans })
+            body: JSON.stringify({ accion: "leerclientesinactivosdetalles" })
         });
 
-        const data = await response.json(); // Recibir la respuesta del servidor
-        if (!data.success) throw new Error(data.message);
+        const data = await response.json();
+
+        // `data` ya es un array, lo usamos directamente
+        const loans = Array.isArray(data) ? data : [];
+
+        if (loans.length === 0) {
+            console.warn("No hay préstamos finalizados.");
+        }
 
         // Renderizar la tabla con la respuesta del servidor
-        $('finishedLoansTable').innerHTML = data.loans.map(loan => `
+        document.getElementById('finishedLoansTable').innerHTML = loans.map(loan => `
             <tr>
                 <td class="p-2">${loan.nombre}</td>
                 <td class="p-2">${loan.apellido}</td>
                 <td class="p-2">${loan.correo}</td>
-                <td class="p-2">$${loan.monto.toFixed(2)}</td>
-                <td class="p-2">${loan.fechaFinalizacion}</td>
-                <td class="p-2">
-                    <button onclick="editFinishedLoan(${loan.id})" class="action-button mb-1">Editar</button>
-                    <button onclick="returnLoan(${loan.id})" class="action-button mb-1">Devolver</button>
-                    <button onclick="deleteFinishedLoan(${loan.id})" class="action-button">Eliminar</button>
-                </td>
+                <td class="p-2">$${parseFloat(loan.monto).toFixed(2)}</td>
+                <td class="p-2">${loan.fecha_finalizacion || 'No disponible'}</td>
             </tr>
         `).join('');
+
     } catch (error) {
         console.error('Error al obtener los préstamos finalizados:', error);
     }
 }
+
+
 
         function calcularDiasRestantes(fechaUltimoPago) {
             const hoy = new Date();
@@ -954,42 +955,45 @@ async function renderFinishedLoans() {
         async function renderPagosVencidos() {
             try {
                 // Obtener pagos vencidos desde el servidor
-                const response = await fetch('server.php', {
+                const response = await fetch('controllers/clientesControlador.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ action: 'getPagosVencidos' })
+                    body: JSON.stringify({ accion: 'leerclientespagosatrasados' })
                 });
         
                 const data = await response.json();
-                if (!data.success) throw new Error(data.message);
         
-                const pagosVencidos = data.pagos;
+                // Si la respuesta es un array, no necesitas verificar 'success' ni 'pagos'
+                if (!Array.isArray(data)) throw new Error('Datos mal formateados');
+        
+                // Usamos el array directamente
+                const pagosVencidos = data;
         
                 // Generar la tabla con los datos obtenidos
                 const tablaVencidos = pagosVencidos.map(pago => `
                     <tr>
                         <td class="p-2">${pago.nombre}</td>
                         <td class="p-2">${pago.apellido}</td>
-                        <td class="p-2">$${pago.montoOriginal.toFixed(2)}</td>
-                        <td class="p-2">$${(pago.montoTotal - pago.montoOriginal).toFixed(2)}</td>
-                        <td class="p-2">$${pago.montoTotal.toFixed(2)}</td>
-                        <td class="p-2">${pago.diasRetraso}</td>
+                        <td class="p-2">$${parseFloat(pago.monto).toFixed(2)}</td>
+                        <td class="p-2">${pago.mensaje || 'No disponible'}</td> <!-- Puedes cambiar esto según el campo -->
+                        <td class="p-2">${pago.estado_prestamo}</td>
                         <td class="p-2">
                             <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
                         </td>
                     </tr>
                 `).join('');
         
-                $('pagosVencidosTable').innerHTML = tablaVencidos;
-                $('multasRecargosTable').innerHTML = tablaVencidos;
+                // Actualizar las tablas con los datos renderizados
+                document.getElementById('pagosVencidosTable').innerHTML = tablaVencidos;
+                document.getElementById('multasRecargosTable').innerHTML = tablaVencidos;
         
             } catch (error) {
                 console.error('Error al obtener los pagos vencidos:', error);
             }
         }
-        
+                
         
         async function deleteLatePayment(id) {
             const response = await fetch('eliminar_pago_vencido.php', {
@@ -1101,6 +1105,101 @@ async function renderFinishedLoans() {
     }
 }
 
+function generarFactura(loan, cobrador) {
+    let facturaHTML = `
+        <div id="factura" style="
+            font-family: Arial, sans-serif;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            border: 3px solid black;
+            text-align: center;
+            background: white;
+            color: black;
+            margin: auto;
+            font-size: 18px;
+        ">
+            <h1 style="margin: 10px 0;">Inversiones P&P Marte</h1>
+            <p style="font-size: 16px; margin: 5px 0;">Factura para Consumidor Final</p>
+            <hr style="border: 2px dashed black; margin: 10px 0;">
+            
+            <div style="text-align: left; font-size: 18px;">
+                <p><strong>Cliente:</strong> ${loan.nombre} ${loan.apellido}</p>
+                <p><strong>Monto:</strong> $${loan.monto.toFixed(2)}</p>
+                <p><strong>Fecha de Inicio:</strong> ${loan.fechaPrestamo}</p>
+                <p><strong>Estado:</strong> ${loan.fechaFinalizacion ? 'Terminado' : 'Activo'}</p>
+    `;
+
+    if (loan.fechaFinalizacion) {
+        facturaHTML += `<p><strong>Fecha de Finalización:</strong> ${loan.fechaFinalizacion}</p>`;
+    } else {
+        facturaHTML += `
+            <p><strong>Cuotas:</strong> ${loan.cuotas}</p>
+            <p><strong>Monto por Cuota:</strong> $${loan.montoPorCuota.toFixed(2)}</p>
+            <p><strong>Próximas Fechas de Pago:</strong><br> ${loan.fechasPago.join('<br>')}</p>
+        `;
+    }
+
+    facturaHTML += `
+            <p><strong>Cobrador:</strong> ${cobrador}</p>
+            </div>
+            <hr style="border: 2px dashed black; margin: 10px 0;">
+            <p style="margin: 10px 0; font-size: 20px;"><strong>¡Gracias por preferirnos!</strong></p>
+        </div>
+    `;
+
+    let facturaContainer = document.getElementById("factura-container");
+    if (!facturaContainer) {
+        facturaContainer = document.createElement("div");
+        facturaContainer.id = "factura-container";
+        document.body.appendChild(facturaContainer);
+    }
+    facturaContainer.innerHTML = facturaHTML;
+    facturaContainer.style.display = "block";
+
+    Swal.fire({
+        title: 'Factura del Préstamo',
+        html: facturaHTML,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Imprimir',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            setTimeout(imprimirFactura, 500);
+        }
+    });
+}
+
+function imprimirFactura() {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #factura-container, #factura-container * {
+                visibility: visible;
+            }
+            #factura-container {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                max-width: 600px;
+                display: block;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    setTimeout(() => {
+        window.print();
+        document.head.removeChild(style);
+    }, 300);
+}
+
+        //quitar esta opcion
         function deleteFinishedLoan(id) {
             Swal.fire({
                 title: '¿Estás seguro?',
