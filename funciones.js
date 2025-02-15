@@ -1260,39 +1260,39 @@ function sendWhatsAppMessage(clientId) {
 
 async function renderFinishedLoans() {
     try {
-        const finishedLoans = getFinishedLoans();
-
-        // Convertir los préstamos finalizados en JSON
-        const response = await fetch('server.php', {
+        const response = await fetch('controllers/clientesControlador.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ loans: finishedLoans })
+            body: JSON.stringify({ accion: "leerclientesinactivosdetalles" })
         });
 
-        const data = await response.json(); // Recibir la respuesta del servidor
-        if (!data.success) throw new Error(data.message);
+        const data = await response.json();
+
+        // `data` ya es un array, lo usamos directamente
+        const loans = Array.isArray(data) ? data : [];
+
+        if (loans.length === 0) {
+            console.warn("No hay préstamos finalizados.");
+        }
 
         // Renderizar la tabla con la respuesta del servidor
-        $('finishedLoansTable').innerHTML = data.loans.map(loan => `
+        document.getElementById('finishedLoansTable').innerHTML = loans.map(loan => `
             <tr>
                 <td class="p-2">${loan.nombre}</td>
                 <td class="p-2">${loan.apellido}</td>
                 <td class="p-2">${loan.correo}</td>
-                <td class="p-2">$${loan.monto.toFixed(2)}</td>
-                <td class="p-2">${loan.fechaFinalizacion}</td>
-                <td class="p-2">
-                    <button onclick="editFinishedLoan(${loan.id})" class="action-button mb-1">Editar</button>
-                    <button onclick="returnLoan(${loan.id})" class="action-button mb-1">Devolver</button>
-                    <button onclick="deleteFinishedLoan(${loan.id})" class="action-button">Eliminar</button>
-                </td>
+                <td class="p-2">$${parseFloat(loan.monto).toFixed(2)}</td>
+                <td class="p-2">${loan.fecha_finalizacion || 'No disponible'}</td>
             </tr>
         `).join('');
+
     } catch (error) {
         console.error('Error al obtener los préstamos finalizados:', error);
     }
 }
+
 
 
         function calcularDiasRestantes(fechaUltimoPago) {
@@ -1931,7 +1931,7 @@ function imprimirFactura() {
     }, 300);
 }
 
-
+        //quitar esta opcion
         function deleteFinishedLoan(id) {
             Swal.fire({
                 title: '¿Estás seguro?',
