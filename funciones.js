@@ -309,11 +309,84 @@ function printRoutes(rutas) {
     routesContainer.innerHTML = ''; // Limpiar el contenedor antes de imprimir nuevas rutas
 
     // Imprimir cada ruta en el contenedor
-    rutas.forEach(ruta => {
-        const rutaElement = document.createElement('div'); // Crear un nuevo elemento para la ruta
-        rutaElement.textContent = `Ruta: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`; // Establecer el texto del elemento
-        routesContainer.appendChild(rutaElement); // Agregar el elemento al contenedor
+    // Suponiendo que routesContainer ya está definido y contiene las rutas
+rutas.forEach(ruta => {
+    const rutaElement = document.createElement('div'); // Crear un nuevo elemento para la ruta
+    rutaElement.style.display = 'flex'; // Usar flexbox para alinear elementos en línea
+    rutaElement.style.alignItems = 'center'; // Alinear verticalmente los elementos al centro
+
+    // Crear un texto que muestra la ruta y el monto
+    const textoRuta = document.createElement('span');
+    textoRuta.textContent = `Ruta: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`; // Establecer el texto del elemento
+    rutaElement.appendChild(textoRuta); // Agregar el texto al elemento de ruta
+
+    // Crear botón de Editar
+    const editarButton = document.createElement('button');
+    editarButton.textContent = 'Editar';
+    editarButton.onclick = () => {
+        abrirFormularioEdicion(ruta); // Llamar a la función para abrir el formulario
+    };
+    editarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
+    rutaElement.appendChild(editarButton); // Agregar el botón de editar
+
+    // Crear botón de Eliminar
+    const eliminarButton = document.createElement('button');
+    eliminarButton.textContent = 'Eliminar';
+    eliminarButton.onclick = () => {
+        // Enviar la solicitud AJAX para eliminar
+        const data = { action: 'eliminar', nombreRuta: ruta.NombreRuta };
+        enviarDatos(data);
+    };
+    eliminarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
+    rutaElement.appendChild(eliminarButton); // Agregar el botón de eliminar
+
+    // Agregar el elemento de ruta al contenedor
+    routesContainer.appendChild(rutaElement);
+});
+
+// Función para abrir el formulario de edición
+function abrirFormularioEdicion(ruta) {
+    const formulario = document.getElementById('formularioEdicion');
+    formulario.querySelector('#nombreRutaInput').value = ruta.NombreRuta; // Prellenar el campo de nombre
+    formulario.querySelector('#montoInput').value = ruta.Monto; // Prellenar el campo de monto
+    formulario.style.display = 'block'; // Mostrar el formulario
+}
+
+// Función para enviar datos al servidor usando fetch
+function enviarDatos(data) {
+    fetch('ruta.php', { // Reemplaza 'ruta.php' con la URL de tu script PHP
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) // Convertir el objeto a JSON
+    })
+    .then(response => response.json()) // Esperar la respuesta en JSON
+    .then(result => {
+        console.log('Respuesta del servidor:', result);
+        // Aquí puedes manejar la respuesta del servidor
+    })
+    .catch(error => {
+        console.error('Error:', error);
     });
+}
+// Función para guardar los cambios
+function guardarCambios() {
+    const nombreRuta = document.getElementById('nombreRutaInput').value;
+    const monto = document.getElementById('montoInput').value;
+
+    const data = { action: 'editar', nombreRuta: nombreRuta, monto: monto };
+    enviarDatos(data); // Enviar la solicitud AJAX para editar
+
+    cerrarFormulario(); // Cerrar el formulario después de guardar
+}
+
+// Función para cerrar el formulario
+function cerrarFormulario() {
+    const formulario = document.getElementById('formularioEdicion');
+    formulario.style.display = 'none'; // Ocultar el formulario
+}
+
 }
 
             
