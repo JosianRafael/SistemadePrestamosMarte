@@ -1,78 +1,114 @@
 <?php
 
-function GuardarClientesModulo($link,$nombre,$apellido,$telefono,$correo,$direccion)
+// Función para guardar un nuevo cliente en la base de datos
+function GuardarClientesModulo($link, $nombre, $apellido, $telefono, $correo, $direccion)
 {
-    $query = "INSERT INTO clientes (nombre, apellido,telefono,correo,direccion) VALUES ('$nombre', '$apellido','$telefono','$correo','$direccion')";
-    mysqli_query($link,$query);
+    // Prepara la consulta SQL para insertar un nuevo cliente
+    $query = "INSERT INTO clientes (nombre, apellido, telefono, correo, direccion) VALUES ('$nombre', '$apellido', '$telefono', '$correo', '$direccion')";
+    // Ejecuta la consulta en la base de datos
+    mysqli_query($link, $query);
 }
 
-function CrearPrestamoModulo ($link,$cliente_id,$monto,$cuotas,$mensaje,$fecha_concesion,$ruta_id,$frecuenciaPago,$interesPrestamo)
+// Función para crear un nuevo préstamo en la base de datos
+function CrearPrestamoModulo($link, $cliente_id, $monto, $cuotas, $mensaje, $fecha_concesion, $ruta_id, $frecuenciaPago, $interesPrestamo)
 {
-    $query = "INSERT INTO prestamos (id_cliente, monto,cuotas,interes,mensaje,fecha_concesion,frecuencia_pago,IDRuta) VALUES 
-    ('$cliente_id', '$monto','$cuotas','$interesPrestamo','$mensaje','$fecha_concesion','$frecuenciaPago','$ruta_id')";
-    mysqli_query($link,$query);
+    // Prepara la consulta SQL para insertar un nuevo préstamo
+    $query = "INSERT INTO prestamos (id_cliente, monto, cuotas, interes, mensaje, fecha_concesion, frecuencia_pago, IDRuta) VALUES 
+    ('$cliente_id', '$monto', '$cuotas', '$interesPrestamo', '$mensaje', '$fecha_concesion', '$frecuenciaPago', '$ruta_id')";
+    // Ejecuta la consulta en la base de datos
+    mysqli_query($link, $query);
 }
 
-function CrearCalendarioDePagos ($link,$id_prestamo,$montocuotas,$fechas_pago,$cuotas)
+// Función para crear un calendario de pagos para un préstamo
+function CrearCalendarioDePagos($link, $id_prestamo, $montocuotas, $fechas_pago, $cuotas)
 {
-    for ($i=1; $i <= $cuotas; $i++) { 
-        $fecha = $fechas_pago[$i-1];
-        $query = "INSERT INTO calendario_pagos (id_prestamo, numero_cuota, fecha_vencimiento, monto) VALUES ('$id_prestamo','$montocuotas','$fecha','$montocuotas')";
-        mysqli_query($link,$query);
+    // Itera sobre el número de cuotas para crear entradas en el calendario de pagos
+    for ($i = 1; $i <= $cuotas; $i++) { 
+        // Obtiene la fecha de pago correspondiente a la cuota actual
+        $fecha = $fechas_pago[$i - 1];
+        // Prepara la consulta SQL para insertar una entrada en el calendario de pagos
+        $query = "INSERT INTO calendario_pagos (id_prestamo, numero_cuota, fecha_vencimiento, monto) VALUES ('$id_prestamo', '$montocuotas', '$fecha', '$montocuotas')";
+        // Ejecuta la consulta en la base de datos
+        mysqli_query($link, $query);
     }
 }
 
+// Función para consultar clientes activos en la base de datos
 function ConsultarClientesActivos($link)
 {
+    // Prepara la consulta SQL para seleccionar todos los clientes activos
     $query = "SELECT * FROM vista_clientes_activos";
-    return mysqli_query($link,$query);
+    // Ejecuta la consulta y devuelve el resultado
+    return mysqli_query($link, $query);
 }
 
+// Función para consultar clientes activos con detalles de sus préstamos
 function ConsultarClientesActivosconPrestamoDetalle($link)
 {
+    // Prepara la consulta SQL para seleccionar clientes activos y sus detalles de préstamos
     $query = "SELECT * FROM vista_clientes_activos_por_ruta";
-    return mysqli_query($link,$query);
+    // Ejecuta la consulta y devuelve el resultado
+    return mysqli_query($link, $query);
 }
 
+// Función para consultar clientes con pagos pendientes
 function ConsultarClientesPagosPendientes($link)
 {
+    // Prepara la consulta SQL para seleccionar clientes con pagos pendientes
     $query = "SELECT * FROM vista_pagos_pendientes";
-    return mysqli_query($link,$query);
+    // Ejecuta la consulta y devuelve el resultado
+    return mysqli_query($link, $query);
 }
 
-function BorrarCliente($link,$cliente_id)
+// Función para borrar un cliente del histórico
+function BorrarCliente($link, $cliente_id)
 {
-    $query = "DELETE * FROM  clientes_historico WHERE id = '$cliente_id'";
-    return mysqli_query($link,$query);
+    // Prepara la consulta SQL para eliminar un cliente del histórico usando su ID
+    $query = "DELETE * FROM clientes_historico WHERE id = '$cliente_id'";
+    // Ejecuta la consulta para eliminar el cliente en la base de datos
+    return mysqli_query($link, $query);
 }
 
+// Función para consultar detalles de clientes inactivos
 function ConsultarClientesInactivosDetalles($link)
 {
+    // Prepara la consulta SQL para seleccionar detalles de clientes inactivos
     $query = "SELECT * FROM vista_cliente_prestamo_historico";
-    return mysqli_query($link,$query);
+    // Ejecuta la consulta y devuelve el resultado
+    return mysqli_query($link, $query);
 }
 
+// Función para consultar el calendario de pagos de clientes inactivos
 function ConsultarClientesInactivosCalendario($link)
 {
+    // Prepara la consulta SQL para seleccionar el calendario de pagos de clientes inactivos
     $query = "SELECT * FROM vista_calendario_pagos_historico";
-    return mysqli_query($link,$query);
+    // Ejecuta la consulta y devuelve el resultado
+    return mysqli_query($link, $query);
 }
 
+// Función para consultar clientes con pagos atrasados
 function ConsultarClientespagosatrasados($link)
 {
+    // Prepara la consulta SQL para seleccionar clientes con pagos atrasados
     $query = "SELECT * FROM clientes_pagos_atrasados";
-    return mysqli_query($link,$query);
+    // Ejecuta la consulta y devuelve el resultado
+    return mysqli_query($link, $query);
 }
 
+// Función para consultar análisis de riesgo de clientes
 function ConsultarAnalisisRiesgo($link)
 {
+    // Prepara la consulta SQL para seleccionar análisis de riesgo
     $query = "SELECT * FROM vista_analisis_riesgo";
-    return mysqli_query($link,$query);
+    // Ejecuta la consulta y devuelve el resultado
+    return mysqli_query($link, $query);
 }
 
-function PagarCuota($link,$ID_CalendarioPago,$monto)
+// Función para procesar el pago de una cuota (sin implementar)
+function PagarCuota($link, $ID_CalendarioPago, $monto)
 {
-    
+    // Funcionalidad no implementada
 }
 
 ?>
