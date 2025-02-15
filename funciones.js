@@ -379,23 +379,23 @@ console.error("Mora button not found");
                         }
                     }
             
-                    // // Función para actualizar la lista de rutas en el DOM
-                    // function actualizarListaRutas() {
-                    //     const listaRutas = document.getElementById('listaRutas');
-                    //     listaRutas.innerHTML = '';
-                    //     rutas.forEach(ruta => {
-                    //         const rutaElement = document.createElement('div');
-                    //         rutaElement.className = 'bg-gray-800 p-4 rounded shadow mb-2';
-                    //         rutaElement.innerHTML = `
-                    //             <h4 class="font-bold">${ruta.nombre}</h4>
-                    //             <p>Fondos iniciales: $${ruta.fondosIniciales.toFixed(2)}</p>
-                    //             <p>Fondos disponibles: $${ruta.fondosDisponibles.toFixed(2)}</p>
-                    //             <button onclick="editarRuta(${ruta.id})" class="bg-yellow-600 text-white p-1 rounded mr-2 hover:bg-yellow-700">Editar</button>
-                    //             <button onclick="borrarRuta(${ruta.id})" class="bg-red-600 text-white p-1 rounded hover:bg-red-700">Borrar</button>
-                    //         `;
-                    //         listaRutas.appendChild(rutaElement);
-                    //     });
-                    // }
+                    // Función para actualizar la lista de rutas en el DOM
+                    function actualizarListaRutas() {
+                        const listaRutas = document.getElementById('listaRutas');
+                        listaRutas.innerHTML = '';
+                        rutas.forEach(ruta => {
+                            const rutaElement = document.createElement('div');
+                            rutaElement.className = 'bg-gray-800 p-4 rounded shadow mb-2';
+                            rutaElement.innerHTML = `
+                                <h4 class="font-bold">${ruta.nombre}</h4>
+                                <p>Fondos iniciales: $${ruta.fondosIniciales.toFixed(2)}</p>
+                                <p>Fondos disponibles: $${ruta.fondosDisponibles.toFixed(2)}</p>
+                                <button onclick="editarRuta(${ruta.id})" class="bg-yellow-600 text-white p-1 rounded mr-2 hover:bg-yellow-700">Editar</button>
+                                <button onclick="borrarRuta(${ruta.id})" class="bg-red-600 text-white p-1 rounded hover:bg-red-700">Borrar</button>
+                            `;
+                            listaRutas.appendChild(rutaElement);
+                        });
+                    }
             
                     // Función para actualizar el select de rutas
                     function actualizarSelectRutas() {
@@ -734,7 +734,7 @@ console.error("Mora button not found");
                     renderCalendarioPagos();
                     break;
                 case 'multas-recargos':
-                    renderPagosVencidos();
+                    renderMultasRecargos();
                     break;
                 case 'recordatorios-pago':
                     renderRecordatoriosPago();
@@ -1667,9 +1667,9 @@ async function renderFinishedLoans() {
                 await syncPagosVencidosConServidor(); // Recargar pagos vencidos desde PHP
             }
             renderCalendarioPagos();
-            renderPagosVencidos();
+            renderMultasRecargos();
         }
-
+        
         async function aplicarInteresPorMora() {
             const response = await fetch('aplicar_interes.php', { method: 'POST' });
             const data = await response.json();
@@ -1677,66 +1677,52 @@ async function renderFinishedLoans() {
                 syncPagosVencidosConServidor();
             }
         }
-        //Esta funcion no esta haciendo nada confirmar cambio
-
-        // async function syncPagosVencidosConServidor() {
-        //     const response = await fetch('controllers/clientesControlador.php',
-        //         {
-        //             method: 'POST', // Usamos POST para enviar datos
-        //             headers: {
-        //                 'Content-Type': 'application/json' // Indicamos que enviamos JSON
-        //             },
-        //             body: JSON.stringify({
-        //                 accion: 'leerclientespagosatrasados' // Enviamos la acción en el cuerpo
-        //             })
-        //         });
-        //     pagosVencidos = await response.json();
-        //     renderPagosVencidos();
-        //     renderPagosVencidos();
-        // }
+        
+        async function syncPagosVencidosConServidor() {
+            const response = await fetch('obtener_pagos_vencidos.php');
+            pagosVencidos = await response.json();
+            renderPagosVencidos();
+            renderMultasRecargos();
+        }
         
         async function renderPagosVencidos() {
             try {
                 // Obtener pagos vencidos desde el servidor
-                const response = await fetch('controllers/clientesControlador.php', {
+                const response = await fetch('server.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ accion: 'leerclientespagosatrasados' })
+                    body: JSON.stringify({ action: 'getPagosVencidos' })
                 });
         
                 const data = await response.json();
+                if (!data.success) throw new Error(data.message);
         
-                // Verificar que la respuesta es un array válido
-                if (!Array.isArray(data)) {
-                    throw new Error("La respuesta del servidor no es un array válido.");
-                }
+                const pagosVencidos = data.pagos;
         
                 // Generar la tabla con los datos obtenidos
-                const tablaVencidos = data.map(pago => `
+                const tablaVencidos = pagosVencidos.map(pago => `
                     <tr>
-                        <td class="p-2">${pago.cliente_nombre}</td>
-                        <td class="p-2">${pago.cliente_apellido}</td>
-                        <td class="p-2">$${parseFloat(pago.montopago).toFixed(2)}</td>
-                        <td class="p-2">$${parseFloat(pago.cuota_mora).toFixed(2)}</td>
-                        <td class="p-2">$${parseFloat(pago.monto_total).toFixed(2)}</td>
-                        <td class="p-2">${pago.dias_retraso}</td>
+                        <td class="p-2">${pago.nombre}</td>
+                        <td class="p-2">${pago.apellido}</td>
+                        <td class="p-2">$${pago.montoOriginal.toFixed(2)}</td>
+                        <td class="p-2">$${(pago.montoTotal - pago.montoOriginal).toFixed(2)}</td>
+                        <td class="p-2">$${pago.montoTotal.toFixed(2)}</td>
+                        <td class="p-2">${pago.diasRetraso}</td>
                         <td class="p-2">
-                            <button onclick="deleteLatePayment(${pago.pago_id})" class="action-button">Eliminar</button>
+                            <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
                         </td>
                     </tr>
                 `).join('');
         
-                // Insertar la tabla en el HTML
-                document.getElementById('pagosVencidosTable').innerHTML = tablaVencidos;
-                document.getElementById('multasRecargosTable').innerHTML = tablaVencidos;
+                $('pagosVencidosTable').innerHTML = tablaVencidos;
+                $('multasRecargosTable').innerHTML = tablaVencidos;
         
             } catch (error) {
                 console.error('Error al obtener los pagos vencidos:', error);
             }
         }
-        
         
         
         async function deleteLatePayment(id) {
@@ -2085,7 +2071,7 @@ setInterval(aplicarInteresPorMora, 86400000); // Cada 24 horas
 setInterval(() => {
     renderClients();
     renderCalendarioPagos();
-    renderPagosVencidos();
+    renderMultasRecargos();
     renderAnalisisRiesgo();
 }, 60000); // Cada minuto
 
