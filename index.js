@@ -1,3 +1,5 @@
+// Index.js es para mostrar el tamano de la pantalla cuando el sistema se habra en el escritorio..
+
 const { app, BrowserWindow } = require('electron');
 
 function createWindow() {
