@@ -6,53 +6,16 @@
 
 let prestamo = {};
 let tablaAmortizacion = [];
+let prestamosChart, clientesChart;
+let pagosVencidos = JSON.parse(localStorage.getItem('pagosVencidos')) || [];
+let multasChart, recargosChart;
+let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionRecordatorios')) || {
+    diasAnticipacion: 3,
+    metodos: ['email']
+};
 
-// Funcion que calcula el interes por mora de los pagos vencidos..
-        // let prestamosChart, clientesChart;
-        // const INTERES_POR_MORA = 0.05;
-        // let pagosVencidos = JSON.parse(localStorage.getItem('pagosVencidos')) || [];
-        // let multasChart, recargosChart;
-        // let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionRecordatorios')) || {
-        //     diasAnticipacion: 3,
-        //     metodos: ['email']
-        // };
-
-        // function verificarPagosVencidos() {
-        //     const clients = getClients();
-        //     const hoy = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
-        
-        //     clients.forEach(client => {
-        //         client.fechasPago.forEach((fecha, index) => {
-        //             if (fecha < hoy) { // Si la fecha de pago ya pasó
-        //                 let montoVencido = client.montoPorCuota * (1 + INTERES_POR_MORA); // Aplica interés
-        //                 let pagoVencido = {
-        //                     id: client.id,
-        //                     nombre: client.nombre,
-        //                     apellido: client.apellido,
-        //                     montoOriginal: client.montoPorCuota,
-        //                     montoConMora: montoVencido.toFixed(2),
-        //                     fechaVencimiento: fecha,
-        //                     diasAtraso: Math.floor((new Date(hoy) - new Date(fecha)) / (1000 * 60 * 60 * 24)) // Días de atraso
-        //                 };
-        
-        //                 // Evita agregar duplicados en la lista de pagos vencidos
-        //                 if (!pagosVencidos.some(p => p.id === client.id && p.fechaVencimiento === fecha)) {
-        //                     pagosVencidos.push(pagoVencido);
-        //                 }
-        //             }
-        //         });
-        //     });
-        
-        //     savePagosVencidos(); // Guarda la lista en localStorage
-        //     renderPagosVencidos(); // Actualiza la UI
-        // }
         //Obtiene el id del elemento para la navegacion
         function $(id) { return document.getElementById(id); }
-        // function getClients() { return JSON.parse(localStorage.getItem('clients')) || []; }
-        // function saveClients(clients) { localStorage.setItem('clients', JSON.stringify(clients)); }
-        // function getFinishedLoans() { return JSON.parse(localStorage.getItem('finishedLoans')) || []; }
-        // function saveFinishedLoans(loans) { localStorage.setItem('finishedLoans', JSON.stringify(loans)); }
-        // function savePagosVencidos() { localStorage.setItem('pagosVencidos', JSON.stringify(pagosVencidos)); }
 
         //###############################################################################
         // F U N C I O N  P A R A   D E S P LA Z A R S E   E N T R E  S E C I O N E S
@@ -324,12 +287,7 @@ function closeEditModal() {
             rutasList.appendChild(li);
         });
     }
-    
-        
-        
-        // Llama a CallRoutes para probar la funcionalidad
-        // CallRoutes();
-        
+            
         // Llama a loadRoutes cuando la página se cargue
         document.addEventListener('DOMContentLoaded', (event) => {
             loadRoutes();
@@ -464,26 +422,35 @@ function closeEditModal() {
                 .catch(error => console.error('Error al obtener rutas:', error));
         }
              
-        function mostrarRutaMasPopular() {
-            const rutaData = {
-                accion: 'obtenerRutas' // Clave de acción
-            };
+        async function mostrarRutaMasPopular() {
+            try {
+                // Obtener rutas
+                const responseRutas = await fetch('controllers/rutasControlador.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ accion: 'obtenerRutas' })
+                });
         
-            fetch('controllers/rutasControlador.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(rutaData) // Enviar datos al servidor
-            })
-            .then(response => response.json())
-            .then(rutas => {
-                const clients = getClients();
+                if (!responseRutas.ok) {
+                    throw new Error('Error al obtener rutas');
+                }
+        
+                const rutas = await responseRutas.json();
+        
+                // Obtener clientes correctamente
+                const clients = await getClients(); // Esperar la promesa de getClients()
+        
+                if (!Array.isArray(clients)) {
+                    throw new Error('Los datos de clientes no son un array');
+                }
+        
                 const rutaCount = {};
         
                 // Contar los clientes por ruta
                 clients.forEach(client => {
-                    const rutaId = client.ruta;
+                    const rutaId = client.ruta_id;
                     if (!rutaCount[rutaId]) {
                         rutaCount[rutaId] = 0;
                     }
@@ -504,8 +471,9 @@ function closeEditModal() {
                 // Mostrar la ruta más popular en el cuadro
                 const rutaMasPopularElement = document.getElementById('rutaMasPopular');
                 rutaMasPopularElement.textContent = `Ruta: ${rutaMasPopular} (N° Clientes: ${maxClientes})`;
-            })
-            .catch(error => console.error('Error al obtener rutas:', error));
+            } catch (error) {
+                console.error('Error en mostrarRutaMasPopular:', error);
+            }
         }
         
         // Llamar a la función para mostrar la ruta más popular cuando se carga el dashboard
@@ -560,7 +528,6 @@ async function renderFinishedLoans() {
 }
 
 
-
         function calcularDiasRestantes(fechaUltimoPago) {
             const hoy = new Date();
             const ultimoPago = new Date(fechaUltimoPago);
@@ -609,347 +576,131 @@ async function renderFinishedLoans() {
             $('editModal').classList.remove('flex');
         }
 
-        // function saveEdit(e) {
-        //     e.preventDefault();
-        //     const id = parseInt($('editId').value);
-        //     const clients = getClients();
-        //     const finishedLoans = getFinishedLoans();
-        //     let index = clients.findIndex(c => c.id === id);
-        //     let isFinishedLoan = false;
 
-        //     if (index === -1) {
-        //         index = finishedLoans.findIndex(l => l.id === id);
-        //         isFinishedLoan = true;
-        //     }
-
-        //     if (index !== -1) {
-        //         const monto = parseFloat($('editMonto').value);
-        //         const cuotas = parseInt($('editCuotas').value);
-        //         if (cuotas > 12) {
-        //             Swal.fire('Error', 'El número máximo de cuotas es 12', 'error');
-        //             return;
-        //         }
-        //         const montoPorCuota = monto / cuotas;
-        //         const fechasPago = [];
-        //         const fechaActual = new Date();
-        //         for (let i = 1; i <= cuotas; i++) {
-        //             const fechaPago = new Date(fechaActual);
-        //             fechaPago.setMonth(fechaActual.getMonth() + i);
-        //             fechasPago.push(fechaPago.toISOString().split('T')[0]);
-        //         }
-        //         const updatedLoan = {
-        //             id: id,
-        //             nombre: $('editNombre').value,
-        //             apellido: $('editApellido').value,
-        //             numero: $('editNumero').value,
-        //             correo: $('editCorreo').value || 'No proporcionado',
-        //             direccion: $('editDireccion').value,
-        //             monto: monto,
-        //             cuotas: cuotas,
-        //             montoPorCuota: montoPorCuota,
-        //             fechasPago: fechasPago,
-        //             mensaje: $('editMensaje').value
-        //         };
-
-        //         if (isFinishedLoan) {
-        //             finishedLoans[index] = { ...finishedLoans[index], ...updatedLoan };
-        //             saveFinishedLoans(finishedLoans);
-        //         } else {
-        //             clients[index] = { ...clients[index], ...updatedLoan };
-        //             saveClients(clients);
-        //         }
-
-        //         renderClients();
-        //         renderFinishedLoans();
-        //         updateDashboard();
-        //         closeEditModal();
-        //         Swal.fire('Éxito', 'Préstamo actualizado correctamente', 'success');
-        //     }
-        // }
-
-        // function deleteClient(id) {
-        //     Swal.fire({
-        //         title: '¿Estás seguro?',
-        //         text: "No podrás revertir esta acción",
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: 'Sí, borrar',
-        //         cancelButtonText: 'Cancelar'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             const clients = getClients().filter(c => c.id !== id);
-        //             saveClients(clients);
-        //             renderClients();
-        //             updateDashboard();
-        //             Swal.fire(
-        //                 'Borrado',
-        //                 'El cliente ha sido eliminado.',
-        //                 'success'
-        //             );
-        //         }
-        //     });
-        // }
-
-        // function sendMessage(id) {
-        //     const clients = getClients();
-        //     const index = clients.findIndex(c => c.id === id);
-        //     if (index !== -1) {
-        //         const nuevoMensaje = $(`mensaje-${id}`).value;
-        //         clients[index].mensaje = nuevoMensaje;
-        //         saveClients(clients);
-        //         Swal.fire('Éxito', `Mensaje actualizado para ${clients[index].nombre} ${clients[index].apellido}`, 'success');
-        //     }
-        // }
-
-        // function returnLoan(id) {
-        //     Swal.fire({
-        //         title: '¿Devolver préstamo?',
-        //         text: "Este préstamo se marcará como activo nuevamente",
-        //         icon: 'question',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: 'Sí, devolver',
-        //         cancelButtonText: 'Cancelar'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             const finishedLoans = getFinishedLoans(); // Obtiene los préstamos terminados
-        //             const index = finishedLoans.findIndex(l => l.id === id); // Encuentra el índice del préstamo
-        
-        //             if (index !== -1) {
-        //                 const loan = finishedLoans[index]; // Obtiene el préstamo encontrado
-        //                 delete loan.fechaFinalizacion; // Elimina la fecha de finalización
-        //                 const clients = getClients(); // Obtiene la lista de clientes
-        //                 clients.push(loan); // Agrega el préstamo devuelto a la lista de clientes
-        //                 saveClients(clients); // Guarda la lista actualizada de clientes
-        //                 finishedLoans.splice(index, 1); // Elimina el préstamo de la lista de terminados
-        //                 saveFinishedLoans(finishedLoans); // Guarda la lista actualizada de préstamos terminados
-        //                 renderClients(); // Actualiza la tabla de clientes activos
-        //                 renderFinishedLoans(); // Actualiza la tabla de préstamos terminados
-        //                 updateDashboard(); // Actualiza el dashboard
-        //                 Swal.fire('Éxito', 'Préstamo devuelto a activos', 'success');
-        //             } else {
-        //                 Swal.fire('Error', 'No se encontró el préstamo para devolver.', 'error');
-        //             }
-        //         }
-        //     });
-        // }
-
-        // function updateDashboard() {
-        //     const clients = getClients(); // Obtén la lista actual de clientes activos
-        //     const totalPrestamos = clients.reduce((sum, client) => sum + client.monto, 0);
-            
-        //     $('totalPrestamos').textContent = `$${totalPrestamos.toFixed(2)}`;
-        //     $('clientesActivos').textContent = clients.length;
-        //     $('prestamosPendientes').textContent = clients.length; // Este campo puede necesitar ajuste
-        //     $('currentDate').textContent = new Date().toLocaleDateString();
-        
-        //     updatePrestamosChart(); // Asegúrate de que estas funciones existan
-        //     updateClientesChart();
-        // }
-        
-        
-
-        // function finishLoan(id) {
-        //     Swal.fire({
-        //         title: '¿Finalizar préstamo?',
-        //         text: "Este préstamo se marcará como terminado",
-        //         icon: 'question',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: 'Sí, finalizar',
-        //         cancelButtonText: 'Cancelar'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             const clients = getClients();
-        //             const index = clients.findIndex(c => c.id === id);
-        //             if (index !== -1) {
-        //                 const finishedLoan = {
-        //                     ...clients[index],
-        //                     fechaFinalizacion: new Date().toISOString().split('T')[0] // Fecha de finalización
-        //                 };
-        
-        //                 // Actualizar la lista de préstamos terminados
-        //                 const finishedLoans = getFinishedLoans();
-        //                 finishedLoans.push(finishedLoan);
-        //                 saveFinishedLoans(finishedLoans);
-        
-        //                 // Eliminar el cliente de los activos
-        //                 clients.splice(index, 1);
-        //                 saveClients(clients);
-        
-        //                 // Re-renderizar ambas tablas
-        //                 renderClients(); // Actualizar la tabla de clientes activos
-        //                 renderFinishedLoans(); // Actualizar la tabla de préstamos terminados
-        
-        //                 // Actualizar el dashboard
-        //                 updateDashboard();
-        
-        //                 Swal.fire('Éxito', 'Préstamo marcado como terminado', 'success');
-        //             }
-        //         }
-        //     });
-        // }
-        
-
-        function updatePrestamosChart() {
-            const clients = getClients();
-            const ctx = $('prestamosChart').getContext('2d');
-            
-            if (prestamosChart) {
-                prestamosChart.destroy();
-            }
-
-            prestamosChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: clients.map(client => `${client.nombre} ${client.apellido}`),
-                    datasets: [{
-                        label: 'Monto del Préstamo',
-                        data: clients.map(client => client.monto),
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
+        function getClients() {
+            return fetch('controllers/clientesControlador.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                body: JSON.stringify({ accion: 'leerclientedetalle' })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener clientes');
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error en getClients:', error);
+                return [];
+            });
+        }
+        
+        function getFinishedLoans() {
+            return fetch('controllers/clientesControlador.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    accion: 'leerclientesinactivosdetalles'
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener préstamos vencidos');
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error en getFinishedLoans:', error);
+                return [];
+            });
+        }
+        
+
+        async function updatePrestamosChart() {
+            try {
+                // Espera a que la promesa de getClients se resuelva
+                const clients = await getClients();
+        
+                // Verificar si clients es un arreglo y tiene elementos
+                if (!Array.isArray(clients) || clients.length === 0) {
+                    console.error("No se recibieron datos válidos de clientes:", clients);
+                    return;
+                }
+        
+                const ctx = $('prestamosChart').getContext('2d');
+        
+                if (prestamosChart) {
+                    prestamosChart.destroy();
+                }
+        
+                prestamosChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: clients.map(client => `${client.cliente_nombre} ${client.cliente_apellido}`),
+                        datasets: [{
+                            label: 'Monto del Préstamo',
+                            data: clients.map(client => parseFloat(client.prestamo_monto)),
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
-            });
-        }
-
-        function updateClientesChart() {
-            const clients = getClients();
-            const finishedLoans = getFinishedLoans();
-            const ctx = $('clientesChart').getContext('2d');
-            
-            if (clientesChart) {
-                clientesChart.destroy();
+                });
+            } catch (error) {
+                console.error("Error al obtener los clientes:", error);
             }
-
-            clientesChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Préstamos Activos', 'Préstamos Terminados'],
-                    datasets: [{
-                        data: [clients.length, finishedLoans.length],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.6)',
-                            'rgba(54, 162, 235, 0.6)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
         }
+        
+        async function updateClientesChart() {
+            try {
+                // Esperamos a que se resuelvan las promesas
+                const clients = await getClients(); 
+                const finishedLoans = await getFinishedLoans();
+                
+                const ctx = document.getElementById('clientesChart').getContext('2d');
+                
+                // Verificamos si el gráfico ya existe para destruirlo antes de crear uno nuevo
+                if (clientesChart) {
+                    clientesChart.destroy();
+                }
+        
+                // Creamos el gráfico con los datos obtenidos
+                clientesChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Préstamos Activos', 'Préstamos Terminados'],
+                        datasets: [{
+                            data: [clients.length, finishedLoans.length],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(54, 162, 235, 0.6)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            } catch (error) {
+                console.error('Error al actualizar el gráfico de clientes:', error);
+            }
+        }
+        
+        updateClientesChart();
+        updatePrestamosChart();
 
-        // function deletePayment(clientId, fechaPago) {
-        //     Swal.fire({
-        //         title: '¿Estás seguro?',
-        //         text: "¿Deseas eliminar este pago?",
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: 'Sí, eliminar',
-        //         cancelButtonText: 'Cancelar'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             const clients = getClients();
-        //             const clientIndex = clients.findIndex(c => c.id === clientId);
-        //             if (clientIndex !== -1) {
-        //                 clients[clientIndex].fechasPago = clients[clientIndex].fechasPago.filter(f => f !== fechaPago);
-        //                 saveClients(clients);
-        //                 renderCalendarioPagos();
-        //                 Swal.fire('Eliminado', 'El pago ha sido eliminado.', 'success');
-        //             }
-        //         }
-        //     });
-        // }
-
-        // function deleteLatePayment(id) {
-        //     Swal.fire({
-        //         title: '¿Estás seguro?',
-        //         text: "¿Deseas eliminar este pago vencido?",
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: 'Sí, eliminar',
-        //         cancelButtonText: 'Cancelar'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             pagosVencidos = pagosVencidos.filter(p => p.id !== id);
-        //             savePagosVencidos();
-        //             renderPagosVencidos();
-        //             Swal.fire('Eliminado', 'El pago vencido ha sido eliminado.', 'success');
-        //         }
-        //     });
-        // }
-
-        // async function checkPagosVencidos() {
-        //     const clients = getClients();
-        //     let clientesActualizados = false;
-        //     let pagosVencidos = [];
-        
-        //     clients.forEach(client => {
-        //         client.fechasPago = client.fechasPago.filter(fechaPago => {
-        //             const diasRetraso = calcularDiasRestantes(fechaPago) * -1;
-        //             if (diasRetraso > 0) {
-        //                 const pagoVencido = {
-        //                     clientId: client.id,
-        //                     nombre: client.nombre,
-        //                     apellido: client.apellido,
-        //                     montoOriginal: client.montoPorCuota,
-        //                     montoTotal: client.montoPorCuota,
-        //                     diasRetraso: diasRetraso,
-        //                     fechaVencimiento: fechaPago
-        //                 };
-        //                 pagosVencidos.push(pagoVencido);
-        //                 clientesActualizados = true;
-        //                 return false;
-        //             }
-        //             return true;
-        //         });
-        //     });
-        
-        //     if (clientesActualizados) {
-        //         await fetch('guardar_pagos_vencidos.php', {
-        //             method: 'POST',
-        //             headers: { 'Content-Type': 'application/json' },
-        //             body: JSON.stringify({ pagosVencidos })
-        //         });
-        
-        //         await syncPagosVencidosConServidor(); // Recargar pagos vencidos desde PHP
-        //     }
-        //     renderCalendarioPagos();
-        //     renderMultasRecargos();
-        // }
-        
-        // async function aplicarInteresPorMora() {
-        //     const response = await fetch('aplicar_interes.php', { method: 'POST' });
-        //     const data = await response.json();
-        //     if (data.success) {
-        //         syncPagosVencidosConServidor();
-        //     }
-        // }
-        
-        // async function syncPagosVencidosConServidor() {
-        //     const response = await fetch('obtener_pagos_vencidos.php');
-        //     pagosVencidos = await response.json();
-        //     renderPagosVencidos();
-        //     renderMultasRecargos();
-        // }
         
         async function renderPagosVencidos() {
             try {
@@ -973,11 +724,12 @@ async function renderFinishedLoans() {
                 // Generar la tabla con los datos obtenidos
                 const tablaVencidos = pagosVencidos.map(pago => `
                     <tr>
-                        <td class="p-2">${pago.nombre}</td>
-                        <td class="p-2">${pago.apellido}</td>
-                        <td class="p-2">$${parseFloat(pago.monto).toFixed(2)}</td>
-                        <td class="p-2">${pago.mensaje || 'No disponible'}</td> <!-- Puedes cambiar esto según el campo -->
-                        <td class="p-2">${pago.estado_prestamo}</td>
+                        <td class="p-2">${pago.cliente_nombre}</td>
+                        <td class="p-2">${pago.cliente_apellido}</td>
+                        <td class="p-2">$${parseFloat(pago.montopago).toFixed(2)}</td>
+                        <td class="p-2">${pago.cuota_mora}</td> <!-- Puedes cambiar esto según el campo -->
+                        <td class="p-2">$${parseFloat(pago.monto_total).toFixed(2)}</td>
+                        <td class="p-2">${pago.dias_retraso}</td>
                         <td class="p-2">
                             <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
                         </td>
@@ -1298,64 +1050,58 @@ function renderCalendarioPagos() {
     renderProximosPagos();
     renderPagosVencidos();
 }
+
 async function renderProximosPagos() {
     try {
         // Obtener los datos de los próximos pagos desde el servidor
-        const response = await fetch('server.php', {
+        const response = await fetch('controllers/clientesControlador.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ action: 'getProximosPagos' })
+            body: JSON.stringify({ accion: 'leerclienteactivocalendariopago' })
         });
 
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            throw new Error('No se pudo obtener los datos');
+        }
+
+        // Convertir la respuesta a JSON
         const data = await response.json();
-        if (!data.success) throw new Error(data.message);
+
+        // Verificar si la respuesta tiene éxito y los datos esperados
+        if (!Array.isArray(data) || data.length === 0) {
+            throw new Error('No se recibieron datos válidos o no hay pagos próximos');
+        }
 
         // Generar la tabla con los datos obtenidos
-        $('proximosPagosTable').innerHTML = data.proximosPagos.map(pago => `
+        document.getElementById('proximosPagosTable').innerHTML = data.map(pago => `
             <tr>
-                <td class="p-2">${pago.nombre}</td>
-                <td class="p-2">${pago.apellido}</td>
-                <td class="p-2">$${pago.montoPorCuota.toFixed(2)}</td>
-                <td class="p-2">${pago.fechaPago}</td>
-                <td class="p-2">${pago.diasRestantes}</td>
+                <td class="p-2">${pago.Nombre} ${pago.Apellido}</td>
+                <td class="p-2">${pago.fecha_vencimiento}</td>
+                <td class="p-2">${pago.numero_cuota}</td>
+                <td class="p-2">${pago.Estado}</td>
+                <td class="p-2">${pago.dias_faltantes}</td>
                 <td class="p-2">
-                    <button onclick="deletePayment(${pago.id}, '${pago.fechaPago}')" class="action-button">Eliminar</button>
+                    <button onclick="deletePayment(${pago.Id})" class="action-button">Eliminar</button>
                 </td>
             </tr>
         `).join('');
-
+        
     } catch (error) {
         console.error('Error al obtener los próximos pagos:', error);
     }
 }
 
-// function mostrarPrestamosVencidos() {
-//     const clients = getClients(); // Obtener todos los clientes
-//     let countVencidos = 0; // Contador para préstamos vencidos
-
-//     clients.forEach(client => {
-//         const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]);
-//         if (diasRestantes <= 0) {
-//             countVencidos++; // Aumentar el contador si el préstamo está vencido
-//         }
-//     });
-
-//     // Mostrar la cantidad de préstamos vencidos en el cuadro
-//     const prestamosVencidosElement = document.getElementById('prestamosVencidos');
-//     prestamosVencidosElement.textContent = countVencidos;
-// }
 
 // Llamar a la función para mostrar la cantidad de préstamos vencidos cuando se carga el dashboard
 mostrarPrestamosVencidos();
 
-setInterval(checkPagosVencidos, 86400000); // Cada 24 horas
-setInterval(aplicarInteresPorMora, 86400000); // Cada 24 horas
+
 setInterval(() => {
     renderClients();
     renderCalendarioPagos();
-    renderMultasRecargos();
     renderAnalisisRiesgo();
 }, 60000); // Cada minuto
 

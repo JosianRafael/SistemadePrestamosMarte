@@ -267,9 +267,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         case 'leerclienteactivo';
             EnviarResultadosClientesActivos($link);
             break;
-        case 'leerclientedetalle';
+       case 'leerclientedetalle';
             EnviarResultadosClientesActivosPrestamosDetalle($link);
             break;
+        case 'leerclienteactivocalendariopago';
+            EnviarResultadosClientesPagosPendientes($link);
+            break; 
         case 'leerclientesinactivosdetalles';
             EnviarClientesInactivosDetalles($link);
             break;
