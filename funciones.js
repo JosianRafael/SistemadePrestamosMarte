@@ -379,23 +379,23 @@ console.error("Mora button not found");
                         }
                     }
             
-                    // Función para actualizar la lista de rutas en el DOM
-                    function actualizarListaRutas() {
-                        const listaRutas = document.getElementById('listaRutas');
-                        listaRutas.innerHTML = '';
-                        rutas.forEach(ruta => {
-                            const rutaElement = document.createElement('div');
-                            rutaElement.className = 'bg-gray-800 p-4 rounded shadow mb-2';
-                            rutaElement.innerHTML = `
-                                <h4 class="font-bold">${ruta.nombre}</h4>
-                                <p>Fondos iniciales: $${ruta.fondosIniciales.toFixed(2)}</p>
-                                <p>Fondos disponibles: $${ruta.fondosDisponibles.toFixed(2)}</p>
-                                <button onclick="editarRuta(${ruta.id})" class="bg-yellow-600 text-white p-1 rounded mr-2 hover:bg-yellow-700">Editar</button>
-                                <button onclick="borrarRuta(${ruta.id})" class="bg-red-600 text-white p-1 rounded hover:bg-red-700">Borrar</button>
-                            `;
-                            listaRutas.appendChild(rutaElement);
-                        });
-                    }
+                    // // Función para actualizar la lista de rutas en el DOM
+                    // function actualizarListaRutas() {
+                    //     const listaRutas = document.getElementById('listaRutas');
+                    //     listaRutas.innerHTML = '';
+                    //     rutas.forEach(ruta => {
+                    //         const rutaElement = document.createElement('div');
+                    //         rutaElement.className = 'bg-gray-800 p-4 rounded shadow mb-2';
+                    //         rutaElement.innerHTML = `
+                    //             <h4 class="font-bold">${ruta.nombre}</h4>
+                    //             <p>Fondos iniciales: $${ruta.fondosIniciales.toFixed(2)}</p>
+                    //             <p>Fondos disponibles: $${ruta.fondosDisponibles.toFixed(2)}</p>
+                    //             <button onclick="editarRuta(${ruta.id})" class="bg-yellow-600 text-white p-1 rounded mr-2 hover:bg-yellow-700">Editar</button>
+                    //             <button onclick="borrarRuta(${ruta.id})" class="bg-red-600 text-white p-1 rounded hover:bg-red-700">Borrar</button>
+                    //         `;
+                    //         listaRutas.appendChild(rutaElement);
+                    //     });
+                    // }
             
                     // Función para actualizar el select de rutas
                     function actualizarSelectRutas() {
@@ -734,7 +734,7 @@ console.error("Mora button not found");
                     renderCalendarioPagos();
                     break;
                 case 'multas-recargos':
-                    renderMultasRecargos();
+                    renderPagosVencidos();
                     break;
                 case 'recordatorios-pago':
                     renderRecordatoriosPago();
@@ -1667,7 +1667,7 @@ async function renderFinishedLoans() {
                 await syncPagosVencidosConServidor(); // Recargar pagos vencidos desde PHP
             }
             renderCalendarioPagos();
-            renderMultasRecargos();
+            renderPagosVencidos();
         }
         
         async function aplicarInteresPorMora() {
@@ -1682,7 +1682,7 @@ async function renderFinishedLoans() {
             const response = await fetch('obtener_pagos_vencidos.php');
             pagosVencidos = await response.json();
             renderPagosVencidos();
-            renderMultasRecargos();
+            renderPagosVencidos();
         }
         
         async function renderPagosVencidos() {
@@ -2071,7 +2071,7 @@ setInterval(aplicarInteresPorMora, 86400000); // Cada 24 horas
 setInterval(() => {
     renderClients();
     renderCalendarioPagos();
-    renderMultasRecargos();
+    renderPagosVencidos();
     renderAnalisisRiesgo();
 }, 60000); // Cada minuto
 
