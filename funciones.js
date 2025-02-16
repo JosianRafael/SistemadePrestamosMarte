@@ -323,13 +323,13 @@ rutas.forEach(ruta => {
     rutaElement.appendChild(textoRuta); // Agregar el texto al elemento de ruta
 
     // Crear botón de Editar
-    const editarButton = document.createElement('button');
-    editarButton.textContent = 'Editar';
-    editarButton.onclick = () => {
-        abrirFormularioEdicion(ruta); // Llamar a la función para abrir el formulario
-    };
-    editarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
-    rutaElement.appendChild(editarButton); // Agregar el botón de editar
+    // const editarButton = document.createElement('button');
+    // editarButton.textContent = 'Editar';
+    // editarButton.onclick = () => {
+    //     abrirFormularioEdicion(ruta); // Llamar a la función para abrir el formulario
+    // };
+    // editarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
+    // rutaElement.appendChild(editarButton); // Agregar el botón de editar
 
     // Crear botón de Eliminar
     const eliminarButton = document.createElement('button');
