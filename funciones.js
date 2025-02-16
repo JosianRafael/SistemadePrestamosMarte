@@ -307,7 +307,7 @@ function printRoutes(rutas) {
     }
 
     // Aquí iría la lógica para imprimir las rutas en el DOM, por ejemplo:
-    const routesContainer = document.getElementById('routesContainer'); // Obtener el contenedor para mostrar las rutas
+    const routesContainer = document.getElementById('listaRutas'); // Obtener el contenedor para mostrar las rutas
     routesContainer.innerHTML = ''; // Limpiar el contenedor antes de imprimir nuevas rutas
 
     // Imprimir cada ruta en el contenedor
