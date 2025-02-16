@@ -118,12 +118,12 @@ function ControladorModificarRutasMonto($link, $datos)
 function BorrarRutaControlador($link, $datos)
 {
     // Validar que los datos requeridos estén presentes
-    if (!$datos || !isset($datos["IDRuta"])) {
+    if (!$datos || !isset($datos["rutaid"])) {
         echo json_encode(['status' => 'error', 'message' => 'Dato inválido']); // Mensaje de error
         exit; // Finalizar la ejecución
     }
 
-    $idRuta = htmlspecialchars($datos["IDRuta"]); // Sanitizar el ID de la ruta
+    $idRuta = htmlspecialchars($datos["rutaid"]); // Sanitizar el ID de la ruta
 
     // Verificar que los datos no estén vacíos
     if (empty($idRuta)) {
@@ -152,6 +152,46 @@ function BorrarRutaControlador($link, $datos)
     }
 }
 
+function ControladorEditarRutas($link, $datos)
+{   
+    // Validar que los datos requeridos estén presentes
+    if (!$datos || !isset($datos["idruta"], $datos["monto"],$datos["nombreRuta"])) {
+        echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']); // Mensaje de error
+        exit; // Finalizar la ejecución
+    }
+    
+    // Sanitizar los datos
+    $nombreRuta = htmlspecialchars($datos["idruta"]); // Sanitizar el ID de la ruta
+    $montoruta = htmlspecialchars($datos["monto"]); // Sanitizar el monto de la ruta
+    $idRuta = htmlspecialchars($datos["idruta"]);
+
+    // Verificar que los datos no estén vacíos
+    if (empty($nombreRuta) || empty($montoruta) || empty($idRuta)) {
+        echo json_encode(['status' => 'error', 'message' => 'Favor complete todos los campos']); // Mensaje de error
+        exit; // Finalizar la ejecución
+    }
+
+    // Iniciar una transacción
+    mysqli_begin_transaction($link);
+    try {
+        // Llamar a la función para modificar el monto de la ruta
+        $resultado = actualizarRuta($link,$nombreRuta,$montoruta,$idRuta);
+        if ($resultado) {
+            // Confirmar la transacción si todo va bien
+            mysqli_commit($link);
+            echo json_encode(['status' => 'success', 'message' => 'Ruta Actualizada correctamente']); // Mensaje de éxito
+        } else {
+            // Lanzar una excepción si la modificación falla
+            throw new Exception('No se pudo actualizar la ruta.'); // Lanzar error
+        }
+
+    } catch (Exception $e) {
+        // Revertir cambios en caso de error
+        mysqli_rollback($link);
+        echo json_encode(['status' => 'error', 'message' => 'Error al actualizar ruta: ' . $e->getMessage()]); // Mensaje de error con detalles
+    }
+}
+
 // Verificar la conexión a la base de datos
 if (!$link) {
     echo json_encode(['status' => 'error', 'message' => 'Error en la conexión a la base de datos']); // Mensaje de error si no hay conexión
@@ -169,6 +209,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ControladorGuardarRutas($datos, $link); // Llamar a la función para guardar rutas
     } elseif ($datos["accion"] == "borrar") {
         BorrarRutaControlador($link, $datos); // Llamar a la función para borrar rutas
+    }elseif ($datos["accion"] == "editar") {
+        ControladorEditarRutas($link,$datos); //llama a la funcion para modificar ruta
     }
 }
 

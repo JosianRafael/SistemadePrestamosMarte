@@ -91,7 +91,7 @@ function ControladorGuardarClientes($datos, $link)
             
             // Confirmar la transacción si todo va bien
             mysqli_commit($link);
-            echo json_encode(['status' => 'success', 'message' => 'Cliente guardado correctamente']);
+            echo json_encode(['success' => true, 'message' => 'Cliente guardado correctamente']);
         }
     } catch (Exception $e) {
         // Revertir cambios en caso de error

@@ -57,11 +57,17 @@ function ModificarRutasMontoModulo($link, $montocambiar, $rutaid)
     }
 }
 
+function actualizarRuta($link,$nombreruta,$monto,$rutaid)
+{
+    $query = "UPDATE rutas SET NombreRuta = '$nombreruta' Monto = '$monto' WHERE IDRuta = '$rutaid'";
+    return mysqli_query($link,$query);
+}
+
 // Función para borrar una ruta de la base de datos
 function BorrarRuta($link, $idRuta)
 {
     // Prepara la consulta SQL para eliminar una ruta específica por su ID
-    $query = "DELETE * FROM rutas WHERE IDRuta = '$idRuta'";
+    $query = "DELETE FROM rutas WHERE IDRuta = '$idRuta'";
     // Ejecuta la consulta para eliminar la ruta en la base de datos
     return mysqli_query($link, $query);
 }
