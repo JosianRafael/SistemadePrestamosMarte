@@ -982,7 +982,7 @@ function saveRecordatoriosConfig(e) {
     Swal.fire('Éxito', 'Configuración de recordatorios guardada', 'success');
     renderRecordatoriosPago();
 }
-
+console.log("Hola");
 async function renderHistorialPrestamos() {
     console.log("🔹 renderHistorialPrestamos() se está ejecutando...");
 
