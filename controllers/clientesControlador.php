@@ -252,6 +252,105 @@ function BorrarClientesInactivos($link,$datos)
 }
 
 
+
+function PagarCuota($link,$datos)
+{
+    try {
+        mysqli_begin_transaction($link);
+    
+        if (!$datos || !isset($datos["id_pago"])) {
+            throw new Exception('Datos inválidos');
+        }
+    
+        $idpago = $datos["id_pago"];
+        $valor = "Pagado";
+    
+        if (empty($idpago)) {
+            throw new Exception('ID pago está vacío');
+        }
+    
+        if (!ActualizarCuota($link, $idpago, $valor)) {
+            throw new Exception('No se pudo actualizar el pago');
+        }
+    
+        mysqli_commit($link);
+        echo json_encode(['status' => 'success', 'message' => 'Pago actualizado correctamente']);
+    } catch (Exception $e) {
+        mysqli_rollback($link);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    } finally {
+        mysqli_close($link);
+    }
+    
+}
+
+
+function DevolverCuota($link,$datos)
+{
+    try {
+        mysqli_begin_transaction($link);
+    
+        if (!$datos || !isset($datos["id_pago"])) {
+            throw new Exception('Datos inválidos');
+        }
+    
+        $idpago = $datos["id_pago"];
+        $valor = "Pendiente";
+    
+        if (empty($idpago)) {
+            throw new Exception('ID pago está vacío');
+        }
+    
+        if (!ActualizarCuota($link, $idpago, $valor)) {
+            throw new Exception('No se pudo actualizar el pago');
+        }
+    
+        mysqli_commit($link);
+        echo json_encode(['status' => 'success', 'message' => 'Pago actualizado correctamente']);
+    } catch (Exception $e) {
+        mysqli_rollback($link);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    } finally {
+        mysqli_close($link);
+    }
+    
+}
+
+
+function EnviarCalendarioPagocompleto($link)
+{
+    $resultado = ConsultarTodoslosPagos($link);
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron calendarios inactivos']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados calendario clientes inactivos: " . print_r($contenido, true) . "\n", FILE_APPEND);
+    echo json_encode($contenido);
+}
+
+
+function EnviarClientesHistorial($link)
+{
+    $resultado = ConsultarHistorialClientes($link);
+    if (!$resultado) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron calendarios inactivos']);
+        return;
+    }
+
+    $contenido = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $contenido[] = $fila;
+    }
+    file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados calendario clientes inactivos: " . print_r($contenido, true) . "\n", FILE_APPEND);
+    echo json_encode($contenido);
+}
+
+
 if (!$link) {
     echo json_encode(['status' => 'error', 'message' => 'Error en la conexión a la base de datos']);
     exit;
@@ -279,14 +378,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         case 'leerclienteinactivocalendariopago';
             EnviarClientesInactivosCalendarioPagos($link);
             break;
+        case 'leerclientecalendariopagocompleto';
+            EnviarCalendarioPagocompleto($link);
+            break;
         case 'leerclientespagosatrasados';
             EnviarClientesPagosatrasados($link);
+        break;
+        case 'ClientesHistorial';
+            EnviarClientesHistorial($link);
         break;
         case 'leeranalisisriesgo';
             EnviarAnalisisRiesgo($link);
         break;
         case 'borrar';
                 BorrarClientesInactivos($link,$datos);
+            break;
+        case 'pagar';
+            PagarCuota($link,$datos);
+        break;
+        case 'devolver';
+            DevolverCuota($link,$datos);
             break;
         default:
             echo json_encode(['status' => 'error', 'message' => 'Error en la clave accion']);

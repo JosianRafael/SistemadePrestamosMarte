@@ -443,7 +443,7 @@ function renderClients() {
     const fetchCalendarios = fetch('controllers/clientesControlador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'leerclienteactivocalendariopago' }) 
+        body: JSON.stringify({ accion: 'leerclientecalendariopagocompleto' }) 
     }).then(response => response.json());
 
     Promise.all([fetchClientes, fetchCalendarios])
@@ -471,8 +471,9 @@ function renderClients() {
                                 <td class="p-2">${client.cliente_nombre}</td>
                                 <td class="p-2">${client.cliente_apellido}</td>
                                 <td class="p-2">${client.cliente_telefono}</td>
-                                <td class="p-2">${pagosCliente.length}</td>
-                                <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
+                                <td class="p-2">${client.ruta_nombre}</td>
+                                <td class="p-2">${client.prestamo_monto}</td>
+                                <td class="p-2">${client.prestamo_cuotas}</td>                            
                                 <td class="p-2">
                                     <button onclick="editClient(${client.cliente_id})" class="action-button mb-1 text-xs">Editar</button>
                                     <button onclick="deleteClient(${client.cliente_id})" class="action-button mb-1 text-xs">Borrar</button>
@@ -487,19 +488,30 @@ function renderClients() {
                                         <table class="w-full text-xs">
                                             <thead>
                                                 <tr>
-                                                    <th class="p-1 border">Fecha</th>
+                                                    <th class="p-1 border">Fecha vencimiento</th>
                                                     <th class="p-1 border">Monto</th>
                                                     <th class="p-1 border">Estado</th>
+                                                    <th class="p-1 border">Mora</th>
+                                                    <th class="p-1 border">Total pagar</th>
+                                                    <th class="p-1 border">Dias restantes/atrasados</th>
+                                                    <th class="p-1 border">Acciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 ${pagosCliente.length > 0 ? pagosCliente.map(pago => `
                                                     <tr>
                                                         <td class="p-1 border">${pago.fecha_vencimiento}</td>
-                                                        <td class="p-1 border">$${pago.numero_cuota}</td>
+                                                        <td class="p-1 border">$${pago.monto}</td>
                                                         <td class="p-1 border">${pago.Estado}</td>
+                                                        <td class="p-1 border">${pago.Mora}</td>
+                                                        <td class="p-1 border">${pago.total_pagar}</td>
+                                                        <td class="p-1 border">${pago.dias_faltantes}</td>
+                                                        <td class="p-1 border">
+                                                            <button onclick="procesarPago(${pago.Id}, 'pagar')" class="action-button text-xs">Pagar</button>
+                                                            <button onclick="procesarPago(${pago.Id}, 'devolver')" class="action-button text-xs">Devolver</button>
+                                                        </td>
                                                     </tr>
-                                                `).join('') : `<tr><td colspan="3" class="text-center">Sin pagos registrados</td></tr>`}
+                                                `).join('') : `<tr><td colspan="4" class="text-center">Sin pagos registrados</td></tr>`}
                                             </tbody>
                                         </table>
                                     </div>
@@ -512,6 +524,48 @@ function renderClients() {
         })
         .catch(error => console.error('Error al obtener datos:', error));
 }
+
+// Función para procesar pagos o devoluciones
+function procesarPago(idPago, accion) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: `Vas a realizar la acción "${accion}" para el pago ID ${idPago}.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, confirmar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            console.log('El id del pago es:', idPago);
+            fetch('controllers/clientesControlador.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion, id_pago: idPago })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Acción ${accion} realizada para el pago ${idPago}:`, data);
+                Swal.fire(
+                    '¡Éxito!',
+                    `La acción "${accion}" se ha realizado correctamente.`,
+                    'success'
+                );
+                renderClients(); // Recargar la lista de clientes y pagos
+            })
+            .catch(error => {
+                console.error(`Error al realizar la acción ${accion}:`, error);
+                Swal.fire(
+                    'Error',
+                    'Ocurrió un problema al procesar la solicitud.',
+                    'error'
+                );
+            });
+        }
+    });
+}
+
 
 function togglePayments(clientId) {
     const paymentRow = document.getElementById(`payments-${clientId}`);
@@ -645,7 +699,7 @@ async function renderFinishedLoans() {
                 <td class="p-2">${loan.nombre}</td>
                 <td class="p-2">${loan.apellido}</td>
                 <td class="p-2">${loan.correo}</td>
-                <td class="p-2">$${parseFloat(loan.monto).toFixed(2)}</td>
+                <td class="p-2">$${parseFloat(loan.total).toFixed(2)}</td>
                 <td class="p-2">${loan.fecha_finalizacion || 'No disponible'}</td>
             </tr>
         `).join(''); // Usar map para crear las filas de la tabla
@@ -892,7 +946,6 @@ async function renderPagosVencidos() {
 
         // Usamos el array directamente
         const pagosVencidos = data;
-
         // Generar la tabla con los datos obtenidos
         const tablaVencidos = pagosVencidos.map(pago => `
             <tr>
@@ -903,7 +956,7 @@ async function renderPagosVencidos() {
                 <td class="p-2">$${parseFloat(pago.monto_total).toFixed(2)}</td>
                 <td class="p-2">${pago.dias_retraso}</td>
                 <td class="p-2">
-                    <button onclick="deleteLatePayment(${pago.id})" class="action-button">Eliminar</button>
+                    <button onclick="procesarPago(${pago.Id}, 'pagar')" class="action-button">Pagar</button>
                 </td>
             </tr>
         `).join('');
@@ -988,7 +1041,7 @@ async function renderHistorialPrestamos() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ accion: 'leerclientesinactivosdetalles' })
+            body: JSON.stringify({ accion: 'ClientesHistorial' })
         });
 
         console.log("🔹 Respuesta recibida del servidor:", response);
@@ -1009,12 +1062,12 @@ async function renderHistorialPrestamos() {
 
         table.innerHTML = allLoans.map(loan => `
             <tr>
-                <td class="p-2">${loan.id_cliente}</td>
+                <td class="p-2">${loan.cliente_id}</td>
                 <td class="p-2">${loan.nombre} ${loan.apellido}</td>
-                <td class="p-2">$${parseFloat(loan.monto).toFixed(2)}</td>
-                <td class="p-2">${loan.fecha_concesion}</td>
-                <td class="p-2">${loan.fecha_finalizacion || 'Activo'}</td>
-                <td class="p-2">${loan.fecha_finalizacion ? 'Terminado' : 'Activo'}</td>
+                <td class="p-2">$${parseFloat(loan.prestamo_monto).toFixed(2)}</td>
+                <td class="p-2">${loan.prestamo_fecha_concesion}</td>
+                <td class="p-2">${loan.prestamo_fecha_finalizacion ?? 'Activo'}</td>
+                <td class="p-2">${loan.prestamo_estado}</td>
                 <td class="p-2">
                     <button onclick="viewLoanDetails(${loan.id_prestamo})" class="action-button">Imprimir</button>
                 </td>
@@ -1344,7 +1397,7 @@ async function renderProximosPagos() {
                 <td class="p-2">${pago.Estado}</td> <!-- Estado del pago -->
                 <td class="p-2">${pago.dias_faltantes}</td> <!-- Días restantes para el pago -->
                 <td class="p-2">
-                    <button onclick="deletePayment(${pago.Id})" class="action-button">Eliminar</button> <!-- Botón para eliminar el pago -->
+                   <button onclick="procesarPago(${pago.Id}, 'pagar')" class="action-button">Pagar</button>
                 </td>
             </tr>
         `).join(''); // Convertir el array de pagos en filas de tabla
