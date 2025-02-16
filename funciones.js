@@ -43,6 +43,12 @@ let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionR
                 case 'analisis-riesgo':
                     renderAnalisisRiesgo();
                     break;
+                case 'analisis-riesgo':
+                      renderAnalisisRiesgo();
+                    break;
+                    case 'prestamos':
+                        renderClients();
+                      break;
             }
         }
 // ###############################################################################
@@ -307,7 +313,7 @@ function printRoutes(rutas) {
     }
 
     // Aquí iría la lógica para imprimir las rutas en el DOM, por ejemplo:
-    const routesContainer = document.getElementById('rutasList'); // Obtener el contenedor para mostrar las rutas
+    const routesContainer = document.getElementById('listaRutas'); // Obtener el contenedor para mostrar las rutas
     routesContainer.innerHTML = ''; // Limpiar el contenedor antes de imprimir nuevas rutas
 
     // Imprimir cada ruta en el contenedor
@@ -431,7 +437,7 @@ function sendWhatsAppMessageReduced(numero) {
     window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank'); // Abre WhatsApp con el mensaje
 }
 
-// Renderiza la lista de clientes en la tabla
+
 function renderClients() {        
     // Obtener clientes y todos los calendarios de pagos en paralelo
     const fetchClientes = fetch('controllers/clientesControlador.php', {
@@ -458,66 +464,72 @@ function renderClients() {
             }
 
             clientTable.innerHTML = `
-                <tbody>
-                    ${clients.map(client => {
-                        // Filtrar pagos que pertenecen a este cliente
-                        const pagosCliente = pagos.filter(pago => pago.id_cliente === client.cliente_id);
-                        const diasRestantes = pagosCliente.length > 0 
-                            ? calcularDiasRestantes(pagosCliente[pagosCliente.length - 1].fecha_vencimiento)
-                            : "Sin pagos";
+                ${clients.map(client => {
+                    // Filtrar pagos que pertenecen a este cliente
+                    const pagosCliente = pagos.filter(pago => pago.id_cliente === client.cliente_id);
+                    const diasRestantes = pagosCliente.length > 0 
+                        ? calcularDiasRestantes(pagosCliente[pagosCliente.length - 1].fecha_vencimiento)
+                        : "Sin pagos";
 
-                        return `
-                            <tr class="text-xs">
-                                <td class="p-2">${client.cliente_nombre}</td>
-                                <td class="p-2">${client.cliente_apellido}</td>
-                                <td class="p-2">${client.cliente_telefono}</td>
-                                <td class="p-2">${pagosCliente.length}</td>
-                                <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
-                                <td class="p-2">
-                                    <button onclick="editClient(${client.cliente_id})" class="action-button mb-1 text-xs">Editar</button>
-                                    <button onclick="deleteClient(${client.cliente_id})" class="action-button mb-1 text-xs">Borrar</button>
-                                    <button onclick="finishLoan(${client.cliente_id})" class="action-button text-xs">Terminar</button>
-                                    <button onclick="togglePayments(${client.cliente_id})" class="action-button text-xs">Ver Pagos</button>
-                                </td>
-                            </tr>
-                            <tr id="payments-${client.cliente_id}" class="hidden">
-                                <td colspan="7">
-                                    <div class="p-2 bg-gray-800 rounded">
-                                        <h3 class="text-sm font-bold mb-1">Calendario de Pagos</h3>
-                                        <table class="w-full text-xs">
-                                            <thead>
+                    return `
+                        <tr class="text-xs">
+                            <td class="p-2">${client.cliente_nombre}</td>
+                            <td class="p-2">${client.cliente_apellido}</td>
+                            <td class="p-2">${client.cliente_telefono}</td>
+                            <td class="p-2">${pagosCliente.length}</td>
+                            <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
+                            <td class="p-2">
+                                <button onclick="editClient(${client.cliente_id})" class="action-button mb-1 text-xs">Editar</button>
+                                <button onclick="deleteClient(${client.cliente_id})" class="action-button mb-1 text-xs">Borrar</button>
+                                <button onclick="finishLoan(${client.cliente_id})" class="action-button text-xs">Terminar</button>
+                                <button onclick="togglePayments(${client.cliente_id})" class="action-button text-xs">Ver Pagos</button>
+                            </td>
+                        </tr>
+                        <tr id="payments-${client.cliente_id}" class="hidden">
+                            <td colspan="7">
+                                <div class="p-2 bg-gray-800 rounded">
+                                    <h3 class="text-sm font-bold mb-1">Calendario de Pagos</h3>
+                                    <table class="w-full text-xs">
+                                        <thead>
+                                            <tr>
+                                                <th class="p-1 border">Fecha</th>
+                                                <th class="p-1 border">Monto</th>
+                                                <th class="p-1 border">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${pagosCliente.length > 0 ? pagosCliente.map(pago => `
                                                 <tr>
-                                                    <th class="p-1 border">Fecha</th>
-                                                    <th class="p-1 border">Monto</th>
-                                                    <th class="p-1 border">Estado</th>
+                                                    <td class="p-1 border">${pago.fecha_vencimiento}</td>
+                                                    <td class="p-1 border">$${pago.numero_cuota}</td>
+                                                    <td class="p-1 border">${pago.Estado}</td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${pagosCliente.length > 0 ? pagosCliente.map(pago => `
-                                                    <tr>
-                                                        <td class="p-1 border">${pago.fecha_vencimiento}</td>
-                                                        <td class="p-1 border">$${pago.numero_cuota}</td>
-                                                        <td class="p-1 border">${pago.Estado}</td>
-                                                    </tr>
-                                                `).join('') : `<tr><td colspan="3" class="text-center">Sin pagos registrados</td></tr>`}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
+                                            `).join('') : `<tr><td colspan="3" class="text-center">Sin pagos registrados</td></tr>`}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')}
             `;
         })
-        .catch(error => console.error('Error al obtener datos:', error));
+        .catch(error => {
+            console.error('Error al obtener datos:', error);
+            alert('Hubo un error al obtener los datos.'); // Muestra un mensaje de alerta
+        });
 }
+
+
+
+
 
 function togglePayments(clientId) {
     const paymentRow = document.getElementById(`payments-${clientId}`);
     if (!paymentRow) return;
     paymentRow.classList.toggle("hidden");
 }
+
 
 
              
