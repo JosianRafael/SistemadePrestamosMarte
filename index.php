@@ -57,17 +57,34 @@
                             By: Josian Viñas & Felix Mendoza
                         </div>
                     </form>
+                    <!-- <form method="POST" action="">
+    <label for="inputText">Ingresa tu texto:</label>
+    <input type="text" id="inputText" name="inputText" required>
+    <button type="submit">Enviar</button>
+</form> -->
+
+<?php
+// if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+//     // Recibir el valor enviado por el formulario
+//     $inputText = $_POST['inputText'];
+
+//     $algo = PASSWORD_ARGON2ID;
+//     $texto = password_hash($inputText,$algo);
+//     // Mostrar el valor recibido
+//     echo "<p>Texto ingresado: $texto</p>";
+// }
+?>
+
                 </div>
             </div>
         </div>
-        <div class="relative hidden bg-gray-100 lg:block">
-            <img
-                src="/placeholder.svg"
-                alt="Image"
-                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
-        </div>
-    </div>
+        <div class="relative hidden bg-gradient-to-r from-gray-200 to-gray-100 lg:block border-l-[1px] border-black shadow-lg">
+    <img
+        src="https://img.freepik.com/vector-premium/logotipo-icono-prestamo-hipotecario_586739-6080.jpg"
+        alt="Image"
+        class="absolute inset-0 h-full w-full object-cover"
+    />
+</div>
 
     <script>
         document.getElementById("loginForm").addEventListener("submit", function(event) {
@@ -91,7 +108,7 @@
             })
             .then(data => {
                 if (data.success) {
-                    window.location.href = "index.html";
+                    window.location.href = data.pag;
                 } else {
                     errorMessage.textContent = data.error;
                     errorMessage.classList.remove("hidden");
