@@ -177,7 +177,9 @@ function closeEditModal() {
     document.getElementById('editRouteModal').style.display = 'none'; // Ocultar el modal de edición
 }
 
-
+document.addEventListener("DOMContentLoaded", () => {
+    initRouteForm();
+});
 
         // ==========================
 // EVENTOS PARA CUANDO EL DOCUMENTO ESTÉ CARGADO
@@ -305,7 +307,7 @@ function printRoutes(rutas) {
     }
 
     // Aquí iría la lógica para imprimir las rutas en el DOM, por ejemplo:
-    const routesContainer = document.getElementById('rutasList'); // Obtener el contenedor para mostrar las rutas
+    const routesContainer = document.getElementById('routesContainer'); // Obtener el contenedor para mostrar las rutas
     routesContainer.innerHTML = ''; // Limpiar el contenedor antes de imprimir nuevas rutas
 
     // Imprimir cada ruta en el contenedor
@@ -334,7 +336,7 @@ rutas.forEach(ruta => {
     eliminarButton.textContent = 'Eliminar';
     eliminarButton.onclick = () => {
         // Enviar la solicitud AJAX para eliminar
-        const data = { accion: 'borrar', rutaid: ruta.IDRuta };
+        const data = { action: 'eliminar', nombreRuta: ruta.NombreRuta };
         enviarDatos(data);
     };
     eliminarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
@@ -354,7 +356,7 @@ function abrirFormularioEdicion(ruta) {
 
 // Función para enviar datos al servidor usando fetch
 function enviarDatos(data) {
-    fetch('controllers/rutasControlador.php', { // Reemplaza 'controllers/rutasControlador.php' con la URL de tu script PHP
+    fetch('ruta.php', { // Reemplaza 'ruta.php' con la URL de tu script PHP
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -364,40 +366,18 @@ function enviarDatos(data) {
     .then(response => response.json()) // Esperar la respuesta en JSON
     .then(result => {
         console.log('Respuesta del servidor:', result);
-
-        // Manejar la respuesta del servidor y mostrar la alerta correspondiente
-        if (result.status === 'success') {
-            Swal.fire(
-                'Éxito', // Título de la alerta
-                result.message, // Mensaje de la alerta
-                'success' // Tipo de alerta
-            );
-        } else {
-            Swal.fire(
-                'Error', // Título de la alerta
-                result.message, // Mensaje de la alerta
-                'error' // Tipo de alerta
-            );
-        }
+        // Aquí puedes manejar la respuesta del servidor
     })
     .catch(error => {
         console.error('Error:', error);
-
-        // Mostrar alerta de error en caso de fallo en la conexión o en la solicitud
-        Swal.fire(
-            'Error', // Título de la alerta
-            'Hubo un problema con la conexión al servidor.', // Mensaje de la alerta
-            'error' // Tipo de alerta
-        );
     });
 }
-
 // Función para guardar los cambios
 function guardarCambios() {
     const nombreRuta = document.getElementById('nombreRutaInput').value;
     const monto = document.getElementById('montoInput').value;
 
-    const data = { accion: 'editar', nombreRuta: nombreRuta, monto: monto, idruta: IDRuta };
+    const data = { action: 'editar', nombreRuta: nombreRuta, monto: monto };
     enviarDatos(data); // Enviar la solicitud AJAX para editar
 
     cerrarFormulario(); // Cerrar el formulario después de guardar
@@ -429,98 +409,126 @@ function sendWhatsAppMessageReduced(numero) {
     window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank'); // Abre WhatsApp con el mensaje
 }
 
-
-// Renderiza la lista de clientes en la tabla
 // Renderiza la lista de clientes en la tabla
 function renderClients() {        
-    // Obtener clientes y todos los calendarios de pagos en paralelo
-    const fetchClientes = fetch('controllers/clientesControlador.php', {
+    fetch('controllers/rutasControlador.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'leerclientedetalle' }) 
-    }).then(response => response.json());
-
-    const fetchCalendarios = fetch('controllers/clientesControlador.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'leerclienteactivocalendariopago' }) 
-    }).then(response => response.json());
-
-    Promise.all([fetchClientes, fetchCalendarios])
-        .then(([clients, pagos]) => {
-            console.log("Clientes obtenidos:", clients);
-            console.log("Pagos obtenidos:", pagos);
-
-            const clientTable = document.getElementById('clientTable');
-            if (!clientTable) {
-                console.error("Elemento clientTable no encontrado");
-                return;
-            }
-
-            clientTable.innerHTML = `
-                <tbody>
-                    ${clients.map(client => {
-                        // Filtrar pagos que pertenecen a este cliente
-                        const pagosCliente = pagos.filter(pago => pago.id_cliente === client.cliente_id);
-                        const diasRestantes = pagosCliente.length > 0 
-                            ? calcularDiasRestantes(pagosCliente[pagosCliente.length - 1].fecha_vencimiento)
-                            : "Sin pagos";
-
-                        return `
-                            <tr class="text-xs">
-                                <td class="p-2">${client.cliente_nombre}</td>
-                                <td class="p-2">${client.cliente_apellido}</td>
-                                <td class="p-2">${client.cliente_telefono}</td>
-                                <td class="p-2">${pagosCliente.length}</td>
-                                <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
-                                <td class="p-2">
-                                    <button onclick="editClient(${client.cliente_id})" class="action-button mb-1 text-xs">Editar</button>
-                                    <button onclick="deleteClient(${client.cliente_id})" class="action-button mb-1 text-xs">Borrar</button>
-                                    <button onclick="finishLoan(${client.cliente_id})" class="action-button text-xs">Terminar</button>
-                                    <button onclick="togglePayments(${client.cliente_id})" class="action-button text-xs">Ver Pagos</button>
-                                </td>
-                            </tr>
-                            <tr id="payments-${client.cliente_id}" class="hidden">
-                                <td colspan="7">
-                                    <div class="p-2 bg-gray-800 rounded">
-                                        <h3 class="text-sm font-bold mb-1">Calendario de Pagos</h3>
-                                        <table class="w-full text-xs">
-                                            <thead>
-                                                <tr>
-                                                    <th class="p-1 border">Fecha</th>
-                                                    <th class="p-1 border">Monto</th>
-                                                    <th class="p-1 border">Estado</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${pagosCliente.length > 0 ? pagosCliente.map(pago => `
-                                                    <tr>
-                                                        <td class="p-1 border">${pago.fecha_vencimiento}</td>
-                                                        <td class="p-1 border">$${pago.numero_cuota}</td>
-                                                        <td class="p-1 border">${pago.Estado}</td>
-                                                    </tr>
-                                                `).join('') : `<tr><td colspan="3" class="text-center">Sin pagos registrados</td></tr>`}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            `;
+        headers: {
+            'Content-Type': 'application/json' // Establece el tipo de contenido a JSON
+        },
+        body: JSON.stringify({
+            accion: 'obtenerRutas' // Acción para obtener las rutas
         })
-        .catch(error => console.error('Error al obtener datos:', error));
+    })
+    .then(response => response.json())
+    .then(rutas => {
+        console.log("Rutas obtenidas:", rutas); // Verifica si las rutas se obtienen correctamente
+
+        updateTotalRutas(rutas.length); // Actualiza el total de rutas
+
+        const clientTable = document.getElementById('clientTable'); // Obtiene la tabla de clientes
+        if (!clientTable) {
+            console.error("Elemento clientTable no encontrado"); // Maneja el error si no se encuentra la tabla
+            return;
+        }
+
+        // Renderiza la tabla de clientes
+        clientTable.innerHTML = `
+            <tbody>
+                ${clients.map(client => {
+                    const diasRestantes = calcularDiasRestantes(client.fechasPago[client.fechasPago.length - 1]); // Calcula días restantes
+                    const rutaNombre = getRouteNameById(client.ruta, rutas); // Obtiene el nombre de la ruta
+
+                    return `
+                        <tr class="text-xs">
+                            <td class="p-2">${client.nombre}</td>
+                            <td class="p-2">${client.apellido}</td>
+                            <td class="p-2">${client.numero}</td>
+                            <td class="p-2">${rutaNombre}</td>
+                            <td class="p-2">$${client.monto.toFixed(2)}</td>
+                            <td class="p-2">${client.cuotas}</td>
+                            <td class="p-2">${client.fechasPago.join(',<br> ')}</td>
+                            <td class="p-2">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencido'}</td>
+                            <td class="p-2">
+                                <button onclick="editClient(${client.id})" class="action-button mb-1 text-xs">Editar</button>
+                                <button onclick="deleteClient(${client.id})" class="action-button mb-1 text-xs">Borrar</button>
+                                <button onclick="finishLoan(${client.id})" class="action-button text-xs">Terminar</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        `;
+
+        // Tabla reducida dividida por rutas
+        const clientTableReducedContainer = document.getElementById('clientTableReducedContainer'); // Obtiene el contenedor de la tabla reducida
+        if (!clientTableReducedContainer) {
+            console.error("Elemento clientTableReducedContainer no encontrado"); // Maneja el error si no se encuentra el contenedor
+            return;
+        }
+
+        // Agrupa los clientes por ruta
+        const clientsByRoute = {};
+        clients.forEach(client => {
+            const rutaNombre = getRouteNameById(client.ruta, rutas); // Obtiene el nombre de la ruta
+            if (!clientsByRoute[rutaNombre]) {
+                clientsByRoute[rutaNombre] = []; // Inicializa el grupo si no existe
+            }
+            clientsByRoute[rutaNombre].push(client); // Añade el cliente al grupo correspondiente
+        });
+
+        // Renderiza las tablas reducidas
+        let reducedTablesHTML = '';
+        Object.keys(clientsByRoute).forEach(ruta => {
+            reducedTablesHTML += `
+                <div class="mb-5">
+                    <h2 class="text-lg font-bold mb-2">Ruta: ${ruta}</h2>
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="p-2 border">Nombre</th>
+                                <th class="p-2 border">Apellido</th>
+                                <th class="p-2 border">Teléfono</th>
+                                <th class="p-2 border">Monto Final</th>
+                                <th class="p-2 border">Ruta</th>
+                                <th class="p-2 border">Dirección</th>
+                                <th class="p-2 border">WhatsApp Mensaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${clientsByRoute[ruta].map(client => {
+                            const interes = parseFloat(client.interesMora) || 0; // Usar interesMora en lugar de interes
+                            const monto = parseFloat(client.monto) || 0; // Asegúrate de que el monto también sea un número
+                            const montoFinal = monto + (monto * (interes / 100)); // Calcula el monto final incluyendo el interés
+
+                            return `
+                                <tr class="text-sm">
+                                    <td class="p-2 border">${client.nombre}</td>
+                                    <td class="p-2 border">${client.apellido}</td>
+                                    <td class="p-2 border">${client.numero}</td>
+                                    <td class="p-2 border">$${montoFinal.toFixed(2)}</td>
+                                    <td class="p-2 border">${ruta}</td>
+                                    <td class="p-2 border">${client.direccion}</td>
+                                    <td class="p-2 border">
+                                        <input type="text" id="mensaje-${client.numero}" class="p-1 w-28 text-xs bg-gray-700 rounded" placeholder="Mensaje">
+                                        <button onclick="sendWhatsAppMessageReduced(${client.numero})" class="bg-green-600 text-white text-xs px-2 py-1 rounded">Enviar</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                        
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+
+        clientTableReducedContainer.innerHTML = reducedTablesHTML; // Inserta las tablas reducidas en el contenedor
+    })
+    .catch(error => console.error('Error al obtener rutas:', error)); // Maneja errores de la solicitud
 }
 
-renderClients();
-
-function togglePayments(clientId) {
-    const paymentRow = document.getElementById(`payments-${clientId}`);
-    if (!paymentRow) return;
-    paymentRow.classList.toggle("hidden");
-}
-       
+             
         /**
  * Función asíncrona para mostrar la ruta más popular en el dashboard.
  * Esta función obtiene todas las rutas y clientes, cuenta cuántos
@@ -575,7 +583,7 @@ async function mostrarRutaMasPopular() {
                 rutaMasPopular = getRouteNameById(rutaId, rutas); // Obtener el nombre de la ruta correspondiente
             }
         }
-        updateTotalRutas(rutas.length);
+
         // Mostrar la ruta más popular en el elemento correspondiente en el DOM
         const rutaMasPopularElement = document.getElementById('rutaMasPopular');
         rutaMasPopularElement.textContent = `Ruta: ${rutaMasPopular} (N° Clientes: ${maxClientes})`;
@@ -584,7 +592,9 @@ async function mostrarRutaMasPopular() {
     }
 }
 
-mostrarRutaMasPopular();
+// Llamar a la función para mostrar la ruta más popular cuando se carga el dashboard
+mostrarRutaMasPopular();     
+// Función para actualizar el total de rutas
 
 /**
  * Función para actualizar el total de rutas en el dashboard.
@@ -652,7 +662,6 @@ async function renderFinishedLoans() {
     }
 }
 
-renderFinishedLoans();
 /**
  * Función para calcular los días restantes hasta la fecha del último pago.
  * @param {string} fechaUltimoPago - La fecha del último pago en formato de cadena.
@@ -958,11 +967,72 @@ function calcularProximosRecordatorios() {
             })
             .map(fecha => ({
                 cliente: `${client.nombre} ${client.apellido}`,
-                monto: client.monto,
-                fecha: fecha.toLocaleDateString()
+                monto: client.montoPorCuota,
+                fecha: fecha
             }))
-    );
+    ).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 }
+
+
+function saveRecordatoriosConfig(e) {
+    e.preventDefault();
+    configuracionRecordatorios.diasAnticipacion = parseInt($('diasAnticipacion').value);
+    configuracionRecordatorios.metodos = Array.from(document.querySelectorAll('input[name="metodoNotificacion"]:checked')).map(checkbox => checkbox.value);
+    localStorage.setItem('configuracionRecordatorios', JSON.stringify(configuracionRecordatorios));
+    Swal.fire('Éxito', 'Configuración de recordatorios guardada', 'success');
+    renderRecordatoriosPago();
+}
+
+async function renderHistorialPrestamos() {
+    console.log("🔹 renderHistorialPrestamos() se está ejecutando...");
+
+    try {
+        const response = await fetch('controllers/clientesControlador.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ accion: 'leerclientesinactivosdetalles' })
+        });
+
+        console.log("🔹 Respuesta recibida del servidor:", response);
+
+        const data = await response.json();
+        console.log("🔹 Datos recibidos:", data);
+
+        if (!Array.isArray(data)) {
+            throw new Error('No se pudo obtener el historial de préstamos');
+        }
+
+        const allLoans = data.sort((a, b) => new Date(b.fecha_concesion) - new Date(a.fecha_concesion));
+
+        console.log("🔹 Datos ordenados:", allLoans);
+
+        const table = document.getElementById('historialPrestamosTable');
+        console.log("🔹 Tabla encontrada:", table);
+
+        table.innerHTML = allLoans.map(loan => `
+            <tr>
+                <td class="p-2">${loan.id_cliente}</td>
+                <td class="p-2">${loan.nombre} ${loan.apellido}</td>
+                <td class="p-2">$${parseFloat(loan.monto).toFixed(2)}</td>
+                <td class="p-2">${loan.fecha_concesion}</td>
+                <td class="p-2">${loan.fecha_finalizacion || 'Activo'}</td>
+                <td class="p-2">${loan.fecha_finalizacion ? 'Terminado' : 'Activo'}</td>
+                <td class="p-2">
+                    <button onclick="viewLoanDetails(${loan.id_prestamo})" class="action-button">Imprimir</button>
+                </td>
+            </tr>
+        `).join('');
+
+        console.log("✅ Tabla actualizada correctamente.");
+        
+    } catch (error) {
+        console.error('❌ Error al obtener el historial de préstamos:', error);
+    }
+}
+
+
 
         
     // ==========================
@@ -1305,8 +1375,3 @@ setInterval(() => {
     renderCalendarioPagos(); // Renderizar el calendario de pagos
     renderAnalisisRiesgo(); // Renderizar el análisis de riesgo
 }, 60000); // Intervalo de 60000 ms (1 minuto)
-
-
-
-
-
