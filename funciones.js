@@ -329,13 +329,13 @@ rutas.forEach(ruta => {
     rutaElement.appendChild(textoRuta); // Agregar el texto al elemento de ruta
 
     // Crear botón de Editar
-    const editarButton = document.createElement('button');
-    editarButton.textContent = 'Editar';
-    editarButton.onclick = () => {
-        abrirFormularioEdicion(ruta); // Llamar a la función para abrir el formulario
-    };
-    editarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
-    rutaElement.appendChild(editarButton); // Agregar el botón de editar
+    // const editarButton = document.createElement('button');
+    // editarButton.textContent = 'Editar';
+    // editarButton.onclick = () => {
+    //     abrirFormularioEdicion(ruta); // Llamar a la función para abrir el formulario
+    // };
+    // editarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
+    // rutaElement.appendChild(editarButton); // Agregar el botón de editar
 
     // Crear botón de Eliminar
     const eliminarButton = document.createElement('button');
@@ -443,13 +443,13 @@ function renderClients() {
     const fetchClientes = fetch('controllers/clientesControlador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'obtenerClientes' }) 
+        body: JSON.stringify({ accion: 'leerclientedetalle' }) 
     }).then(response => response.json());
 
-    const fetchCalendarios = fetch('controllers/pagosControlador.php', {
+    const fetchCalendarios = fetch('controllers/clientesControlador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'obtenerTodosLosPagos' }) 
+        body: JSON.stringify({ accion: 'leerclienteactivocalendariopago' }) 
     }).then(response => response.json());
 
     Promise.all([fetchClientes, fetchCalendarios])
@@ -666,6 +666,9 @@ async function renderFinishedLoans() {
         console.error('Error al obtener los préstamos finalizados:', error); // Manejar cualquier error ocurrido
     }
 }
+
+renderFinishedLoans();
+renderClients();
 
 /**
  * Función para calcular los días restantes hasta la fecha del último pago.
