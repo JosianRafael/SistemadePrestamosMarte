@@ -307,7 +307,7 @@ function printRoutes(rutas) {
     }
 
     // Aquí iría la lógica para imprimir las rutas en el DOM, por ejemplo:
-    const routesContainer = document.getElementById('rutasList'); // Obtener el contenedor para mostrar las rutas
+    const routesContainer = document.getElementById('listaRutas'); // Obtener el contenedor para mostrar las rutas
     routesContainer.innerHTML = ''; // Limpiar el contenedor antes de imprimir nuevas rutas
 
     // Imprimir cada ruta en el contenedor
@@ -437,13 +437,13 @@ function renderClients() {
     const fetchClientes = fetch('controllers/clientesControlador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'obtenerClientes' }) 
+        body: JSON.stringify({ accion: 'leerclientedetalle' }) 
     }).then(response => response.json());
 
-    const fetchCalendarios = fetch('controllers/pagosControlador.php', {
+    const fetchCalendarios = fetch('controllers/clientesControlador.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accion: 'obtenerTodosLosPagos' }) 
+        body: JSON.stringify({ accion: 'leerclienteactivocalendariopago' }) 
     }).then(response => response.json());
 
     Promise.all([fetchClientes, fetchCalendarios])
@@ -654,6 +654,9 @@ async function renderFinishedLoans() {
         console.error('Error al obtener los préstamos finalizados:', error); // Manejar cualquier error ocurrido
     }
 }
+
+renderFinishedLoans();
+renderClients();
 
 /**
  * Función para calcular los días restantes hasta la fecha del último pago.
