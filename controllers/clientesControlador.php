@@ -48,6 +48,8 @@ function ControladorGuardarClientes($datos, $link)
         exit;
     }
 
+    
+
     // Iniciar transacción
     mysqli_begin_transaction($link);
     try {

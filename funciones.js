@@ -43,6 +43,12 @@ let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionR
                 case 'analisis-riesgo':
                     renderAnalisisRiesgo();
                     break;
+                case 'analisis-riesgo':
+                      renderAnalisisRiesgo();
+                    break;
+                    case 'prestamos':
+                        renderClients();
+                      break;
             }
         }
 // ###############################################################################
@@ -431,7 +437,7 @@ function sendWhatsAppMessageReduced(numero) {
     window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank'); // Abre WhatsApp con el mensaje
 }
 
-// Renderiza la lista de clientes en la tabla
+
 function renderClients() {        
     // Obtener clientes y todos los calendarios de pagos en paralelo
     const fetchClientes = fetch('controllers/clientesControlador.php', {
@@ -458,13 +464,12 @@ function renderClients() {
             }
 
             clientTable.innerHTML = `
-                <tbody>
-                    ${clients.map(client => {
-                        // Filtrar pagos que pertenecen a este cliente
-                        const pagosCliente = pagos.filter(pago => pago.id_cliente === client.cliente_id);
-                        const diasRestantes = pagosCliente.length > 0 
-                            ? calcularDiasRestantes(pagosCliente[pagosCliente.length - 1].fecha_vencimiento)
-                            : "Sin pagos";
+                ${clients.map(client => {
+                    // Filtrar pagos que pertenecen a este cliente
+                    const pagosCliente = pagos.filter(pago => pago.id_cliente === client.cliente_id);
+                    const diasRestantes = pagosCliente.length > 0 
+                        ? calcularDiasRestantes(pagosCliente[pagosCliente.length - 1].fecha_vencimiento)
+                        : "Sin pagos";
 
                         return `
                             <tr class="text-xs">
@@ -522,7 +527,10 @@ function renderClients() {
                 </tbody>
             `;
         })
-        .catch(error => console.error('Error al obtener datos:', error));
+        .catch(error => {
+            console.error('Error al obtener datos:', error);
+            alert('Hubo un error al obtener los datos.'); // Muestra un mensaje de alerta
+        });
 }
 
 // Función para procesar pagos o devoluciones
@@ -572,6 +580,7 @@ function togglePayments(clientId) {
     if (!paymentRow) return;
     paymentRow.classList.toggle("hidden");
 }
+
 
 
              

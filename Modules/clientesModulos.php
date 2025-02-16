@@ -1,5 +1,4 @@
 <?php
-
 // Función para guardar un nuevo cliente en la base de datos
 function GuardarClientesModulo($link, $nombre, $apellido, $telefono, $correo, $direccion)
 {
