@@ -356,7 +356,7 @@ function abrirFormularioEdicion(ruta) {
 
 // Función para enviar datos al servidor usando fetch
 function enviarDatos(data) {
-    fetch('ruta.php', { // Reemplaza 'ruta.php' con la URL de tu script PHP
+    fetch('controllers/rutasControlador.php', { // Reemplaza 'ruta.php' con la URL de tu script PHP
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -432,7 +432,6 @@ function renderClients() {
             return;
         }
 
-        // Renderiza la tabla de clientes
         clientTable.innerHTML = `
             <tbody>
                 ${clients.map(client => {
