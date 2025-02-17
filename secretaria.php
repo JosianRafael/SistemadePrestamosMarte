@@ -14,7 +14,7 @@ if (!isset($_SESSION["session"]))
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inversiones P&P Marte</title>
+    <title>Inversiones P&P Marte / Secretaria</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -41,22 +41,22 @@ if (!isset($_SESSION["session"]))
             <span style="color: white;" class="text-2xl font-bold">💰 Inversiones P&P Marte</span>
         </div>
         <div class="flex items-center space-x-6">
-            <span style="color: white;" class="text-sm">Bienvenido Sr armando, haz ingresado como admin</span>
-            <img style="width: 50px;" src="https://static.vecteezy.com/system/resources/previews/010/158/758/non_2x/dollar-money-icon-sign-symbol-design-free-png.png" id="darkModeToggle" class="p-2">
-                
-        </img>
-        </div>
+    <span style="color: white;" class="text-sm">Haz ingresado a la oficina de secretaria</span>
+    <img style="width: 50px;" src="https://png.pngtree.com/png_detail/20181019/desk-clerk-png-clipart_3369249.png" id="darkModeToggle" class="p-2">     
+    <button class="border border-white text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition">
+        Cerrar sesión
+    </button>
+</div>
     </nav>
     <div class="grid lg:grid-cols-[280px_1fr]">
         <aside class="border-r bg-gray-900 backdrop-blur shadow-lg">
-            <div class="flex h-16 items-center gap-2 border-b px-6 bg-gray-800">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
-                <span class="font-bold text-white">Sistema de Préstamos</span>
-            </div>
             <nav class="space-y-2 px-2 py-3">
-                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('dashboard')">Dashboard</button>
+            <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('dashboard')">Dashboard</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('registro')">Registro de Clientes</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('prestamos')">Préstamos Activos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('prestamos-terminados')">Préstamos Terminados</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('calendario-pagos')">Calendario de Pagos</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('multas-recargos')">Multas y Recargos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('recordatorios-pago')">Agenda de Notas</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('historial-prestamos')">Historial de Préstamos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('analisis-riesgo')">Análisis de Riesgo</button>
@@ -643,7 +643,6 @@ if (!isset($_SESSION["session"]))
     </footer>
     <script src="secretaria.js"></script>
     <script src="calculadora.js"></script>
-    <script src="facturas.js"></script>
 </body>
 </html>
 

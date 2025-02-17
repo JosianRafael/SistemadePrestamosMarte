@@ -18,7 +18,7 @@ let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionR
         function $(id) { return document.getElementById(id); }
 
         //###############################################################################
-        // F U N C I O N  P A R A   D E S P LA Z A R S E   E N T R E  S E C I O N E S
+        // F U N C I O N  P A R A   D E S P LA Z A R S E   E N T R E  S E C I O N E S   (De la secretaria).
         // ###############################################################################
 
         function showSection(sectionId) {
@@ -337,16 +337,16 @@ rutas.forEach(ruta => {
     // editarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
     // rutaElement.appendChild(editarButton); // Agregar el botón de editar
 
-    // Crear botón de Eliminar
-    const eliminarButton = document.createElement('button');
-    eliminarButton.textContent = 'Eliminar';
-    eliminarButton.onclick = () => {
-        // Enviar la solicitud AJAX para eliminar
-        const data = { accion: 'borrar', rutaid: ruta.IDRuta };
-        enviarDatos(data);
-    };
-    eliminarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
-    rutaElement.appendChild(eliminarButton); // Agregar el botón de eliminar
+    // // Crear botón de Eliminar
+    // const eliminarButton = document.createElement('button');
+    // eliminarButton.textContent = 'Eliminar';
+    // eliminarButton.onclick = () => {
+    //     // Enviar la solicitud AJAX para eliminar
+    //     const data = { accion: 'borrar', rutaid: ruta.IDRuta };
+    //     enviarDatos(data);
+    // };
+    // eliminarButton.style.marginLeft = '10px'; // Añadir un margen para separar el botón del texto
+    // rutaElement.appendChild(eliminarButton); // Agregar el botón de eliminar
 
     // Agregar el elemento de ruta al contenedor
     routesContainer.appendChild(rutaElement);
@@ -480,9 +480,7 @@ function renderClients() {
                                 <td class="p-2">${client.prestamo_monto}</td>
                                 <td class="p-2">${client.prestamo_cuotas}</td>                            
                                 <td class="p-2">
-                                    <button onclick="editClient(${client.cliente_id})" class="action-button mb-1 text-xs">Editar</button>
-                                    <button onclick="deleteClient(${client.cliente_id})" class="action-button mb-1 text-xs">Borrar</button>
-                                    <button onclick="finishLoan(${client.cliente_id})" class="action-button text-xs">Terminar</button>
+
                                     <button onclick="togglePayments(${client.cliente_id})" class="action-button text-xs">Ver Pagos</button>
                                 </td>
                             </tr>
@@ -1040,46 +1038,34 @@ function saveRecordatoriosConfig(e) {
     Swal.fire('Éxito', 'Configuración de recordatorios guardada', 'success');
     renderRecordatoriosPago();
 }
-console.log("Hola");
+
 async function renderHistorialPrestamos() {
     console.log("🔹 renderHistorialPrestamos() se está ejecutando...");
 
     try {
         const response = await fetch('controllers/clientesControlador.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ accion: 'ClientesHistorial' })
         });
-
-        console.log("🔹 Respuesta recibida del servidor:", response);
 
         const data = await response.json();
         console.log("🔹 Datos recibidos:", data);
 
-        if (!Array.isArray(data)) {
-            throw new Error('No se pudo obtener el historial de préstamos');
-        }
+        if (!Array.isArray(data)) throw new Error('No se pudo obtener el historial de préstamos');
 
         const allLoans = data.sort((a, b) => new Date(b.fecha_concesion) - new Date(a.fecha_concesion));
 
-        console.log("🔹 Datos ordenados:", allLoans);
-
         const table = document.getElementById('historialPrestamosTable');
-        console.log("🔹 Tabla encontrada:", table);
-
         table.innerHTML = allLoans.map(loan => `
             <tr>
-                <td class="p-2">${loan.cliente_id}</td>
-                <td class="p-2">${loan.nombre} ${loan.apellido}</td>
-                <td class="p-2">$${parseFloat(loan.prestamo_monto).toFixed(2)}</td>
-                <td class="p-2">${loan.prestamo_fecha_concesion}</td>
-                <td class="p-2">${loan.prestamo_fecha_finalizacion ?? 'Activo'}</td>
-                <td class="p-2">${loan.prestamo_estado}</td>
-                <td class="p-2">
-                    <button onclick="viewLoanDetails(${loan.id_prestamo})" class="action-button">Imprimir</button>
-                </td>
+                <td>${loan.cliente_id}</td>
+                <td>${loan.nombre} ${loan.apellido}</td>
+                <td>$${parseFloat(loan.prestamo_monto).toFixed(2)}</td>
+                <td>${loan.prestamo_fecha_concesion}</td>
+                <td>${loan.prestamo_fecha_finalizacion ?? 'Activo'}</td>
+                <td>${loan.prestamo_estado}</td>
+                <td><button onclick="viewLoanDetails(this)" class="action-button">Imprimir</button></td>
             </tr>
         `).join('');
 
@@ -1090,24 +1076,31 @@ async function renderHistorialPrestamos() {
     }
 }
 
-
-
-        
-    // ==========================
-// EVENTOS PARA CUANDO EL DOCUMENTO ESTÉ CARGADO
-// ==========================
-
 /**
  * Muestra los detalles del préstamo y solicita el nombre del cobrador.
  * 
- * @param id - ID del préstamo que se desea visualizar.
+ * @param {HTMLElement} btn - Botón que se ha clicado para obtener los detalles del préstamo.
  */
-function viewLoanDetails(id) {
-    const clients = getClients();
-    const finishedLoans = getFinishedLoans();
-    const loan = clients.find(c => c.id === id) || finishedLoans.find(l => l.id === id);
+async function viewLoanDetails(btn) {
+    try {
+        // Obtener la fila del botón clicado
+        const row = btn.closest('tr');
+        if (!row) {
+            console.error("❌ No se encontró la fila correspondiente.");
+            return;
+        }
 
-    if (loan) {
+        // Extraer datos de la fila
+        const cells = row.cells;
+        const loan = {
+            cliente_id: cells[0].textContent,
+            nombre: cells[1].textContent,
+            monto: parseFloat(cells[2].textContent.replace('$', '').replace(',', '')),
+            fechaPrestamo: cells[3].textContent,
+            fechaFinalizacion: cells[4].textContent === 'Activo' ? null : cells[4].textContent,
+            estado: cells[5].textContent,
+        };
+
         Swal.fire({
             title: "Seleccionar Cobrador",
             input: "text",
@@ -1120,14 +1113,14 @@ function viewLoanDetails(id) {
                 generarFactura(loan, cobrador);
             }
         });
+
+    } catch (error) {
+        console.error('❌ Error en viewLoanDetails:', error);
     }
 }
 
 /**
  * Genera y muestra la factura del préstamo.
- * 
- * @param loan - Objeto que representa el préstamo.
- * @param cobrador - Nombre del cobrador asignado.
  */
 function generarFactura(loan, cobrador) {
     let facturaHTML = `
@@ -1143,32 +1136,19 @@ function generarFactura(loan, cobrador) {
             margin: auto;
             font-size: 18px;
         ">
-            <h1 style="margin: 10px 0;">Inversiones P&P Marte</h1>
-            <p style="font-size: 16px; margin: 5px 0;">Factura para Consumidor Final</p>
-            <hr style="border: 2px dashed black; margin: 10px 0;">
-            
+            <h1>Inversiones P&P Marte</h1>
+            <p style="font-size: 16px;">Factura para Consumidor Final</p>
+            <hr style="border: 2px dashed black;">
             <div style="text-align: left; font-size: 18px;">
-                <p><strong>Cliente:</strong> ${loan.nombre} ${loan.apellido}</p>
+                <p><strong>Cliente:</strong> ${loan.nombre}</p>
                 <p><strong>Monto:</strong> $${loan.monto.toFixed(2)}</p>
                 <p><strong>Fecha de Inicio:</strong> ${loan.fechaPrestamo}</p>
                 <p><strong>Estado:</strong> ${loan.fechaFinalizacion ? 'Terminado' : 'Activo'}</p>
-    `;
-
-    if (loan.fechaFinalizacion) {
-        facturaHTML += `<p><strong>Fecha de Finalización:</strong> ${loan.fechaFinalizacion}</p>`;
-    } else {
-        facturaHTML += `
-            <p><strong>Cuotas:</strong> ${loan.cuotas}</p>
-            <p><strong>Monto por Cuota:</strong> $${loan.montoPorCuota.toFixed(2)}</p>
-            <p><strong>Próximas Fechas de Pago:</strong><br> ${loan.fechasPago.join('<br>')}</p>
-        `;
-    }
-
-    facturaHTML += `
-            <p><strong>Cobrador:</strong> ${cobrador}</p>
+                ${loan.fechaFinalizacion ? `<p><strong>Fecha de Finalización:</strong> ${loan.fechaFinalizacion}</p>` : ''}
+                <p><strong>Cobrador:</strong> ${cobrador}</p>
             </div>
-            <hr style="border: 2px dashed black; margin: 10px 0;">
-            <p style="margin: 10px 0; font-size: 20px;"><strong>¡Gracias por preferirnos!</strong></p>
+            <hr style="border: 2px dashed black;">
+            <p style="font-size: 20px;"><strong>¡Gracias por preferirnos!</strong></p>
         </div>
     `;
 
@@ -1219,12 +1199,15 @@ function imprimirFactura() {
         }
     `;
     document.head.appendChild(style);
-    
+
     setTimeout(() => {
         window.print();
         document.head.removeChild(style);
     }, 300);
 }
+
+
+
 
 // ==========================
 // EVENTO PARA ELIMINAR UN PRÉSTAMO FINALIZADO

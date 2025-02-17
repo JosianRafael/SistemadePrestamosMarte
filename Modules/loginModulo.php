@@ -1,10 +1,18 @@
 <?php
 require_once __DIR__ . '/../Config/config.php';
 session_start();
-$usuario = $_POST['usuario'];
-$contrasena = $_POST['password'];
 
-$query = "SELECT usuario, password FROM login_usuario WHERE usuario = ?";
+// Verificar si las claves existen antes de usarlas
+$usuario = $_POST['usuario'] ?? null;
+$contrasena = $_POST['password'] ?? null;
+
+if (!$usuario || !$contrasena) {
+    echo json_encode(["success" => false, "error" => "Faltan datos obligatorios."]);
+    exit;
+}
+
+// Modificar la consulta SQL para incluir 'rol'
+$query = "SELECT usuario, password, rol FROM login_usuario WHERE usuario = ?";
 $stmt = $link->prepare($query);
 $stmt->bind_param("s", $usuario);
 $stmt->execute();
@@ -12,23 +20,22 @@ $resultado = $stmt->get_result();
 
 if ($resultado->num_rows > 0) {
     $fila = $resultado->fetch_assoc();
-    $passwordHash = $fila['password'];  // Contraseña almacenada en la base de datos (texto plano)
-    $rol = $fila["rol"];
-    if ($rol == "Admin")
-    {
-        $pag = "sistema.php";
-    }else
-    {
-        $pag = "secretaria.php";
-    }
+    $passwordHash = $fila['password'];  
+    $rol = $fila["rol"];  // Ya no dará error porque ahora sí está en la consulta
 
-    if (password_verify($contrasena,$passwordHash)) {  // Comparación directa (sin password_verify)
-<<<<<<< HEAD
-        echo json_encode(["success" => true, "usuario" => $fila['usuario']]);
-=======
-        echo json_encode(["success" => true, "pag" => $pag ,"usuario" => $fila['usuario']]);
-        $_SESSION["session"] = "admin";
->>>>>>> dd3913a515855912da74ccb9d5ea6e04d15aa422
+    // Verificar contraseña
+    if (password_verify($contrasena, $passwordHash)) {
+        $_SESSION["session"] = "admin";  
+        
+        // Definir la página a redirigir según el rol
+        $pag = ($rol == "Admin") ? "sistema.php" : "secretaria.php";
+
+        // Respuesta JSON correcta en un solo `echo`
+        echo json_encode([
+            "success" => true, 
+            "usuario" => $fila['usuario'],
+            "pag" => $pag
+        ]);
     } else {
         echo json_encode(["success" => false, "error" => "Contraseña incorrecta."]);
     }
@@ -38,5 +45,4 @@ if ($resultado->num_rows > 0) {
 
 $stmt->close();
 $link->close();
-
 ?>

@@ -41,11 +41,13 @@ if (!isset($_SESSION["session"]))
             <span style="color: white;" class="text-2xl font-bold">💰 Inversiones P&P Marte</span>
         </div>
         <div class="flex items-center space-x-6">
-            <span style="color: white;" class="text-sm">Bienvenido Sr armando, haz ingresado como admin</span>
-            <img style="width: 50px;" src="https://static.vecteezy.com/system/resources/previews/010/158/758/non_2x/dollar-money-icon-sign-symbol-design-free-png.png" id="darkModeToggle" class="p-2">
-                
-        </img>
-        </div>
+    <span style="color: white;" class="text-sm">Bienvenido Sr Armando, has ingresado como admin</span>
+    <img style="width: 50px;" src="https://static.vecteezy.com/system/resources/previews/010/158/758/non_2x/dollar-money-icon-sign-symbol-design-free-png.png" id="darkModeToggle" class="p-2">     
+    <button class="border border-white text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition">
+        Cerrar sesión
+    </button>
+</div>
+
     </nav>
     <div class="grid lg:grid-cols-[280px_1fr]">
         <aside class="border-r bg-gray-900 backdrop-blur shadow-lg">
@@ -647,7 +649,6 @@ if (!isset($_SESSION["session"]))
     </footer>
     <script src="funciones.js"></script>
     <script src="calculadora.js"></script>
-    <script src="facturas.js"></script>
 </body>
 </html>
 
