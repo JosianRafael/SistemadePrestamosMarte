@@ -14,7 +14,7 @@ if ($resultado->num_rows > 0) {
     $fila = $resultado->fetch_assoc();
     $passwordHash = $fila['password'];  // Contraseña almacenada en la base de datos (texto plano)
 
-    if ($contrasena === $passwordHash) {  // Comparación directa (sin password_verify)
+    if (password_verify($contrasena,$passwordHash)) {  // Comparación directa (sin password_verify)
         echo json_encode(["success" => true, "usuario" => $fila['usuario']]);
     } else {
         echo json_encode(["success" => false, "error" => "Contraseña incorrecta."]);
@@ -25,4 +25,5 @@ if ($resultado->num_rows > 0) {
 
 $stmt->close();
 $link->close();
+
 ?>

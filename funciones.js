@@ -420,7 +420,7 @@ function cerrarFormulario() {
 }
 
             
-        // Llama a loadRoutes cuando la página se cargue
+// Llama a loadRoutes cuando la página se cargue
 document.addEventListener('DOMContentLoaded', (event) => {
     loadRoutes(); // Carga las rutas al iniciar la página
 });
@@ -518,10 +518,8 @@ function renderClients() {
             console.error('Error al obtener datos:', error);
             alert('Hubo un error al obtener los datos.'); // Muestra un mensaje de alerta
         });
+        
 }
-
-
-
 
 
 function togglePayments(clientId) {
@@ -529,8 +527,6 @@ function togglePayments(clientId) {
     if (!paymentRow) return;
     paymentRow.classList.toggle("hidden");
 }
-
-
 
              
         /**
@@ -577,7 +573,7 @@ async function mostrarRutaMasPopular() {
         });
 
         updateTotalRutas(rutas.length);
-        // Inicializar variables para encontrar la ruta más popular
+        // Inicializar variables para encontrar la ruta más popular.
         let maxClientes = 0; // Contador máximo de clientes
         let rutaMasPopular = ''; // Nombre de la ruta más popular
 

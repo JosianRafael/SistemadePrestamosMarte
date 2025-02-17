@@ -60,13 +60,15 @@
                 </div>
             </div>
         </div>
-        <div class="relative hidden bg-gray-100 lg:block">
-            <img
-                src="/placeholder.svg"
-                alt="Image"
-                class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
-        </div>
+        <div class="relative hidden bg-gradient-to-r from-gray-200 to-gray-100 lg:block border-l-[1px] border-black shadow-lg">
+    <img
+        src="https://img.freepik.com/vector-premium/logotipo-icono-prestamo-hipotecario_586739-6080.jpg"
+        alt="Image"
+        class="absolute inset-0 h-full w-full object-cover"
+    />
+</div>
+
+
     </div>
 
     <script>
