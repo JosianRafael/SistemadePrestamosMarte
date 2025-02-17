@@ -118,6 +118,7 @@ function addClient(e) {
             renderClients(); // Renderizar la lista de clientes
             updateDashboard(); // Actualizar el tablero de control
             showSection('prestamos'); // Mostrar la sección de préstamos
+            actualizarDashBoard();
         } else {
             Swal.fire('Error', 'Hubo un problema con la conexión al servidor.', 'error'); // Mostrar mensaje de error
         }
@@ -512,8 +513,8 @@ function renderClients() {
                                                         <td class="p-1 border">${pago.total_pagar}</td>
                                                         <td class="p-1 border">${pago.dias_faltantes}</td>
                                                         <td class="p-1 border">
-                                                            <button onclick="procesarPago(${pago.Id}, 'pagar')" class="action-button text-xs">Pagar</button>
-                                                            <button onclick="procesarPago(${pago.Id}, 'devolver')" class="action-button text-xs">Devolver</button>
+                                                            <button onclick="procesarPago(${pago.Id},${pago.ruta_id},${pago.total_pagar},'${pago.Estado}','pagar')" class="action-button text-xs">Pagar</button>
+                                                            <button onclick="procesarPago(${pago.Id},${pago.ruta_id},${pago.total_pagar},'${pago.Estado}','devolver')" class="action-button text-xs">Devolver</button>
                                                         </td>
                                                     </tr>
                                                 `).join('') : `<tr><td colspan="4" class="text-center">Sin pagos registrados</td></tr>`}
@@ -534,7 +535,7 @@ function renderClients() {
 }
 
 // Función para procesar pagos o devoluciones
-function procesarPago(idPago, accion) {
+function procesarPago(idPago, ruta_id, cantidad, estado, accion) {
     Swal.fire({
         title: '¿Estás seguro?',
         text: `Vas a realizar la acción "${accion}" para el pago ID ${idPago}.`,
@@ -550,17 +551,30 @@ function procesarPago(idPago, accion) {
             fetch('controllers/clientesControlador.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ accion, id_pago: idPago })
+                body: JSON.stringify({ accion, id_pago: idPago, rutaid: ruta_id, total: cantidad, Estado: estado })
             })
-            .then(response => response.json())
+            .then(response => response.json())  // Convertir la respuesta a JSON
             .then(data => {
-                console.log(`Acción ${accion} realizada para el pago ${idPago}:`, data);
-                Swal.fire(
-                    '¡Éxito!',
-                    `La acción "${accion}" se ha realizado correctamente.`,
-                    'success'
-                );
-                renderClients(); // Recargar la lista de clientes y pagos
+                console.log(`Acción ${accion} realizada para el pago ${idPago}: con ruta id ${ruta_id}`, data);
+
+                // Verificar si la respuesta es exitosa o de error
+                if (data.status === 'success') {
+                    Swal.fire(
+                        '¡Éxito!',
+                        data.message,  // Mensaje del JSON
+                        'success'
+                    );
+                    renderClients(); // Recargar la lista de clientes y pagos
+                    renderProximosPagos(); //Recarga proximos pagos
+                    renderPagosVencidos();
+                    actualizarDashBoard();
+                } else {
+                    Swal.fire(
+                        'Error',
+                        data.message,  // Mensaje del JSON
+                        'error'
+                    );
+                }
             })
             .catch(error => {
                 console.error(`Error al realizar la acción ${accion}:`, error);
@@ -575,6 +589,7 @@ function procesarPago(idPago, accion) {
 }
 
 
+
 function togglePayments(clientId) {
     const paymentRow = document.getElementById(`payments-${clientId}`);
     if (!paymentRow) return;
@@ -582,7 +597,10 @@ function togglePayments(clientId) {
 }
 
 
-
+/**#######################################################
+ *  Funciones para actualizar información en el dashboard
+ * ######################################################
+ * /
              
         /**
  * Función asíncrona para mostrar la ruta más popular en el dashboard.
@@ -646,6 +664,37 @@ async function mostrarRutaMasPopular() {
     } catch (error) {
         console.error('Error en mostrarRutaMasPopular:', error); // Manejar cualquier error ocurrido
     }
+}
+
+function actualizarDashBoard() {
+    // Definir el objeto con la acción a enviar
+    const datos = { accion: 'dashboard' };
+
+    // Enviar la solicitud a PHP
+    fetch('controllers/clientesControlador.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json()) // Convertir la respuesta a JSON
+    .then(data => {
+        if (Array.isArray(data) && data.length > 0) { 
+            document.getElementById('totalPrestamos').innerText = data[0].total_prestamos;
+            document.getElementById('clientesActivos').innerText = data[0].total_clientes;
+            document.getElementById('prestamosPendientes').innerText = data[0].total_prestamos_pendientes;
+        } else {
+            console.error('La respuesta no es un array:', data);
+            document.getElementById('totalPrestamos').innerText = '$0';
+            document.getElementById('clientesActivos').innerText = "0";
+            document.getElementById('prestamosPendientes').innerText = "0";
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener los préstamos:', error);
+        document.getElementById('totalPrestamos').innerText = '$0';
+        document.getElementById('clientesActivos').innerText = "0";
+        document.getElementById('prestamosPendientes').innerText = "0";
+    });
 }
 
 // Llamar a la función para mostrar la ruta más popular cuando se carga el dashboard
@@ -932,6 +981,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClientesChart();
     updatePrestamosChart();
     renderPagosVencidos(); // Llama a la función para renderizar los pagos vencidos
+    actualizarDashBoard();
 });
 
 // Función asíncrona para renderizar los pagos vencidos en la interfaz.
@@ -965,7 +1015,7 @@ async function renderPagosVencidos() {
                 <td class="p-2">$${parseFloat(pago.monto_total).toFixed(2)}</td>
                 <td class="p-2">${pago.dias_retraso}</td>
                 <td class="p-2">
-                    <button onclick="procesarPago(${pago.Id}, 'pagar')" class="action-button">Pagar</button>
+                    <button onclick="procesarPago(${pago.pago_id},${pago.ruta_id},${pago.monto_total},'${pago.cuota_estado}', 'pagar')" class="action-button">Pagar</button>
                 </td>
             </tr>
         `).join('');
@@ -1406,7 +1456,7 @@ async function renderProximosPagos() {
                 <td class="p-2">${pago.Estado}</td> <!-- Estado del pago -->
                 <td class="p-2">${pago.dias_faltantes}</td> <!-- Días restantes para el pago -->
                 <td class="p-2">
-                   <button onclick="procesarPago(${pago.Id}, 'pagar')" class="action-button">Pagar</button>
+                   <button onclick="procesarPago(${pago.Id},${pago.ruta_id},${pago.numero_cuota},'${pago.Estado}','pagar')" class="action-button">Pagar</button>
                 </td>
             </tr>
         `).join(''); // Convertir el array de pagos en filas de tabla
@@ -1432,4 +1482,5 @@ setInterval(() => {
     renderClients(); // Renderizar la lista de clientes
     renderCalendarioPagos(); // Renderizar el calendario de pagos
     renderAnalisisRiesgo(); // Renderizar el análisis de riesgo
+    actualizarDashBoard();
 }, 60000); // Intervalo de 60000 ms (1 minuto)

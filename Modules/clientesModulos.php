@@ -123,4 +123,10 @@ function ConsultarHistorialClientes($link)
     return mysqli_query($link,$query);
 }
 
+function Dashboarddatos($link)
+{
+    $query = "SELECT * FROM totales_dashboard";
+    return mysqli_query($link,$query);
+}
+
 ?>
