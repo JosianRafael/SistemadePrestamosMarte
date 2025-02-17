@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["session"]))
+{
+    header("Location: index.php");
+    exit();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -312,10 +323,8 @@
                                 <th class="p-2">Apellido</th>
                                 <th class="p-2">Telefono</th>
                                 <th class="p-2">Ruta pertenece</th>
-                                <th class="p-2">Monto</th>
+                                <th class="p-2">Monto prestamo</th>
                                 <th class="p-2">Cuotas</th>
-                                <th class="p-2">Fechas de Pago</th>
-                                <th class="p-2">Días Restantes</th>
                                 <th class="p-2">Acciones</th>
                             </tr>
                         </thead>

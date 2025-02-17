@@ -57,6 +57,24 @@
                             By: Josian Viñas & Felix Mendoza
                         </div>
                     </form>
+                    <!-- <form method="POST" action="">
+    <label for="inputText">Ingresa tu texto:</label>
+    <input type="text" id="inputText" name="inputText" required>
+    <button type="submit">Enviar</button>
+</form> -->
+
+<?php
+// if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+//     // Recibir el valor enviado por el formulario
+//     $inputText = $_POST['inputText'];
+
+//     $algo = PASSWORD_ARGON2ID;
+//     $texto = password_hash($inputText,$algo);
+//     // Mostrar el valor recibido
+//     echo "<p>Texto ingresado: $texto</p>";
+// }
+?>
+
                 </div>
             </div>
         </div>
@@ -67,9 +85,6 @@
         class="absolute inset-0 h-full w-full object-cover"
     />
 </div>
-
-
-    </div>
 
     <script>
         document.getElementById("loginForm").addEventListener("submit", function(event) {
@@ -93,7 +108,7 @@
             })
             .then(data => {
                 if (data.success) {
-                    window.location.href = "index.html";
+                    window.location.href = data.pag;
                 } else {
                     errorMessage.textContent = data.error;
                     errorMessage.classList.remove("hidden");

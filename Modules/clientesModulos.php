@@ -105,9 +105,28 @@ function ConsultarAnalisisRiesgo($link)
 }
 
 // Función para procesar el pago de una cuota (sin implementar)
-function PagarCuota($link, $ID_CalendarioPago, $monto)
+function ActualizarCuota($link, $ID_CalendarioPago,$valor)
 {
-    // Funcionalidad no implementada
+    $query = "UPDATE calendario_pagos SET estado = '$valor' WHERE id = '$ID_CalendarioPago'";
+    return mysqli_query($link,$query);
+}
+
+function ConsultarTodoslosPagos($link)
+{
+    $query = "SELECT * FROM consultar_calendario_pagos";
+    return mysqli_query($link,$query);
+}
+
+function ConsultarHistorialClientes($link)
+{
+    $query = "SELECT * FROM vista_clientes_historial";
+    return mysqli_query($link,$query);
+}
+
+function Dashboarddatos($link)
+{
+    $query = "SELECT * FROM totales_dashboard";
+    return mysqli_query($link,$query);
 }
 
 ?>
