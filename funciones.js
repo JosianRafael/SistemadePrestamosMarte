@@ -325,9 +325,27 @@ rutas.forEach(ruta => {
     rutaElement.style.alignItems = 'center'; // Alinear verticalmente los elementos al centro
 
     // Crear un texto que muestra la ruta y el monto
-    const textoRuta = document.createElement('span');
-    textoRuta.textContent = `Ruta: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`; // Establecer el texto del elemento
-    rutaElement.appendChild(textoRuta); // Agregar el texto al elemento de ruta
+    const textoRuta = document.createElement('div');
+textoRuta.textContent = `Ruta: ${ruta.NombreRuta}, Monto: ${ruta.Monto}`;
+
+// Aplicar estilos para mejorar el diseño
+Object.assign(textoRuta.style, {
+    backgroundColor: "black",
+    color: "white",
+    border: "2px solid white",
+    padding: "10px",
+    margin: "8px 0",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "bold",
+    textAlign: "center",
+    width: "fit-content",
+    display: "inline-block" // Para asegurarse de que el tamaño se ajuste
+});
+
+// Agregar al contenedor de rutas
+rutaElement.appendChild(textoRuta);
+
 
     // Crear botón de Editar
     // const editarButton = document.createElement('button');

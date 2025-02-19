@@ -275,7 +275,7 @@ if (!isset($_SESSION["session"]))
     <h2 class="text-2xl font-bold mb-4">Registro de Clientes</h2>
 
     <form id="clientForm" class="bg-card p-4 rounded space-y-4">
-        <input type="text" id="nombre" placeholder="Nombre" class="w-full p-2 bg-gray-800 rounded" required>
+    <input type="text" id="nombre" placeholder="Nombre" class="w-full p-2 bg-gray-800 rounded" required>
         <input type="text" id="apellido" placeholder="Apellido" class="w-full p-2 bg-gray-800 rounded" required>
         <input type="number" id="numero" placeholder="Número de teléfono. Ej: 8095730808" class="w-full p-2 bg-gray-800 rounded" required>
         <input type="email" id="correo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-800 rounded">
@@ -327,9 +327,6 @@ if (!isset($_SESSION["session"]))
                         <tbody id="clientTable"></tbody>
                     </table>
                     
-                    
-                    
-
                 </div>
                 <br>
                         <br>
@@ -344,17 +341,15 @@ if (!isset($_SESSION["session"]))
 <!-- Contenedor para las tablas reducidas divididas por rutas -->
 <div id="clientTableReducedContainer"></div>
 
-
-            </div>
+     </div>
 
             
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             
         
             <div id="prestamos-terminados" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Préstamos Terminados</h2>
                 <input type="text" id="filterFinishedInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border bg-black text-white border-white"> <br>
-                • <strong>Aviso:</strong> No se Recomienda borrar la informacion de los prestamos terminados.
                 <br>
                 <br>
                 <div class="bg-card p-4 rounded overflow-x-auto">
@@ -367,7 +362,7 @@ if (!isset($_SESSION["session"]))
                                 <th class="p-2">Monto Pagado</th>
                                 <th class="p-2">Fecha de Finalización</th>
                             </tr>
-                        </thead>F
+                        </thead>
                         <tbody id="finishedLoansTable"></tbody>
                     </table>
                 </div>
@@ -447,8 +442,8 @@ if (!isset($_SESSION["session"]))
                     <div class="bg-black p-4 rounded shadow mb-6">
                         <h3 class="text-xl font-semibold mb-2">Crear Nueva Ruta</h3>
                         <form id="nuevaRutaForm" class="grid grid-cols-2 gap-4">
-                            <input type="text" id="nombreRuta" placeholder="Nombre de la Ruta" class="p-2 rounded" required>
-                            <input type="number" id="fondosRuta" placeholder="Fondos Disponibles" class="p-2 rounded" required>
+                            <input type="text" id="nombreRuta" placeholder="Nombre de la Ruta" class="p-2 rounded" maxlength="50" required>
+                            <input type="number" id="fondosRuta" placeholder="Fondos Disponibles" class="p-2 rounded" min="1" max="7000000" required>
                             <button type="submit" class="bg-blue-600 text-white p-2 rounded col-span-2 hover:bg-blue-700">Crear Ruta</button>
                         </form>
                     </div>
