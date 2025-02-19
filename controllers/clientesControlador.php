@@ -279,6 +279,21 @@ function PagarCuota($link,$datos)
             exit;
         }
 
+        $cuotas = ConsultarTodoslosPagos($link);
+        $cuotas = mysqli_fetch_array($cuotas);
+
+        foreach ($cuotas as $fila)
+        {
+            if ($fila["Id"] == $idpago)
+            {
+                if ($fila["Estado"] == "Pagado")
+                {
+                    echo json_encode(['status' => 'error', 'message' => 'La cuota ya esta pagada']);
+                    exit;
+                }
+            }
+        }
+
         if (!ActualizarCuota($link, $idpago, $valor)) {
             throw new Exception('No se pudo actualizar el pago');
         }
@@ -321,6 +336,21 @@ function DevolverCuota($link,$datos)
         {
             echo json_encode(['status' => 'error', 'message' => 'No hay ninguna cuota que devolver']);
             exit;
+        }
+
+        $cuotas = ConsultarTodoslosPagos($link);
+        $cuotas = mysqli_fetch_array($cuotas);
+
+        foreach ($cuotas as $fila)
+        {
+            if ($fila["Id"] == $idpago)
+            {
+                if ($fila["Estado"] == "Pendiente")
+                {
+                    echo json_encode(['status' => 'error', 'message' => 'No hay ninguna cuota que devolver']);
+                    exit;
+                }
+            }
         }
 
         if (!ActualizarCuota($link, $idpago, $valor)) {
