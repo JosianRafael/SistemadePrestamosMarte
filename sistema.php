@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
             <span style="color: white;" class="text-2xl font-bold">💰 Inversiones P&P Marte</span>
         </div>
         <div class="flex items-center space-x-6">
-    <span style="color: white;" class="text-sm">Bienvenido Sr Armando, has ingresado como admin</span>
+    <span style="color: white;" class="text-sm">Bienvenido, has ingresado como admin</span>
     <img style="width: 50px;" src="https://static.vecteezy.com/system/resources/previews/010/158/758/non_2x/dollar-money-icon-sign-symbol-design-free-png.png" id="darkModeToggle" class="p-2">     
     <button onclick="CerrarSession()" class="border border-white text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition">
         Cerrar sesión
