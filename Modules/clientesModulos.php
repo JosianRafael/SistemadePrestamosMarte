@@ -129,4 +129,10 @@ function Dashboarddatos($link)
     return mysqli_query($link,$query);
 }
 
+function BorrarClienteprestamoycalendariopagos($link,$idcliente)
+{
+    $query = "DELETE FROM clientes WHERE id = '$idcliente'";
+    return mysqli_query($link,$query);
+}
+
 ?>

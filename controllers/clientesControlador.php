@@ -65,7 +65,7 @@ function ControladorGuardarClientes($datos, $link)
         if ($fondos_disponibles < $monto)
         {
             // No hay fondos suficientes
-            echo json_encode(['status' => 'error', 'message' => 'No hay fondos suficientes para otorgar el préstamo']);
+            echo json_encode(['status' => 'error', 'message' => 'No hay fondos suficientes para otorgar el préstamo en la ruta seleccionada']);
             mysqli_rollback($link);
         }else
         {
@@ -255,39 +255,36 @@ function BorrarClientesInactivos($link,$datos)
 
 
 
-function PagarCuota($link,$datos)
+function PagarCuota($link, $datos)
 {
     try {
         mysqli_begin_transaction($link);
-    
-        if (!$datos || !isset($datos["id_pago"],$datos["rutaid"],$datos["total"],$datos["Estado"])) {
+
+        if (!$datos || !isset($datos["id_pago"], $datos["rutaid"], $datos["total"], $datos["Estado"])) {
             throw new Exception('Datos inválidos');
         }
-    
+
         $idpago = $datos["id_pago"];
         $valor = "Pagado";
         $rutaid =  $datos["rutaid"];
         $monto = $datos["total"];
         $estado = $datos["Estado"];
-    
+
         if (empty($idpago) || empty($rutaid) || empty($monto) || empty($estado)) {
             throw new Exception('Un campo esta vacio');
         }
-        
-        if ($estado == "Pagado"){
+
+        if ($estado == "Pagado") {
             echo json_encode(['status' => 'error', 'message' => 'La cuota ya esta pagada']);
             exit;
         }
 
         $cuotas = ConsultarTodoslosPagos($link);
-        $cuotas = mysqli_fetch_array($cuotas);
-
-        foreach ($cuotas as $fila)
-        {
-            if ($fila["Id"] == $idpago)
-            {
-                if ($fila["Estado"] == "Pagado")
-                {
+        
+        // Asegúrate de que el resultado sea un array de resultados
+        while ($fila = mysqli_fetch_array($cuotas, MYSQLI_ASSOC)) {
+            if ($fila["Id"] == $idpago) {
+                if ($fila["Estado"] == "Pagado") {
                     echo json_encode(['status' => 'error', 'message' => 'La cuota ya esta pagada']);
                     exit;
                 }
@@ -297,8 +294,8 @@ function PagarCuota($link,$datos)
         if (!ActualizarCuota($link, $idpago, $valor)) {
             throw new Exception('No se pudo actualizar el pago');
         }
-        
-        ModificarRutasMontoModulo($link,$monto,$rutaid);
+
+        ModificarRutasMontoModulo($link, $monto, $rutaid);
 
         mysqli_commit($link);
         echo json_encode(['status' => 'success', 'message' => 'Pago actualizado correctamente']);
@@ -308,45 +305,40 @@ function PagarCuota($link,$datos)
     } finally {
         mysqli_close($link);
     }
-    
 }
 
 
-function DevolverCuota($link,$datos)
+function DevolverCuota($link, $datos)
 {
     try {
         mysqli_begin_transaction($link);
-    
-        if (!$datos || !isset($datos["id_pago"],$datos["rutaid"],$datos["total"],$datos["Estado"])) {
+
+        if (!$datos || !isset($datos["id_pago"], $datos["rutaid"], $datos["total"], $datos["Estado"])) {
             throw new Exception('Datos inválidos');
         }
-    
+
         $idpago = $datos["id_pago"];
         $valor = "Pendiente";
         $monto = $datos["total"];
         $rutaid = $datos["rutaid"];
-        $monto = $monto * -1;
+        $monto = $monto * -1;  // Invertir el monto
         $estado = $datos["Estado"];
 
         if (empty($idpago)) {
             throw new Exception('ID pago está vacío');
         }
-        
-        if ($estado == "Pendiente")
-        {
+
+        if ($estado == "Pendiente") {
             echo json_encode(['status' => 'error', 'message' => 'No hay ninguna cuota que devolver']);
             exit;
         }
 
         $cuotas = ConsultarTodoslosPagos($link);
-        $cuotas = mysqli_fetch_array($cuotas);
-
-        foreach ($cuotas as $fila)
-        {
-            if ($fila["Id"] == $idpago)
-            {
-                if ($fila["Estado"] == "Pendiente")
-                {
+        
+        // Asegúrate de que el resultado sea un array de resultados
+        while ($fila = mysqli_fetch_array($cuotas, MYSQLI_ASSOC)) {
+            if ($fila["Id"] == $idpago) {
+                if ($fila["Estado"] == "Pendiente") {
                     echo json_encode(['status' => 'error', 'message' => 'No hay ninguna cuota que devolver']);
                     exit;
                 }
@@ -357,8 +349,8 @@ function DevolverCuota($link,$datos)
             throw new Exception('No se pudo actualizar el pago');
         }
 
-        ModificarRutasMontoModulo($link,$monto,$rutaid);
-    
+        ModificarRutasMontoModulo($link, $monto, $rutaid);
+
         mysqli_commit($link);
         echo json_encode(['status' => 'success', 'message' => 'Pago actualizado correctamente']);
     } catch (Exception $e) {
@@ -367,8 +359,9 @@ function DevolverCuota($link,$datos)
     } finally {
         mysqli_close($link);
     }
-    
+
 }
+
 
 
 function EnviarCalendarioPagocompleto($link)
@@ -418,6 +411,38 @@ function Enviardashboard($link)
     }
     file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados dashboard: " . print_r($contenido, true) . "\n", FILE_APPEND);
     echo json_encode($contenido);
+}
+
+function BorrarClienteytodasuinformación($link,$datos)
+{
+    try {
+        mysqli_begin_transaction($link);
+    
+        if (!$datos || !isset($datos["idcliente"])) {
+            throw new Exception('Datos inválidos');
+        }
+    
+        $idcliente = $datos["idcliente"];
+
+        if (empty($idcliente)) {
+            throw new Exception('ID pago está vacío');
+        }
+        
+        if (BorrarClienteprestamoycalendariopagos($link,$idcliente))
+        {
+            mysqli_commit($link);
+            echo json_encode(['status' => 'success', 'message' => 'Cliente borrado exitosamente.']);
+        }else
+        {
+            throw new Exception('Hubo un error al borrar');
+        }
+
+    } catch (Exception $e) {
+        mysqli_rollback($link);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    } finally {
+        mysqli_close($link);
+    }
 }
 
 if (!$link) {
@@ -470,6 +495,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             break;
         case 'dashboard';
             Enviardashboard($link);
+        case 'borrarcliente';
+            BorrarClienteytodasuinformación($link,$datos);
         break;
         default:
             echo json_encode(['status' => 'error', 'message' => 'Error en la clave accion']);

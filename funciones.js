@@ -116,15 +116,14 @@ function addClient(e) {
             Swal.fire('Éxito', 'Cliente registrado correctamente', 'success'); // Mostrar mensaje de éxito
             document.getElementById('clientForm').reset(); // Reiniciar el formulario
             renderClients(); // Renderizar la lista de clientes
-            updateDashboard(); // Actualizar el tablero de control
             showSection('prestamos'); // Mostrar la sección de préstamos
             actualizarDashBoard();
         } else {
-            Swal.fire('Error', 'Hubo un problema con la conexión al servidor.', 'error'); // Mostrar mensaje de error
+            Swal.fire('Error', data.message, 'error'); // Mostrar mensaje de error
         }
     })
     .catch(error => {
-        Swal.fire('Error', 'Hubo un problema con la conexión al servidor.', 'error'); // Mostrar mensaje de error
+        Swal.fire('Error', 'Hubo un problema. ' + data.message, 'error'); // Mostrar mensaje de error
         console.error('Error:', error); // Registrar el error en la consola
     });
 }
@@ -481,9 +480,7 @@ function renderClients() {
                                 <td class="p-2">${client.prestamo_monto}</td>
                                 <td class="p-2">${client.prestamo_cuotas}</td>                            
                                 <td class="p-2">
-                                    <button onclick="editClient(${client.cliente_id})" class="action-button mb-1 text-xs">Editar</button>
-                                    <button onclick="deleteClient(${client.cliente_id})" class="action-button mb-1 text-xs">Borrar</button>
-                                    <button onclick="finishLoan(${client.cliente_id})" class="action-button text-xs">Terminar</button>
+                                    <button onclick="deleteClient(${client.cliente_id},'${client.cliente_nombre}','${client.cliente_apellido}')" class="action-button mb-1 text-xs">Borrar</button>
                                     <button onclick="togglePayments(${client.cliente_id})" class="action-button text-xs">Ver Pagos</button>
                                 </td>
                             </tr>
@@ -534,6 +531,62 @@ function renderClients() {
         });
         
 }
+
+//Funcion para borrar clietne
+function deleteClient (id_cliente,nombre,apellido)
+{
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: `Se borrara al cliente ${nombre} ${apellido}.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, confirmar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            console.log('El id del cliente es:', id_cliente);
+            fetch('controllers/clientesControlador.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion: "borrarcliente", idcliente: id_cliente })
+            })
+            .then(response => response.json())  // Convertir la respuesta a JSON
+            .then(data => {
+                console.log(`El resultado de borrar es: `, data);
+
+                // Verificar si la respuesta es exitosa o de error
+                if (data.status === 'success') {
+                    Swal.fire(
+                        '¡Éxito!',
+                        data.message,  // Mensaje del JSON
+                        'success'
+                    );
+                    renderClients(); // Recargar la lista de clientes y pagos
+                    renderProximosPagos(); //Recarga proximos pagos
+                    renderPagosVencidos();
+                    actualizarDashBoard();
+                } else {
+                    Swal.fire(
+                        'Error',
+                        data.message,  // Mensaje del JSON
+                        'error'
+                    );
+                }
+            })
+            .catch(error => {
+                console.error(`Error al borrar:`, error);
+                Swal.fire(
+                    'Error',
+                    'Ocurrió un problema al procesar la solicitud.',
+                    'error'
+                );
+            });
+        }
+    });
+}
+
 
 // Función para procesar pagos o devoluciones
 function procesarPago(idPago, ruta_id, cantidad, estado, accion) {
