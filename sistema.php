@@ -1,13 +1,24 @@
 <?php
 session_start();
 
-if (!isset($_SESSION["session"]))
-{
+if (!isset($_SESSION["session"], $_SESSION["rol"]) || $_SESSION["rol"] !== "Admin") {
+    session_unset();
+    session_destroy();
     header("Location: index.php");
     exit();
 }
 
+$data = json_decode(file_get_contents("php://input"), true);
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["accion"] === "cerrarsession") {
+    session_unset();
+    session_destroy();
+    
+    echo json_encode(['status' => 'success', 'message' => 'Sesión cerrada']);
+    exit();
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -43,7 +54,7 @@ if (!isset($_SESSION["session"]))
         <div class="flex items-center space-x-6">
     <span style="color: white;" class="text-sm">Bienvenido Sr Armando, has ingresado como admin</span>
     <img style="width: 50px;" src="https://static.vecteezy.com/system/resources/previews/010/158/758/non_2x/dollar-money-icon-sign-symbol-design-free-png.png" id="darkModeToggle" class="p-2">     
-    <button class="border border-white text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition">
+    <button onclick="CerrarSession()" class="border border-white text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition">
         Cerrar sesión
     </button>
 </div>

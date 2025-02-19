@@ -1400,6 +1400,54 @@ async function renderProximosPagos() {
 }
 
 // ==========================
+// FUNCION CERRAR SESSION
+// ==========================
+
+function CerrarSession()
+{
+    fetch("secretaria.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            accion: "cerrarsession"  // Envía una acción identificadora
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            Swal.fire({
+                icon: "success",
+                title: "Sesión cerrada",
+                text: "Has cerrado sesión correctamente.",
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "OK"
+            }).then(() => {
+                window.location.href = "index.php"; // Redirige después de confirmar
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo cerrar la sesión.",
+                confirmButtonColor: "#d33"
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Hubo un problema con la solicitud.",
+            confirmButtonColor: "#d33"
+        });
+    });
+}
+
+
+// ==========================
 // MOSTRAR PRESTAMOS VENCIDOS
 // ==========================
 
