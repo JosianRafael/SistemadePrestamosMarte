@@ -1113,7 +1113,7 @@ async function renderHistorialPrestamos() {
         table.innerHTML = allLoans.map(loan => `
             <tr>
                 <td>${loan.cliente_id}</td>
-                <td>${loan.nombre} ${loan.apellido}</td>
+                <td>${loan.cliente_nombre} ${loan.cliente_apellido}</td>
                 <td>$${parseFloat(loan.prestamo_monto).toFixed(2)}</td>
                 <td>${loan.prestamo_fecha_concesion}</td>
                 <td>${loan.prestamo_fecha_finalizacion ?? 'Activo'}</td>
