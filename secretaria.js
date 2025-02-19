@@ -1119,36 +1119,39 @@ async function viewLoanDetails(btn) {
     }
 }
 
-/**
- * Genera y muestra la factura del préstamo.
- */
+// Genera la factura...
 function generarFactura(loan, cobrador) {
     let facturaHTML = `
         <div id="factura" style="
-            font-family: Arial, sans-serif;
-            width: 90%;
-            max-width: 600px;
-            padding: 20px;
-            border: 3px solid black;
+            font-family: 'Arial', sans-serif;
+            width: 80%;
+            max-width: 700px;
+            padding: 30px;
+            border: 4px solid #2c3e50;
             text-align: center;
-            background: white;
-            color: black;
+            background: #ffffff;
+            color: #2c3e50;
             margin: auto;
             font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         ">
-            <h1>Inversiones P&P Marte</h1>
-            <p style="font-size: 16px;">Factura para Consumidor Final</p>
-            <hr style="border: 2px dashed black;">
-            <div style="text-align: left; font-size: 18px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <img src="https://static.vecteezy.com/system/resources/previews/010/158/758/original/dollar-money-icon-sign-symbol-design-free-png.png" alt="Logo" style="height: 70px;">
+                <h1 style="flex-grow: 1; text-align: center; font-size: 26px; margin: 0;">Inversiones P&P Marte</h1>
+            </div>
+            <p style="font-size: 16px; font-weight: bold;">Factura para Consumidor Final</p>
+            <hr style="border: 2px solid #2c3e50;">
+            <div style="text-align: left; font-size: 18px; padding: 15px; background: #ecf0f1; border-radius: 8px;">
                 <p><strong>Cliente:</strong> ${loan.nombre}</p>
-                <p><strong>Monto:</strong> $${loan.monto.toFixed(2)}</p>
+                <p><strong>Monto Prestado:</strong> $${loan.monto.toFixed(2)}</p>
                 <p><strong>Fecha de Inicio:</strong> ${loan.fechaPrestamo}</p>
                 <p><strong>Estado:</strong> ${loan.fechaFinalizacion ? 'Terminado' : 'Activo'}</p>
                 ${loan.fechaFinalizacion ? `<p><strong>Fecha de Finalización:</strong> ${loan.fechaFinalizacion}</p>` : ''}
                 <p><strong>Cobrador:</strong> ${cobrador}</p>
             </div>
-            <hr style="border: 2px dashed black;">
-            <p style="font-size: 20px;"><strong>¡Gracias por preferirnos!</strong></p>
+            <hr style="border: 2px solid #2c3e50;">
+            <p style="font-size: 20px; font-weight: bold;">¡Gracias por preferirnos!</p>
         </div>
     `;
 
@@ -1174,9 +1177,6 @@ function generarFactura(loan, cobrador) {
     });
 }
 
-/**
- * Imprime la factura generada.
- */
 function imprimirFactura() {
     const style = document.createElement("style");
     style.innerHTML = `
@@ -1192,8 +1192,8 @@ function imprimirFactura() {
                 left: 50%;
                 top: 50%;
                 transform: translate(-50%, -50%);
-                width: 90%;
-                max-width: 600px;
+                width: 80%;
+                max-width: 700px;
                 display: block;
             }
         }
@@ -1205,7 +1205,6 @@ function imprimirFactura() {
         document.head.removeChild(style);
     }, 300);
 }
-
 
 
 

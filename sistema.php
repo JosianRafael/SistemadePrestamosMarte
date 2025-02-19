@@ -371,7 +371,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
             <div id="prestamos-terminados" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4">Préstamos Terminados</h2>
                 <input type="text" id="filterFinishedInput" placeholder="Filtrar por nombre" class="mb-4 p-2 border bg-black text-white border-white"> <br>
-                • <strong>Aviso:</strong> No se Recomienda borrar la informacion de los prestamos terminados.
                 <br>
                 <br>
                 <div class="bg-card p-4 rounded overflow-x-auto">
@@ -384,7 +383,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
                                 <th class="p-2">Monto Pagado</th>
                                 <th class="p-2">Fecha de Finalización</th>
                             </tr>
-                        </thead>F
+                        </thead>
                         <tbody id="finishedLoansTable"></tbody>
                     </table>
                 </div>
@@ -586,7 +585,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
                             <tr class="text-left">
                                 <th class="p-2">ID</th>
                                 <th class="p-2">Cliente</th>
-                                <th class="p-2">Monto</th>
+                                <th class="p-2">Monto Prestado</th>
                                 <th class="p-2">Fecha Inicio</th>
                                 <th class="p-2">Fecha Fin</th>
                                 <th class="p-2">Estado</th>

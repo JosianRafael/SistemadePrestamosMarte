@@ -574,7 +574,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
                             <tr class="text-left">
                                 <th class="p-2">ID</th>
                                 <th class="p-2">Cliente</th>
-                                <th class="p-2">Monto</th>
+                                <th class="p-2">Monto Prestado</th>
                                 <th class="p-2">Fecha Inicio</th>
                                 <th class="p-2">Fecha Fin</th>
                                 <th class="p-2">Estado</th>
