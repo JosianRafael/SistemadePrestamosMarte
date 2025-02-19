@@ -409,8 +409,16 @@ function Enviardashboard($link)
     while ($fila = mysqli_fetch_assoc($resultado)) {
         $contenido[] = $fila;
     }
+
+     // Si no hay datos, devuelve un error en formato JSON válido
+     if (empty($contenido)) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontraron datos para el dashboard']);
+        return;
+    }
+
     file_put_contents("depuracionenviandodatosclientes.txt", "Datos enviados dashboard: " . print_r($contenido, true) . "\n", FILE_APPEND);
     echo json_encode($contenido);
+    exit;
 }
 
 function BorrarClienteytodasuinformación($link,$datos)

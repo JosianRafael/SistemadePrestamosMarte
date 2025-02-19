@@ -26,7 +26,7 @@ let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionR
             $(sectionId).classList.remove('hidden');
             switch(sectionId) {
                 case 'dashboard':
-                    updateDashboard();
+                    actualizarDashBoard();
                     break;
                 case 'calendario-pagos':
                     renderCalendarioPagos();
@@ -1458,7 +1458,7 @@ $('recordatoriosForm').addEventListener('submit', saveRecordatoriosConfig); // E
 // Llamadas a las funciones para renderizar la lista de clientes y préstamos finalizados al cargar la página
 renderClients(); // Renderizar la lista de clientes
 renderFinishedLoans(); // Renderizar la lista de préstamos finalizados
-updateDashboard(); // Actualizar el tablero de control
+actualizarDashBoard(); // Actualizar el tablero de control
 showSection('dashboard'); // Mostrar la sección del tablero de control
 
 // ==========================
