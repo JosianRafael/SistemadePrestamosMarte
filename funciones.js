@@ -754,11 +754,13 @@ function actualizarDashBoard() {
             document.getElementById('totalPrestamos').innerText = data[0].total_prestamos;
             document.getElementById('clientesActivos').innerText = data[0].total_clientes;
             document.getElementById('prestamosPendientes').innerText = data[0].total_prestamos_pendientes;
+            document.getElementById('prestamosVencidos').innerText = data[0].total_pagos_atrasados;
         } else {
             console.error('La respuesta no es un array:', data);
             document.getElementById('totalPrestamos').innerText = '$0';
             document.getElementById('clientesActivos').innerText = "0";
             document.getElementById('prestamosPendientes').innerText = "0";
+            document.getElementById('prestamosVencidos').innerText = "0";
         }
     })
     .catch(error => {
@@ -766,6 +768,7 @@ function actualizarDashBoard() {
         document.getElementById('totalPrestamos').innerText = '$0';
         document.getElementById('clientesActivos').innerText = "0";
         document.getElementById('prestamosPendientes').innerText = "0";
+        document.getElementById('prestamosVencidos').innerText = "0";
     });
 }
 
@@ -1167,38 +1170,97 @@ async function renderHistorialPrestamos() {
     console.log("🔹 renderHistorialPrestamos() se está ejecutando...");
 
     try {
+        // Fetch historial de préstamos
         const response = await fetch('controllers/clientesControlador.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ accion: 'ClientesHistorial' })
         });
-
         const data = await response.json();
-        console.log("🔹 Datos recibidos:", data);
-
         if (!Array.isArray(data)) throw new Error('No se pudo obtener el historial de préstamos');
 
-        const allLoans = data.sort((a, b) => new Date(b.fecha_concesion) - new Date(a.fecha_concesion));
+        // Fetch calendario de pagos actuales
+        const responsePagos = await fetch('controllers/clientesControlador.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accion: 'leerclientecalendariopagocompleto' })
+        });
+        const pagos = await responsePagos.json();
+        
+        // Fetch calendario de pagos históricos
+        const responsePagosHist = await fetch('controllers/clientesControlador.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accion: 'leerclienteinactivocalendariopago' })
+        });
+        const pagosHistoricos = await responsePagosHist.json();
+
+        const allLoans = data.sort((a, b) => new Date(b.prestamo_fecha_concesion) - new Date(a.prestamo_fecha_concesion));
 
         const table = document.getElementById('historialPrestamosTable');
-        table.innerHTML = allLoans.map(loan => `
-            <tr>
-                <td>${loan.cliente_id}</td>
-                <td>${loan.cliente_nombre} ${loan.cliente_apellido}</td>
-                <td>$${parseFloat(loan.prestamo_monto).toFixed(2)}</td>
-                <td>${loan.prestamo_fecha_concesion}</td>
-                <td>${loan.prestamo_fecha_finalizacion ?? 'Activo'}</td>
-                <td>${loan.prestamo_estado}</td>
-                <td><button onclick="viewLoanDetails(this)" class="action-button">Imprimir</button></td>
-            </tr>
-        `).join('');
+        table.innerHTML = allLoans.map(loan => {
+            const pagosCliente = (loan.prestamo_estado === 'Activo') 
+                ? pagos.filter(pago => pago["Id Prestamo"] == loan.prestamo_id)
+                : pagosHistoricos.filter(pago => pago.id_prestamo == loan.prestamo_id);
+            
+            return `
+                <tr>
+                    <td>${loan.cliente_id}</td>
+                    <td>${loan.cliente_nombre} ${loan.cliente_apellido}</td>
+                    <td>$${parseFloat(loan.prestamo_monto).toFixed(2)}</td>
+                    <td>${loan.prestamo_fecha_concesion}</td>
+                    <td>${loan.prestamo_fecha_finalizacion ?? 'Activo'}</td>
+                    <td>${loan.prestamo_estado}</td>
+                    <td>
+                        <button onclick="viewLoanDetails(this)" class="action-button">Imprimir</button>
+                        <button onclick="togglePaymentshistory(${loan.prestamo_id})" class="action-button">Ver Pagos</button>
+                    </td>
+                </tr>
+                <tr id="payments-${loan.prestamo_id}" class="hidden">
+                    <td colspan="7">
+                        <div class="p-2 bg-gray-800 rounded">
+                            <h3 class="text-sm font-bold mb-1">Calendario de Pagos</h3>
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr>
+                                        <th class="p-1 border">Número de Cuota</th>
+                                        <th class="p-1 border">Fecha de Vencimiento</th>
+                                        <th class="p-1 border">Monto de Cuota</th>
+                                        <th class="p-1 border">Estado de Cuota</th>
+                                        <th class="p-1 border">Fecha de Pago</th>
+                                        <th class="p-1 border">Mora</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${pagosCliente.length > 0 ? pagosCliente.map(pago => `
+                                        <tr>
+                                            <td class="p-1 border">${pago.id_calendario ?? pago.Id}</td>
+                                            <td class="p-1 border">${pago.fecha_vencimiento}</td>
+                                            <td class="p-1 border">$${parseFloat(pago.monto_cuota ?? pago.monto).toFixed(2)}</td>
+                                            <td class="p-1 border">${pago.estado_cuota ?? pago.Estado}</td>
+                                            <td class="p-1 border">${pago.fecha_pago ?? 'N/A'}</td>
+                                            <td class="p-1 border">$${parseFloat(pago.mora ?? pago.Mora).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('') : `<tr><td colspan="7" class="text-center">Sin pagos registrados</td></tr>`}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>`;
+        }).join('');
 
         console.log("✅ Tabla actualizada correctamente.");
-        
     } catch (error) {
-        console.error('❌ Error al obtener el historial de préstamos:', error);
+        console.error('❌ Error al obtener los datos:', error);
     }
 }
+
+function togglePaymentshistory(idPrestamo) {
+    const row = document.getElementById(`payments-${idPrestamo}`);
+    row.classList.toggle('hidden');
+}
+
+
 
 /**
  * Muestra los detalles del préstamo y solicita el nombre del cobrador.
@@ -1576,9 +1638,6 @@ function CerrarSession()
 // ==========================
 // MOSTRAR PRESTAMOS VENCIDOS
 // ==========================
-
-// Llamar a la función para mostrar la cantidad de préstamos vencidos cuando se carga el dashboard
-mostrarPrestamosVencidos(); // Mostrar préstamos vencidos al cargar el dashboard
 
 // ==========================
 // ACTUALIZAR INFORMACIÓN CADA MINUTO
