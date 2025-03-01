@@ -49,6 +49,10 @@ let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionR
                     case 'prestamos':
                         renderClients();
                       break;
+                      case 'closureSection':
+                        renderClients();
+                      break;
+                      
             }
         }
 // ###############################################################################
@@ -1634,10 +1638,6 @@ function CerrarSession()
         });
     });
 }
-
-// ==========================
-// MOSTRAR PRESTAMOS VENCIDOS
-// ==========================
 
 // ==========================
 // ACTUALIZAR INFORMACIÓN CADA MINUTO

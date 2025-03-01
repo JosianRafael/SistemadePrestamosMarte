@@ -285,33 +285,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
     <h2 class="text-2xl font-bold mb-4">Registro de Clientes</h2>
 
     <form id="clientForm" class="bg-card p-4 rounded space-y-4">
+    <!-- Nombre y Apellido -->
     <input type="text" id="nombre" placeholder="Nombre" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="text" id="apellido" placeholder="Apellido" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="number" id="numero" placeholder="Número de teléfono. Ej: 8095730808" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="email" id="correo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-800 rounded">
-        <input type="text" id="direccion" placeholder="Dirección, donde vive ?" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="number" id="monto" placeholder="Monto del préstamo" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="number" id="cuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-800 rounded" required min="1" max="12">
-    
-        <!-- Nuevo campo: Interés por mora -->
-        <input type="number" id="interesMora" placeholder="Interés de prestamos (%)" class="w-full p-2 bg-gray-800 rounded" required min="0">
-    
-        <!-- Nuevo campo: Frecuencia de cobro -->
-        <select id="frecuenciaCobro" class="w-full p-2 bg-gray-800 rounded" required>
-            <option value="" disabled selected>Selecciona la frecuencia de cobro</option>
-            <option value="diario">Diario</option>
-            <option value="semanal">Semanal</option>
-            <option value="quincenal">Quincenal</option>
-            <option value="mensual">Mensual</option>
-        </select>
-    
-        <select id="ruta" class="w-full p-2 bg-gray-800 rounded" required>
-            <option value="" disabled selected>Selecciona una ruta</option>
-            <option value="">Selecciona una ruta</option>
-        </select>
-    
-        <textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded" required></textarea>
-        <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Registrar Cliente</button>
+    <input type="text" id="apellido" placeholder="Apellido" class="w-full p-2 bg-gray-800 rounded" required>
+
+    <!-- Número de teléfono y correo -->
+    <input type="number" id="numero" placeholder="Número de teléfono. Ej: 8095730808" class="w-full p-2 bg-gray-800 rounded" required>
+    <input type="email" id="correo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-800 rounded">
+
+    <!-- Dirección -->
+    <input type="text" id="direccion" placeholder="Dirección, donde vive?" class="w-full p-2 bg-gray-800 rounded" required>
+
+    <!-- Tipo de documento de identidad -->
+    <select id="tipoDocumento" class="w-full p-2 bg-gray-800 rounded" required>
+        <option value="" disabled selected>Selecciona el tipo de documento</option>
+        <option value="cedula">Cédula</option>
+        <option value="pasaporte">Pasaporte</option>
+    </select>
+
+    <!-- Número de documento -->
+    <input type="text" id="documento" placeholder="Número de Cédula/Pasaporte" class="w-full p-2 bg-gray-800 rounded" required>
+
+    <!-- Datos laborales -->
+    <input type="text" id="lugarTrabajo" placeholder="Lugar de trabajo" class="w-full p-2 bg-gray-800 rounded" required>
+    <input type="number" id="ingresos" placeholder="Ingresos mensuales" class="w-full p-2 bg-gray-800 rounded" required min="0">
+
+    <!-- Datos del préstamo -->
+    <input type="number" id="monto" placeholder="Monto del préstamo" class="w-full p-2 bg-gray-800 rounded" required>
+    <input type="number" id="cuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-800 rounded" required min="1" max="12">
+    <input type="number" id="interesMora" placeholder="Interés de préstamos (%)" class="w-full p-2 bg-gray-800 rounded" required min="0">
+
+    <!-- Frecuencia de cobro -->
+    <select id="frecuenciaCobro" class="w-full p-2 bg-gray-800 rounded" required>
+        <option value="" disabled selected>Selecciona la frecuencia de cobro</option>
+        <option value="diario">Diario</option>
+        <option value="semanal">Semanal</option>
+        <option value="quincenal">Quincenal</option>
+        <option value="mensual">Mensual</option>
+    </select>
+
+    <!-- Ruta -->
+    <select id="ruta" class="w-full p-2 bg-gray-800 rounded" required>
+        <option value="" disabled selected>Selecciona una ruta</option>
+        <option value="ruta1">Ruta 1</option>
+        <option value="ruta2">Ruta 2</option>
+        <option value="ruta3">Ruta 3</option>
+    </select>
+
+    <!-- Referencias personales (opcional) -->
+    <textarea id="referencias" placeholder="Referencias personales (nombre y teléfono)" class="w-full p-2 bg-gray-800 rounded"></textarea>
+
+    <!-- Mensaje adicional -->
+    <textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded" required></textarea>
+
+    <!-- Botón de enviar -->
+    <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+        Registrar Cliente
+    </button>
+</form>
+
     </form>
     
                 
@@ -621,26 +653,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
     
     
 
-    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-gray-800 p-4 rounded shadow">
-            <h2 class="text-xl font-semibold mb-2">Editar Cliente</h2>
-            <form id="editForm" class="space-y-2">
-                <input type="hidden" id="editId">
-                <input type="text" id="editNombre" placeholder="Nombre" class="w-full p-2 bg-gray-700 rounded" required>
-                <input type="text" id="editApellido" placeholder="Apellido" class="w-full p-2 bg-gray-700 rounded" required>
-                <input type="tel" id="editNumero" placeholder="Número de teléfono" class="w-full p-2 bg-gray-700 rounded" required>
-                <input type="email" id="editCorreo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-700 rounded">
-                <input type="text" id="editDireccion" placeholder="Dirección" class="w-full p-2 bg-gray-700 rounded" required>
-                <input type="number" id="editMonto" placeholder="Monto del préstamo" class="w-full p-2 bg-gray-700 rounded" required>
-                <input type="number" id="editCuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-700 rounded" required min="1" max="12">
-                <textarea id="editMensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-700 rounded"></textarea>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="closeEditModal()" class="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Cancelar</button>
-                    <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    
 
     <footer style="color: white;" class="text-center p-4 bg-gray-900 text-white dark:text-black">
         © 2025 Inversiones P&P Marte. Todos los derechos reservados.<br>

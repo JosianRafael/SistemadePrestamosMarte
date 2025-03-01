@@ -68,15 +68,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
             </div>
             <nav class="space-y-2 px-2 py-3">
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('dashboard')">Dashboard</button>
-                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('registro')">Registro de Clientes</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('registro')">Registro de Clientes / Rutas</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('registro')">Tablero de Clientes / Info</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('prestamos')">Préstamos Activos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('prestamos-terminados')">Préstamos Terminados</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('calendario-pagos')">Calendario de Pagos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('multas-recargos')">Multas y Recargos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('recordatorios-pago')">Agenda de Notas</button>
-                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('historial-prestamos')">Historial de Préstamos</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('historial-prestamos')">Historial de Préstamos / Fact</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('analisis-riesgo')">Análisis de Riesgo</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('prestamos-calculadora')">EMI Calculadora</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('closureSection')">Cierre del Dia</button>
                
             </nav>
         </aside>
@@ -214,8 +216,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
                     <div class="space-y-1">
                         <h1 class="text-2xl font-bold">Dashboard</h1>
                         <div class="text-sm text-gray-400" id="currentDate"></div>
+
                     </div>
                 </div>
+                <script>
+        function updateCurrentDate() {
+            const currentDateElement = document.getElementById('currentDate');
+            const currentDate = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            currentDateElement.textContent = currentDate.toLocaleDateString('es-ES', options);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+        });
+
+        setInterval(updateCurrentDate, 60000);
+    </script>
+
                 <div class="grid gap-4 md:grid-cols-3">
                     <div class="bg-card p-4 rounded">
                         <h3 class="text-sm text-gray-400">Total Préstamos</h3>
@@ -255,6 +273,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
                 </div>
             </div>
 
+            <div id="closureSection" class="p-4 border rounded text-white border-white section hidden">
+        <h2 class="text-xl font-bold mb-4">Cierre de Día</h2>
+        <div id="currentClosureDate" class="text-lg mb-2"></div>
+        <button id="closeDayButton" class="bg-blue-600 text-white p-2 rounded">Cerrar Día</button>
+    </div>
+
             <div id="registro" class="section hidden">
                 <h2 class="text-2xl font-bold mb-4 mt-6">Crear Rutas</h2>
                 
@@ -289,36 +313,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
         </button>
     </div>
 </form>
-    <h2 class="text-2xl font-bold mb-4">Registro de Clientes</h2>
+<h2 class="text-2xl font-bold mb-4">Registro de Clientes</h2>
 
-    <form id="clientForm" class="bg-card p-4 rounded space-y-4">
-        <input type="text" id="nombre" placeholder="Nombre" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="text" id="apellido" placeholder="Apellido" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="number" id="numero" placeholder="Número de teléfono. Ej: 8095730808" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="email" id="correo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-800 rounded">
-        <input type="text" id="direccion" placeholder="Dirección, donde vive ?" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="number" id="monto" placeholder="Monto del préstamo" class="w-full p-2 bg-gray-800 rounded" required>
-        <input type="number" id="cuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-800 rounded" required min="1" max="12">
-    
-        <!-- Nuevo campo: Interés por mora -->
-        <input type="number" id="interesMora" placeholder="Interés de prestamos (%)" class="w-full p-2 bg-gray-800 rounded" required min="0">
-    
-        <!-- Nuevo campo: Frecuencia de cobro -->
-        <select id="frecuenciaCobro" class="w-full p-2 bg-gray-800 rounded" required>
-            <option value="" disabled selected>Selecciona la frecuencia de cobro</option>
-            <option value="diario">Diario</option>
-            <option value="semanal">Semanal</option>
-            <option value="quincenal">Quincenal</option>
-            <option value="mensual">Mensual</option>
-        </select>
-    
-        <select id="ruta" class="w-full p-2 bg-gray-800 rounded" required>
-            <option value="" disabled selected>Selecciona una ruta</option>
-            <option value="">Selecciona una ruta</option>
-        </select>
-    
-        <textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded" required></textarea>
-        <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Registrar Cliente</button>
+<form id="clientForm" class="bg-card p-4 rounded space-y-4">
+<!-- Nombre y Apellido -->
+<input type="text" id="nombre" placeholder="Nombre" class="w-full p-2 bg-gray-800 rounded" required>
+<input type="text" id="apellido" placeholder="Apellido" class="w-full p-2 bg-gray-800 rounded" required>
+
+<!-- Número de teléfono y correo -->
+<input type="number" id="numero" placeholder="Número de teléfono. Ej: 8095730808" class="w-full p-2 bg-gray-800 rounded" required>
+<input type="email" id="correo" placeholder="Correo electrónico (opcional)" class="w-full p-2 bg-gray-800 rounded">
+
+<!-- Dirección -->
+<input type="text" id="direccion" placeholder="Dirección, donde vive?" class="w-full p-2 bg-gray-800 rounded" required>
+
+<!-- Tipo de documento de identidad -->
+<select id="tipoDocumento" class="w-full p-2 bg-gray-800 rounded" required>
+    <option value="" disabled selected>Selecciona el tipo de documento</option>
+    <option value="cedula">Cédula</option>
+    <option value="pasaporte">Pasaporte</option>
+</select>
+
+<!-- Número de documento -->
+<input type="text" id="documento" placeholder="Número de Cédula/Pasaporte" class="w-full p-2 bg-gray-800 rounded" required>
+
+<!-- Datos laborales -->
+<input type="text" id="lugarTrabajo" placeholder="Lugar de trabajo" class="w-full p-2 bg-gray-800 rounded" required>
+<input type="number" id="ingresos" placeholder="Ingresos mensuales" class="w-full p-2 bg-gray-800 rounded" required min="0">
+
+<!-- Datos del préstamo -->
+<input type="number" id="monto" placeholder="Monto del préstamo" class="w-full p-2 bg-gray-800 rounded" required>
+<input type="number" id="cuotas" placeholder="Número de cuotas (máx. 12)" class="w-full p-2 bg-gray-800 rounded" required min="1" max="12">
+<input type="number" id="interesMora" placeholder="Interés de préstamos (%)" class="w-full p-2 bg-gray-800 rounded" required min="0">
+
+<!-- Frecuencia de cobro -->
+<select id="frecuenciaCobro" class="w-full p-2 bg-gray-800 rounded" required>
+    <option value="" disabled selected>Selecciona la frecuencia de cobro</option>
+    <option value="diario">Diario</option>
+    <option value="semanal">Semanal</option>
+    <option value="quincenal">Quincenal</option>
+    <option value="mensual">Mensual</option>
+</select>
+
+<!-- Ruta -->
+<select id="ruta" class="w-full p-2 bg-gray-800 rounded" required>
+    <option value="" disabled selected>Selecciona una ruta</option>
+    <option value="ruta1">Ruta 1</option>
+    <option value="ruta2">Ruta 2</option>
+    <option value="ruta3">Ruta 3</option>
+</select>
+
+<!-- Referencias personales (opcional) -->
+<textarea id="referencias" placeholder="Referencias personales" required class="w-full p-2 bg-gray-800 rounded"></textarea>
+
+<!-- Mensaje adicional -->
+<textarea id="mensaje" placeholder="Mensaje" class="w-full p-2 bg-gray-800 rounded" required></textarea>
+
+<!-- Botón de enviar -->
+<button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+    Registrar Cliente
+    </button>
     </form>
     
                 
@@ -657,6 +711,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
         © 2025 Inversiones P&P Marte. Todos los derechos reservados.<br>
         By: Josian Viñas & Felix Mendoza
     </footer>
+    <script>
+    let currentDate;
+
+    // Cargar la fecha desde localStorage al cargar la página
+    function loadDate() {
+        const savedDate = localStorage.getItem('currentDate');
+
+        if (savedDate) {
+            currentDate = new Date(savedDate);
+        } else {
+            currentDate = new Date(); // Si no hay fecha guardada, usar la fecha actual
+        }
+
+        updateDisplayDate();
+    }
+
+    function updateDisplayDate() {
+        const dateElement = document.getElementById('currentDate');
+        const closureDateElement = document.getElementById('currentClosureDate');
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        dateElement.textContent = `Fecha Actual: ${currentDate.toLocaleDateString('es-ES', options)}`;
+        closureDateElement.textContent = `Fecha de cierre: ${currentDate.toLocaleDateString('es-ES', options)}`;
+    }
+
+    function closeDay() {
+        currentDate.setDate(currentDate.getDate() + 1); // Avanzar al siguiente día
+        localStorage.setItem('currentDate', currentDate.toISOString()); // Guardar la nueva fecha en localStorage
+        alert(`Día cerrado correctamente. La nueva fecha es: ${currentDate.toLocaleDateString('es-ES')}`);
+        updateDisplayDate(); // Actualizar la fecha de cierre
+    }
+
+    document.getElementById('closeDayButton').addEventListener('click', closeDay);
+
+    // Inicializa la sección de cierre de día al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDate(); // Cargar la fecha desde localStorage
+    });
+</script>
+
     <script src="funciones.js"></script>
     <script src="calculadora.js"></script>
 </body>
