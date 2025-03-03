@@ -78,10 +78,171 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('historial-prestamos')">Historial de Préstamos / Fact</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('analisis-riesgo')">Análisis de Riesgo</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('prestamos-calculadora')">EMI Calculadora</button>
+                <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('contratos')">Apartado de Contratos</button>
                 <button class="w-full text-left p-2 text-gray-300 hover:bg-gray-800 hover:text-white rounded transition-all" onclick="showSection('closureSection')">Cierre del Dia</button>
                
             </nav>
         </aside>
+
+        <div id="contratos" class="section hidden">
+    <h2 class="text-2xl font-bold mb-4">Gestión de Contratos</h2>
+    
+    <!-- Formulario de Contrato -->
+    <div class="bg-card p-4 rounded">
+        <form id="contratoForm" class="space-y-6">
+            <!-- Datos del Prestamista -->
+            <div class="bg-opacity-50 p-4 rounded border">
+                <h3 class="text-lg font-bold mb-2">Datos del Prestamista</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1">Nombre o Razón Social</label>
+                        <input type="text" id="nombrePrestamista" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">DNI/RFC</label>
+                        <input type="text" id="dniPrestamista" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Dirección</label>
+                        <input type="text" id="direccionPrestamista" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Teléfono</label>
+                        <input type="tel" id="telefonoPrestamista" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos del Cliente (Prestatario) -->
+            <div class="bg-opacity-50 p-4 rounded border">
+                <h3 class="text-lg font-bold mb-2">Datos del Cliente (Prestatario)</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1">Nombre Completo</label>
+                        <input type="text" id="nombreCliente" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">DNI/RFC</label>
+                        <input type="text" id="dniCliente" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Dirección</label>
+                        <input type="text" id="direccionCliente" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Teléfono</label>
+                        <input type="tel" id="telefonoCliente" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Email</label>
+                        <input type="email" id="emailCliente" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Ocupación</label>
+                        <input type="text" id="ocupacionCliente" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalles del Préstamo -->
+            <div class="bg-opacity-50 p-4 rounded border">
+                <h3 class="text-lg font-bold mb-2">Detalles del Préstamo</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block mb-1">Monto del Préstamo ($)</label>
+                        <input type="number" id="montoPrestamo" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Tasa de Interés Anual (%)</label>
+                        <input type="number" id="interesPrestamo" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Plazo (meses)</label>
+                        <input type="number" id="plazoPrestamo" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Método de Pago</label>
+                        <select id="metodoPago" class="w-full p-2 border bg-black text-white border-white" required>
+                            <option value="mensual">Mensual</option>
+                            <option value="quincenal">Quincenal</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="diario">Diario</option>
+                            <option value="anual">Anual</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Fecha de Inicio</label>
+                        <input type="date" id="fechaInicio" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Día de Pago</label>
+                        <input type="number" id="diaPago" min="1" max="31" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Garantías y Condiciones -->
+            <div class="bg-opacity-50 p-4 rounded border">
+                <h3 class="text-lg font-bold mb-2">Garantías y Condiciones</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block mb-1">Garantías (opcional)</label>
+                        <textarea id="garantias" rows="3" class="w-full p-2 border bg-black text-white border-white"></textarea>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Penalización por Mora (%)</label>
+                        <input type="number" id="penalizacionMora" class="w-full p-2 border bg-black text-white border-white" value="5" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Condiciones Especiales (opcional)</label>
+                        <textarea id="condicionesEspeciales" rows="3" class="w-full p-2 border bg-black text-white border-white"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referencias -->
+            <div class="bg-opacity-50 p-4 rounded border">
+                <h3 class="text-lg font-bold mb-2">Referencias del Cliente</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1">Nombre Referencia 1</label>
+                        <input type="text" id="nombreRef1" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Teléfono Referencia 1</label>
+                        <input type="tel" id="telefonoRef1" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Nombre Referencia 2</label>
+                        <input type="text" id="nombreRef2" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Teléfono Referencia 2</label>
+                        <input type="tel" id="telefonoRef2" class="w-full p-2 border bg-black text-white border-white" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <button type="reset" class="px-4 py-2 bg-gray-600 text-white rounded">Limpiar</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Generar Contrato</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal del Contrato -->
+    <div id="modalContrato" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
+            <button id="cerrarModal" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+            <div id="contenidoContrato" class="text-black"></div>
+            <div class="mt-6 flex justify-end gap-4">
+                <button id="imprimirContrato" class="px-4 py-2 bg-blue-600 text-white rounded">Imprimir Contrato</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        
 
         <div id="prestamos-calculadora" class="section hidden max-w-6xl mx-auto p-6 bg-gray-900 text-white">
             <h2 class="text-3xl font-bold mb-8 text-center text-blue-400">Calculadora de Préstamos</h2>
@@ -752,6 +913,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($data["accion"]) && $data["acc
 
     <script src="funciones.js"></script>
     <script src="calculadora.js"></script>
+    <script src="contratos.js"></script>
 </body>
 </html>
 

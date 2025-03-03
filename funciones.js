@@ -52,6 +52,13 @@ let configuracionRecordatorios = JSON.parse(localStorage.getItem('configuracionR
                       case 'closureSection':
                         renderClients();
                       break;
+                      case 'contratos':
+                        renderClients();
+                      break;
+                      
+
+                      
+                      
                       
             }
         }
@@ -1638,6 +1645,9 @@ function CerrarSession()
         });
     });
 }
+
+
+
 
 // ==========================
 // ACTUALIZAR INFORMACIÓN CADA MINUTO
